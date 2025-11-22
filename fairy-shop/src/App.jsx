@@ -37,7 +37,7 @@ function App() {
 
   return (
     <div className="min-h-screen overflow-hidden">
-      <AnimatedBackground />
+      <AnimatedBackground themeEmojis={currentTheme.emojis} />
 
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
 

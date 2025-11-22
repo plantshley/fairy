@@ -25,32 +25,30 @@ const Sparkle = ({ delay = 0, x, y }) => {
   );
 };
 
-const Cloud = ({ delay = 0, x, y, size = 60 }) => {
+const Cloud = ({ delay = 0, x, y, emoji }) => {
   return (
     <motion.div
-      className="absolute opacity-30"
+      className="absolute text-2xl opacity-30"
       style={{
         left: `${x}%`,
         top: `${y}%`,
-        fontSize: `${size}px`,
       }}
       animate={{
-        x: [0, 20, 0],
-        y: [0, -10, 0],
+        y: [0, -20, 0],
       }}
       transition={{
-        duration: 8,
+        duration: 4,
         repeat: Infinity,
         delay,
         ease: 'easeInOut',
       }}
     >
-      ☁️
+      {emoji}
     </motion.div>
   );
 };
 
-const Heart = ({ delay = 0, x, y }) => {
+const Heart = ({ delay = 0, x, y, emoji }) => {
   return (
     <motion.div
       className="absolute text-2xl"
@@ -70,12 +68,12 @@ const Heart = ({ delay = 0, x, y }) => {
         ease: 'easeInOut',
       }}
     >
-      💖
+      {emoji}
     </motion.div>
   );
 };
 
-export const AnimatedBackground = () => {
+export const AnimatedBackground = ({ themeEmojis = ['💖', '🌸', '✨', '☁️', '🦋', '💗'] }) => {
   const [sparkles, setSparkles] = useState([]);
   const [clouds, setClouds] = useState([]);
   const [hearts, setHearts] = useState([]);
@@ -95,8 +93,8 @@ export const AnimatedBackground = () => {
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 80,
-      size: 40 + Math.random() * 40,
       delay: Math.random() * 3,
+      emoji: themeEmojis[i % themeEmojis.length],
     }));
     setClouds(newClouds);
 
@@ -106,9 +104,10 @@ export const AnimatedBackground = () => {
       x: Math.random() * 100,
       y: Math.random() * 100,
       delay: Math.random() * 2,
+      emoji: themeEmojis[(i + 3) % themeEmojis.length],
     }));
     setHearts(newHearts);
-  }, []);
+  }, [themeEmojis]);
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden animated-gradient-bg">
@@ -116,10 +115,10 @@ export const AnimatedBackground = () => {
         <Sparkle key={sparkle.id} x={sparkle.x} y={sparkle.y} delay={sparkle.delay} />
       ))}
       {clouds.map((cloud) => (
-        <Cloud key={cloud.id} x={cloud.x} y={cloud.y} size={cloud.size} delay={cloud.delay} />
+        <Cloud key={cloud.id} x={cloud.x} y={cloud.y} delay={cloud.delay} emoji={cloud.emoji} />
       ))}
       {hearts.map((heart) => (
-        <Heart key={heart.id} x={heart.x} y={heart.y} delay={heart.delay} />
+        <Heart key={heart.id} x={heart.x} y={heart.y} delay={heart.delay} emoji={heart.emoji} />
       ))}
     </div>
   );
