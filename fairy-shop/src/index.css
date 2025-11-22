@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalnia+Glaze:wght@100..700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Twinkle Fairy Dream Theme */
+  --bg-gradient-start: #ffc4e1;
+  --bg-gradient-mid: #d4a5f5;
+  --bg-gradient-end: #b5d3ff;
+  --accent-primary: #ff9dda;
+  --accent-secondary: #c5a3ff;
+  --text-primary: #8b4f8a;
+  --text-secondary: #9d6b9e;
+  --sparkle-color: #ffe0f0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'JetBrains Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .animated-gradient-bg {
+    background: var(--rainbow-gradient, linear-gradient(
+      135deg,
+      var(--bg-gradient-start),
+      var(--bg-gradient-mid),
+      var(--bg-gradient-end),
+      var(--bg-gradient-start)
+    ));
+    background-size: 400% 400%;
+    animation: gradient 15s ease-in-out infinite;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

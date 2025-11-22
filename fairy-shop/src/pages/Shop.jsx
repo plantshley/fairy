@@ -1,0 +1,50 @@
+import { motion } from 'framer-motion';
+
+export const Shop = () => {
+  return (
+    <motion.div
+      className="w-full h-full flex flex-col items-center justify-center p-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+    >
+      <motion.h1
+        className="font-kalnia text-6xl mb-4 gradient-text text-center"
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
+        Shop 🛍️ ✨
+      </motion.h1>
+
+      <p className="text-center mb-8 text-lg" style={{ color: 'var(--text-secondary)' }}>
+        ˚ ༘♡ Browse my crochet creations ⋆˚✿˖°
+      </p>
+
+      {/* Ko-fi Shop Embed */}
+      <motion.div
+        className="w-full max-w-5xl bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden"
+        style={{ height: '80vh' }}
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <iframe
+          id="kofiframe"
+          src="https://ko-fi.com/kirametki/shop"
+          style={{
+            border: 'none',
+            width: '100%',
+            height: '100%',
+          }}
+          title="Ko-fi Shop"
+        />
+      </motion.div>
+
+      <p className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+        Made with love 💖 Thank you for supporting my craft! 🌸
+      </p>
+    </motion.div>
+  );
+};
