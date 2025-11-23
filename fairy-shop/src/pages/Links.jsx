@@ -21,16 +21,16 @@ export const Links = () => {
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-6xl mb-4 gradient-text text-center"
+        className="font-kalnia text-4xl mb-4 gradient-text text-center"
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        Find Me Everywhere 🔗 ✨
+        ˚ ༘♡ ⋆ links ⋆˚✿˖°
       </motion.h1>
 
-      <p className="text-center mb-12 text-lg" style={{ color: 'var(--text-secondary)' }}>
-        ˗ˏˋ ★ Connect with me ★ ˎˊ˗
+      <p className="text-center mb-12 text-base" style={{ color: 'var(--text-secondary)' }}>
+        connect with me across the web
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl w-full">

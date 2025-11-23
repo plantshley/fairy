@@ -10,16 +10,16 @@ export const Shop = () => {
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-6xl mb-4 gradient-text text-center"
+        className="font-kalnia text-4xl mb-4 gradient-text text-center"
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        Shop 🛍️ ✨
+        ˚ ༘♡ ⋆ shop ⋆˚✿˖°
       </motion.h1>
 
-      <p className="text-center mb-8 text-lg" style={{ color: 'var(--text-secondary)' }}>
-        ˚ ༘♡ Browse my crochet creations ⋆˚✿˖°
+      <p className="text-center mb-8 text-base" style={{ color: 'var(--text-secondary)' }}>
+        ˚ ༘♡ browse my crochet creatures ⋆˚✿˖°
       </p>
 
       {/* Ko-fi Shop Embed */}
@@ -43,7 +43,7 @@ export const Shop = () => {
       </motion.div>
 
       <p className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
-        Made with love 💖 Thank you for supporting my craft! 🌸
+        💞 handmade with love & care 💞
       </p>
     </motion.div>
   );

@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { Navigation } from './components/Navigation';
 import { ThemeSelector } from './components/ThemeSelector';
+import { CursorSparkles } from './components/CursorSparkles';
 import { Home } from './pages/Home';
 import { Shop } from './pages/Shop';
 import { Links } from './pages/Links';
@@ -38,6 +39,7 @@ function App() {
   return (
     <div className="min-h-screen overflow-hidden">
       <AnimatedBackground themeEmojis={currentTheme.emojis} />
+      <CursorSparkles currentTheme={currentTheme} />
 
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
 

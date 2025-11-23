@@ -10,16 +10,16 @@ export const BuildYourOwn = () => {
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-6xl mb-4 gradient-text text-center"
+        className="font-kalnia text-4xl mb-4 gradient-text text-center"
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        Build Your Own 🧶 ✨
+        ˚ ༘♡ ⋆ build your own ⋆˚✿˖°
       </motion.h1>
 
-      <p className="text-center mb-12 text-lg" style={{ color: 'var(--text-secondary)' }}>
-        ˗ˏˋ ★ Design your dream plushie ★ ˎˊ˗
+      <p className="text-center mb-12 text-base" style={{ color: 'var(--text-secondary)' }}>
+        design your dream plushie
       </p>
 
       <motion.div

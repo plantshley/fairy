@@ -9,7 +9,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
     <>
       {/* Corner creature button */}
       <motion.button
-        className="fixed bottom-6 right-6 z-50 text-6xl cursor-pointer bg-transparent border-none"
+        className="fixed bottom-6 right-6 z-50 cursor-pointer bg-transparent border-none p-0"
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
@@ -25,7 +25,11 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
         }}
         title="Change theme"
       >
-        🧚‍♀️
+        <img
+          src="/wings-bun-png4.png"
+          alt="Change theme"
+          className="w-24 h-24 object-contain"
+        />
       </motion.button>
 
       {/* Theme selection modal */}
