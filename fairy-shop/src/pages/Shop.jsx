@@ -19,7 +19,7 @@ export const Shop = () => {
       </motion.h1>
 
       <p className="text-center mb-8 text-base" style={{ color: 'var(--text-secondary)' }}>
-        ˚ ༘♡ browse my crochet creatures ⋆˚✿˖°
+        ✧･ﾟ: *✧･ﾟ:* browse my crochet creatures *:･ﾟ✧*:･ﾟ✧
       </p>
 
       {/* Ko-fi Shop Embed */}

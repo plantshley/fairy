@@ -21,20 +21,19 @@ export const CursorSparkles = ({ currentTheme }) => {
 
     const COLOR_POOL = [];
     (function buildColorPool() {
-      // Use theme colors if available
+      // Use theme colors
       const themeColors = currentTheme ? [
         currentTheme.colors.accentPrimary,
         currentTheme.colors.accentSecondary,
         currentTheme.colors.sparkleColor,
       ] : [];
 
-      // Generate variations of theme colors
+      // Generate 100% theme colors
       for (let i = 0; i < 512; i++) {
-        if (themeColors.length > 0 && Math.random() > 0.3) {
-          // 70% chance to use theme colors
+        if (themeColors.length > 0) {
           COLOR_POOL.push(themeColors[Math.floor(Math.random() * themeColors.length)]);
         } else {
-          // 30% chance for pastel random colors
+          // Fallback to pastel random colors if no theme
           const c1 = 255;
           const c2 = Math.floor(Math.random() * 256);
           const c3 = Math.floor(Math.random() * (256 - c2 / 2));
