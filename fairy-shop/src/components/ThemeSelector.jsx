@@ -110,7 +110,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
                     color: 'white',
                   }}
                   onClick={() => setIsOpen(false)}
-                  whileHover={{ opacity: 0.6 }}
+                  whileHover={{ opacity: 0.8 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   Close ⋆˚✿˖°

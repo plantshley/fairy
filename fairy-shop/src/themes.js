@@ -16,7 +16,7 @@ export const themes = {
       heading: '"Kalnia Glaze", serif',
       body: '"JetBrains Mono", monospace',
     },
-    emojis: ['💖', '🌸', '✨', '☁️', '🦋', '💗'],
+    emojis: ['💖', '🌸', '✨', '🌷', '🦋', '🪻'],
     decorations: ['˚ ༘♡ ⋆', '✧˖°', '⋆˚✿˖°', '˗ˏˋ ★ ˎˊ˗'],
   },
   glitterGroovyRainbow: {
@@ -24,13 +24,13 @@ export const themes = {
     name: 'Glitter Groovy Rainbow',
     colors: {
       bgGradientStart: '#ff0080',
-      bgGradientMid: '#00ff00',
-      bgGradientEnd: '#0080ff',
+      bgGradientMid: '#00d4ff',
+      bgGradientEnd: '#aa66ff',
       accentPrimary: '#ff0080',
-      accentSecondary: '#ffff00',
+      accentSecondary: '#ffdd00',
       textPrimary: '#1a1a1a',
       textSecondary: '#4a4a4a',
-      sparkleColor: '#ffff00',
+      sparkleColor: '#ffdd00',
     },
     fonts: {
       heading: '"Kalnia Glaze", serif',

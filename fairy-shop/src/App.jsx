@@ -26,7 +26,7 @@ function App() {
       case 'shop':
         return <Shop key="shop" />;
       case 'links':
-        return <Links key="links" />;
+        return <Links key="links" currentTheme={currentTheme} />;
       case 'gallery':
         return <Gallery key="gallery" />;
       case 'build':
