@@ -36,7 +36,7 @@ export const themes = {
       heading: '"Kalnia Glaze", serif',
       body: '"JetBrains Mono", monospace',
     },
-    emojis: ['🌈', '✨', '💫', '⭐', '🎉', '💥'],
+    emojis: ['🌈', '✨', '💫', '⭐', '🎉', '🦄'],
     decorations: ['★', '☆', '✦', '✧', '❈', '✪'],
   },
   celestialAngelicClouds: {

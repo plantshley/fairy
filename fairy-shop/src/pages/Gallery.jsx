@@ -15,11 +15,11 @@ export const Gallery = () => {
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        ˚ ༘♡ ⋆ gallery ⋆˚✿˖°
+        ₊˚⊹♡ gallery ♡⊹˚₊
       </motion.h1>
 
       <p className="text-center mb-12 text-base" style={{ color: 'var(--text-secondary)' }}>
-        my creations & artwork
+        ⊹ creations & artwork ⊹
       </p>
 
       <motion.div

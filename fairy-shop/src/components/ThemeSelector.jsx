@@ -60,23 +60,23 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
               >
               <div className="relative">
                 {/* Decorative creature in corner */}
-                <div className="absolute -top-4 -right-4 text-4xl">✨</div>
+                <div className="absolute -top-4 -right-4 text-4xl"></div>
 
                 <h2 className="font-kalnia text-4xl mb-2 gradient-text text-center">
-                  Choose Your Magic ✨
+                  Choose Your Magic
                 </h2>
 
                 <p className="text-center text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-                  ˚ ༘♡ Select a theme ⋆˚
+                  ˚ ༘♡ Select a theme ♡⋆˚
                 </p>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {Object.values(themes).map((theme) => (
                     <motion.button
                       key={theme.id}
-                      className="w-full p-4 rounded-2xl border-2 transition-all text-left"
+                      className="w-full p-4 rounded-2xl transition-all overflow-hidden relative h-20 flex items-center justify-center"
                       style={{
-                        borderColor: currentTheme.id === theme.id ? theme.colors.accentPrimary : 'transparent',
+                        border: currentTheme.id === theme.id ? `3px solid ${theme.colors.accentPrimary}` : 'none',
                         background: theme.id === 'glitterGroovyRainbow'
                           ? 'linear-gradient(90deg, #ff3399, #ff9933, #ffdd00, #00d4ff, #5599ff, #aa66ff, #ff3399)'
                           : `linear-gradient(135deg, ${theme.colors.bgGradientStart}, ${theme.colors.bgGradientMid})`,
@@ -88,33 +88,33 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-semibold text-lg" style={{ color: theme.colors.textPrimary }}>
-                            {theme.name}
-                          </div>
-                          <div className="text-sm mt-1">
-                            {theme.emojis.join(' ')}
-                          </div>
+                      <div className="flex flex-col items-center justify-center gap-1 text-center">
+                        <div className="font-semibold text-base" style={{ color: theme.colors.textPrimary }}>
+                          {theme.name}
                         </div>
-                        {currentTheme.id === theme.id && (
-                          <span className="text-2xl">💖</span>
-                        )}
+                        <div className="text-base">
+                          {theme.emojis.join(' ')}
+                        </div>
                       </div>
+                      {currentTheme.id === theme.id && (
+                        <span className="absolute right-3 text-xl">💖</span>
+                      )}
                     </motion.button>
                   ))}
                 </div>
 
-                <button
+                <motion.button
                   className="mt-6 w-full py-2 px-4 rounded-full font-medium"
                   style={{
                     background: 'var(--accent-primary)',
                     color: 'white',
                   }}
                   onClick={() => setIsOpen(false)}
+                  whileHover={{ opacity: 0.6 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Close ⋆˚✿˖°
-                </button>
+                </motion.button>
               </div>
               </motion.div>
             </motion.div>

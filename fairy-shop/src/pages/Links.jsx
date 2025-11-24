@@ -26,11 +26,11 @@ export const Links = () => {
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        ˚ ༘♡ ⋆ links ⋆˚✿˖°
+        ⋆｡‧˚ʚ♡ɞ˚‧｡⋆ links ⋆｡‧˚ʚ♡ɞ˚‧｡⋆
       </motion.h1>
 
       <p className="text-center mb-12 text-base" style={{ color: 'var(--text-secondary)' }}>
-        connect with me across the web
+        ʚ♡ɞ connect with me across the web ʚ♡ɞ
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl w-full">

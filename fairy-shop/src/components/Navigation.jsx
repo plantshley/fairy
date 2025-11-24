@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 const tabs = [
   { id: 'home', label: 'Home', emoji: '🏠' },
-  { id: 'shop', label: 'Shop', emoji: '🛍️' },
+  { id: 'shop', label: 'Shop', emoji: '🧸' },
   { id: 'links', label: 'Links', emoji: '🔗' },
   { id: 'gallery', label: 'Gallery', emoji: '🎨' },
   { id: 'build', label: 'Build', emoji: '🧶' },
@@ -34,7 +34,7 @@ export const Navigation = ({ activeTab, onTabChange }) => {
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
               >
-                ✨
+                💕
               </motion.span>
             )}
           </motion.button>

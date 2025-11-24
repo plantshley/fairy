@@ -15,11 +15,11 @@ export const Shop = () => {
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        ˚ ༘♡ ⋆ shop ⋆˚✿˖°
+        ✧･ﾟ: *✧･ﾟ:* shop *:･ﾟ✧*:･ﾟ✧
       </motion.h1>
 
       <p className="text-center mb-8 text-base" style={{ color: 'var(--text-secondary)' }}>
-        ✧･ﾟ: *✧･ﾟ:* browse my crochet creatures *:･ﾟ✧*:･ﾟ✧
+        ･ﾟ✧ browse my crochet creatures ✧ﾟ･
       </p>
 
       {/* Ko-fi Shop Embed */}

@@ -15,11 +15,11 @@ export const BuildYourOwn = () => {
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        ˚ ༘♡ ⋆ build your own ⋆˚✿˖°
+        ˗ˏˋ ★ ˎˊ˗ build your own ˗ˏˋ ★ ˎˊ˗
       </motion.h1>
 
       <p className="text-center mb-12 text-base" style={{ color: 'var(--text-secondary)' }}>
-        design your dream plushie
+        ★ design your dream plushie ★
       </p>
 
       <motion.div

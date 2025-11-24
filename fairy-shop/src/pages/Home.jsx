@@ -163,7 +163,7 @@ export const Home = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
         >
-          ˗ˏˋ ★ Use the navigation on the left to explore and click the bunny to the right to customize the theme ★ ˎˊ˗
+          ˗ˏˋ ★ Use the navigation on the left to explore and click the friend to the right to customize the theme ★ ˎˊ˗
         </motion.p>
       </motion.div>
     </motion.div>
