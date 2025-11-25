@@ -24,6 +24,7 @@ export const themes = {
     name: 'Glitter Groovy Rainbow',
     colors: {
       bgGradientStart: '#ff0080',
+      bgGradientMid2: '#ffdd00',
       bgGradientMid: '#00d4ff',
       bgGradientEnd: '#aa66ff',
       accentPrimary: '#ff0080',

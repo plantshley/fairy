@@ -43,15 +43,14 @@ export const Links = ({ currentTheme }) => {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative group"
+            className={`relative group ${currentTheme?.id === 'glitterGroovyRainbow' ? 'rainbow-glow-card' : ''}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.98 }}
           >
             <motion.div
-              className="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl overflow-hidden h-32 w-full"
+              className="relative bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl overflow-hidden h-32 w-full"
               style={{
                 border: '3px solid transparent',
                 backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
@@ -59,6 +58,7 @@ export const Links = ({ currentTheme }) => {
                 backgroundClip: 'padding-box, border-box',
               }}
             >
+
               <div className="flex items-center gap-4 h-full">
                 <motion.div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"

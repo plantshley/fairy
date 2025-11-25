@@ -63,15 +63,72 @@ body {
 
 @keyframes sparkle {
   0%, 100% {
-    opacity: 0;
-    transform: scale(0) rotate(0deg);
+    opacity: 0.75;
+    transform: scale(0.9);
   }
   50% {
     opacity: 1;
-    transform: scale(1) rotate(180deg);
+    transform: scale(1);
   }
 }
 
 .animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.animate-sparkle-delay-1 {
+  animation: sparkle 2s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.animate-sparkle-delay-2 {
   animation: sparkle 2.5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.animate-sparkle-delay-3 {
+  animation: sparkle 2.5s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+@keyframes rainbow-glowing {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.rainbow-glow-card::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: linear-gradient(45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000);
+  background-size: 400%;
+  z-index: -1;
+  filter: blur(5px);
+  animation: rainbow-glowing 20s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  border-radius: 1.5rem;
+}
+
+.rainbow-glow-card:hover::before {
+  opacity: 1;
 }
