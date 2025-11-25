@@ -1,9 +1,39 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { themes } from '../themes';
 
 export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Preload all creature images on mount
+  useEffect(() => {
+    const imagesToPreload = [
+      '/heart-bright1.png',
+      '/cherry-bing-frootie1.png',
+      '/moon-custom1.png',
+      '/glacial-seas-dolphin1.png',
+    ];
+
+    imagesToPreload.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
+  const getModalCreature = () => {
+    switch (currentTheme?.id) {
+      case 'twinkleFairyDream':
+        return '/heart-bright1.png';
+      case 'glitterGroovyRainbow':
+        return '/cherry-bing-frootie1.png';
+      case 'celestialAngelicClouds':
+        return '/moon-custom1.png';
+      case 'crystalSeasideGarden':
+        return '/glacial-seas-dolphin1.png';
+      default:
+        return '/heart-bright1.png';
+    }
+  };
 
   return (
     <>
@@ -13,22 +43,21 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        animate={{
-          y: [0, -10, 0],
-        }}
-        transition={{
-          y: {
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          },
-        }}
         title="Change theme"
       >
-        <img
-          src="/wings-bun-png4.png"
+        <motion.img
+          src={getModalCreature()}
           alt="Change theme"
-          className="w-24 h-24 object-contain"
+          className="w-32 h-32 object-contain"
+          animate={{
+            y: [0, -8, 0],
+            rotate: [0, 5, -5, 0],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
         />
       </motion.button>
 
@@ -59,9 +88,6 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
                 onClick={(e) => e.stopPropagation()}
               >
               <div className="relative">
-                {/* Decorative creature in corner */}
-                <div className="absolute -top-4 -right-4 text-4xl"></div>
-
                 <h2 className="font-kalnia text-4xl mb-2 gradient-text text-center">
                   Choose Your Magic
                 </h2>
