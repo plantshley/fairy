@@ -1,6 +1,23 @@
 import { motion } from 'framer-motion';
 
-export const Home = () => {
+export const Home = ({ currentTheme }) => {
+  const getThemeEmojis = () => {
+    switch (currentTheme?.id) {
+      case 'twinkleFairyDream':
+        return ['🪻', '🦋', '🌷'];
+      case 'glitterGroovyRainbow':
+        return ['✨', '🌈', '🦄'];
+      case 'celestialAngelicClouds':
+        return ['🤍', '☁️', '🕊️'];
+      case 'crystalSeasideGarden':
+        return ['🫧', '🪸', '💎'];
+      default:
+        return ['🪻', '🦋', '🌷'];
+    }
+  };
+
+  const themeEmojis = getThemeEmojis();
+
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center justify-center p-8"
@@ -20,48 +37,45 @@ export const Home = () => {
           <motion.img
             src="/vday-birb-png1.png"
             alt="Valentine's bird"
-            className="w-24 h-24 object-contain"
+            className="w-28 h-28 object-contain"
             style={{ willChange: 'transform' }}
             animate={{
-              y: [0, -15, 0],
+              y: [0, -12, 0],
             }}
             transition={{
-              duration: 5,
+              duration: 2,
               repeat: Infinity,
-              ease: [0.42, 0, 0.58, 1],
-              times: [0, 0.5, 1],
-            }}
-          />
-          <motion.img
-            src="/snail5.png"
-            alt="Snail"
-            className="w-24 h-24 object-contain"
-            style={{ willChange: 'transform' }}
-            animate={{
-              y: [0, -15, 0],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: [0.42, 0, 0.58, 1],
-              times: [0, 0.5, 1],
-              delay: 0.3,
+              ease: 'linear',
             }}
           />
           <motion.img
             src="/scootaloo1.png"
             alt="Scootaloo"
+            className="w-28 h-28 object-contain"
+            style={{ willChange: 'transform' }}
+            animate={{
+              y: [0, -12, 0],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'linear',
+              delay: 0.67,
+            }}
+          />
+          <motion.img
+            src="/butterflies.png"
+            alt="Butterflies"
             className="w-24 h-24 object-contain"
             style={{ willChange: 'transform' }}
             animate={{
-              y: [0, -15, 0],
+              y: [0, -12, 0],
             }}
             transition={{
-              duration: 5,
+              duration: 2,
               repeat: Infinity,
-              ease: [0.42, 0, 0.58, 1],
-              times: [0, 0.5, 1],
-              delay: 0.6,
+              ease: 'linear',
+              delay: 1.33,
             }}
           />
         </div>
@@ -73,7 +87,7 @@ export const Home = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          kirametki ♡ fairykun
+          fairykun ♡ kirametki
         </motion.h1>
 
         {/* Subtitle */}
@@ -123,7 +137,7 @@ export const Home = () => {
               ease: 'easeInOut',
             }}
           >
-            🌈
+            {themeEmojis[0]}
           </motion.span>
           <motion.span
             animate={{
@@ -137,7 +151,7 @@ export const Home = () => {
               delay: 0.3,
             }}
           >
-            🎨
+            {themeEmojis[1]}
           </motion.span>
           <motion.span
             animate={{
@@ -151,7 +165,7 @@ export const Home = () => {
               delay: 0.6,
             }}
           >
-            💗
+            {themeEmojis[2]}
           </motion.span>
         </motion.div>
 

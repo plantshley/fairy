@@ -22,7 +22,7 @@ function App() {
   const renderPage = () => {
     switch (activeTab) {
       case 'home':
-        return <Home key="home" />;
+        return <Home key="home" currentTheme={currentTheme} />;
       case 'shop':
         return <Shop key="shop" />;
       case 'links':
@@ -32,7 +32,7 @@ function App() {
       case 'build':
         return <BuildYourOwn key="build" />;
       default:
-        return <Home key="home" />;
+        return <Home key="home" currentTheme={currentTheme} />;
     }
   };
 

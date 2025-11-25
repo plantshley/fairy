@@ -132,3 +132,50 @@ body {
 .rainbow-glow-card:hover::before {
   opacity: 1;
 }
+
+@keyframes fairy-sparkle {
+  0% {
+    transform: translate(0, 0) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(1) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.fairy-sparkle-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.fairy-sparkle-card::before,
+.fairy-sparkle-card::after {
+  content: '✨';
+  position: absolute;
+  font-size: 20px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.fairy-sparkle-card:hover::before {
+  animation: fairy-sparkle 1.5s ease-out infinite;
+  --tx: 30px;
+  --ty: -30px;
+  left: 20%;
+  top: 50%;
+}
+
+.fairy-sparkle-card:hover::after {
+  animation: fairy-sparkle 1.5s ease-out infinite 0.75s;
+  --tx: -30px;
+  --ty: -30px;
+  right: 20%;
+  top: 50%;
+}

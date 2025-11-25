@@ -15,15 +15,30 @@ const links = [
   { url: 'https://www.behance.net/gallery/73695003/Ashley-Geraets-Digital-Portfolio-%282015-present%29', label: 'Art Portfolio', emoji: '🎀', color: '#1769FF', subtitle: '2015 to present' },
 ];
 
-const LinkCard = ({ link, index, currentTheme, particlesReady }) => {
+const LinkCard = ({ link, index, currentTheme }) => {
+  const [particleState, setParticlesReady] = useState();
   const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    // Only initialize particles for themes that use them
+    const particleThemes = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden'];
+    if (!particleThemes.includes(currentTheme?.id)) return;
+
+    console.log('Initializing particles for card', index);
+    initParticlesEngine(async (engine) => {
+      await loadFull(engine);
+    }).then(() => {
+      console.log('Particles loaded for card', index);
+      setParticlesReady("loaded");
+    });
+  }, [currentTheme?.id, index]);
 
   const particleOptions = useMemo(() => ({
     key: `star-${link.url}`,
     name: "Star",
     particles: {
       number: {
-        value: 20,
+        value: 30,
         density: { enable: false },
       },
       color: {
@@ -39,8 +54,8 @@ const LinkCard = ({ link, index, currentTheme, particlesReady }) => {
         type: "star",
         options: { star: { sides: 4 } },
       },
-      opacity: { value: 0.8 },
-      size: { value: { min: 1, max: 4 } },
+      opacity: { value: 0.9 },
+      size: { value: { min: 2, max: 5 } },
       rotate: {
         value: { min: 0, max: 360 },
         enable: true,
@@ -70,14 +85,28 @@ const LinkCard = ({ link, index, currentTheme, particlesReady }) => {
     ],
     emitters: [
       {
-        autoPlay: isHovering,
+        autoPlay: true,
         fill: true,
         life: { wait: true },
-        rate: { quantity: 5, delay: 0.5 },
+        rate: { quantity: 8, delay: 0.4 },
         position: { x: 50, y: 50 },
       },
     ],
-  }), [isHovering, link.url, currentTheme]);
+  }), [link.url, currentTheme]);
+
+  const modifiedOptions = useMemo(() => {
+    return { ...particleOptions, autoPlay: isHovering };
+  }, [isHovering, particleOptions]);
+
+  const getCardClassName = () => {
+    const baseClass = 'relative group';
+    if (currentTheme?.id === 'glitterGroovyRainbow') {
+      return `${baseClass} rainbow-glow-card`;
+    }
+    return baseClass;
+  };
+
+  const shouldShowParticles = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden'].includes(currentTheme?.id);
 
   return (
     <motion.a
@@ -85,26 +114,29 @@ const LinkCard = ({ link, index, currentTheme, particlesReady }) => {
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`relative group ${currentTheme?.id === 'glitterGroovyRainbow' ? 'rainbow-glow-card' : ''}`}
+      className={getCardClassName()}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
+      whileHover={{ scale: 1.05, transition: { type: 'spring', stiffness: 400, damping: 25 } }}
       whileTap={{ scale: 0.98 }}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      {/* Particles for non-rainbow themes */}
-      {currentTheme?.id !== 'glitterGroovyRainbow' && !!particlesReady && (
+      {shouldShowParticles && !!particleState && (
         <Particles
           id={`particles-${index}`}
-          className={`pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity ${particlesReady === "ready" ? "group-hover:opacity-100" : ""}`}
-          particlesLoaded={async () => {}}
-          options={particleOptions}
+          className={`pointer-events-none absolute -bottom-8 -left-8 -right-8 -top-8 z-10 opacity-0 transition-opacity ${particleState === "ready" ? "group-hover:opacity-100" : ""}`}
+          particlesLoaded={async () => {
+            console.log('Particles ready for card', index);
+            setParticlesReady("ready");
+          }}
+          options={modifiedOptions}
         />
       )}
 
       <motion.div
-        className="relative bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl overflow-hidden h-32 w-full"
+        className="relative bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl h-32 w-full"
         style={{
           border: '3px solid transparent',
           backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
