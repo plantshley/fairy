@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Your Own Crochet Creature - Implementation Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kalnia+Glaze:wght@100..700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffd1dc 0%, #e0b0ff 50%, #ffc8dd 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #fff5f7 0%, #fef6fb 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ffb6f0 0%, #d4a5ff 50%, #ffccf9 100%);
+            padding: 50px 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-family: 'Kalnia Glaze', serif;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        h2 {
+            font-family: 'Kalnia Glaze', serif;
+            font-size: 32px;
+            color: #a855f7;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #ffccf9;
+            padding-bottom: 10px;
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        h3 {
+            font-family: 'Kalnia Glaze', serif;
+            font-size: 24px;
+            color: #c084fc;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .event-section {
+            background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 100%);
+            border-left: 5px solid #d946ef;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .event-section h3 {
+            margin-top: 0;
+            color: #86198f;
+        }
+
+        .parameter-list {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .parameter-list ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .parameter-list li {
+            padding: 12px;
+            margin: 8px 0;
+            background: linear-gradient(90deg, #fdf4ff 0%, #fef3f9 100%);
+            border-radius: 8px;
+            border-left: 4px solid #e879f9;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .parameter-list li strong {
+            color: #a21caf;
+            font-weight: 600;
+        }
+
+        .query-box {
+            background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+            border: 2px solid #fda4af;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border-left: 5px solid #fb923c;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .tip-box strong {
+            color: #ea580c;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+            color: #991b1b;
+        }
+
+        .priority-medium {
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+            color: #9a3412;
+        }
+
+        .priority-low {
+            background: linear-gradient(135deg, #d9f99d 0%, #bef264 100%);
+            color: #365314;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #e9d5ff 0%, #f3e8ff 100%);
+            color: #6b21a8;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #fefefe;
+        }
+
+        .code-inline {
+            background: #fce7f3;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #be185d;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 100%);
+            padding: 30px 40px;
+            text-align: center;
+            color: #86198f;
+            font-size: 14px;
+        }
+
+        .phase-header {
+            background: linear-gradient(90deg, #f9a8d4 0%, #d8b4fe 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 25px 0 15px 0;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        ol {
+            padding-left: 25px;
+        }
+
+        ol li {
+            margin: 10px 0;
+            padding-left: 10px;
+        }
+
+        .file-format-box {
+            background: linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 100%);
+            border: 2px solid #93c5fd;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .file-format-box h4 {
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Build Your Own Crochet Creature ✨</h1>
+            <p>Interactive Canvas Builder - Implementation Guide</p>
+            <p style="font-size: 14px; margin-top: 10px; opacity: 0.9;">React-Konva Implementation • Desktop & Mobile Support</p>
+        </div>
+
+        <div class="content">
+            <h2>🎯 Overview</h2>
+            <p>
+                This guide documents the implementation of an interactive drag-and-drop canvas builder that allows users to create custom crochet creatures.
+                The feature supports both desktop and mobile devices, with intuitive touch controls and gesture support.
+            </p>
+
+            <div class="event-section">
+                <h3>Key Features</h3>
+                <ul style="padding-left: 20px; margin-top: 15px;">
+                    <li style="margin: 8px 0;">📦 <strong>Body Type Selection</strong> - Choose from predefined body shapes that appear in canvas center</li>
+                    <li style="margin: 8px 0;">🎨 <strong>Category Toggles</strong> - Switch between accessories, limbs, eyes, nose, mouth, and more</li>
+                    <li style="margin: 8px 0;">🖱️ <strong>Drag & Drop</strong> - Freely position objects onto the canvas</li>
+                    <li style="margin: 8px 0;">🔄 <strong>Resize & Rotate</strong> - Transform objects with handles and gestures</li>
+                    <li style="margin: 8px 0;">🌈 <strong>Color Picker</strong> - Fill body and object shapes with HTML color picker</li>
+                    <li style="margin: 8px 0;">✏️ <strong>Free Draw Mode</strong> - Draw directly on canvas with finger or mouse</li>
+                    <li style="margin: 8px 0;">📱 <strong>Touch Support</strong> - Full mobile gesture support (pinch, drag, rotate)</li>
+                </ul>
+            </div>
+
+            <h2>📚 Technology Stack</h2>
+
+            <div class="event-section">
+                <h3>React-Konva <span class="priority-badge priority-high">Recommended</span></h3>
+                <p>
+                    React-Konva is the official React wrapper for Konva.js, a powerful 2D canvas library. It provides declarative React components
+                    that map directly to Konva objects, making canvas manipulation intuitive for React developers.
+                </p>
+            </div>
+
+            <h3>Why React-Konva?</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>React-Konva</th>
+                        <th>Fabric.js</th>
+                        <th>HTML5 Canvas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>React Integration</strong></td>
+                        <td>✅ Native wrapper</td>
+                        <td>⚠️ Manual integration</td>
+                        <td>⚠️ Imperative API</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Touch/Mobile Support</strong></td>
+                        <td>✅ Built-in multi-touch</td>
+                        <td>✅ Good support</td>
+                        <td>❌ Manual implementation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Drag & Drop</strong></td>
+                        <td>✅ <code>draggable={true}</code></td>
+                        <td>✅ Built-in</td>
+                        <td>❌ Complex to implement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Resize/Rotate</strong></td>
+                        <td>✅ Transformer component</td>
+                        <td>✅ Built-in controls</td>
+                        <td>❌ Very complex</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Free Drawing</strong></td>
+                        <td>✅ Line component + events</td>
+                        <td>✅ Freehand drawing mode</td>
+                        <td>⚠️ Manual path tracking</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SVG Color Filling</strong></td>
+                        <td>✅ Fill attribute</td>
+                        <td>✅ Fill property</td>
+                        <td>⚠️ Complex with SVG</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Learning Curve</strong></td>
+                        <td>✅ Familiar React patterns</td>
+                        <td>⚠️ Different paradigm</td>
+                        <td>❌ Low-level API</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tip-box">
+                <strong>💡 Recommendation:</strong>
+                React-Konva is the clear winner for this React project. It provides the best developer experience, native mobile support,
+                and all required features out of the box. The declarative API fits naturally with React's component model.
+            </div>
+
+            <h2>🗂️ File Format Requirements</h2>
+
+            <div class="file-format-box">
+                <h4>✅ Recommended: SVG with Transparent Background</h4>
+                <p><strong>Why SVG?</strong></p>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>Dynamic color filling via <code class="code-inline">fill</code> attribute</li>
+                    <li>Infinite scalability without quality loss</li>
+                    <li>Smaller file sizes than PNG for simple shapes</li>
+                    <li>Easy to parse and manipulate paths</li>
+                </ul>
+            </div>
+
+            <div class="file-format-box">
+                <h4>⚠️ PNG Alternative</h4>
+                <p><strong>If using PNG:</strong></p>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>Must have transparent background (not solid white)</li>
+                    <li>Color filling is limited - requires canvas pixel manipulation or color filters</li>
+                    <li>Works best for textures and detailed illustrations that don't need recoloring</li>
+                    <li>Larger file sizes at high resolution</li>
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <strong>🎨 Color Filling Implementation:</strong>
+                For dynamic color changes, SVG is strongly recommended. With SVG, you can change the <code class="code-inline">fill</code>
+                property directly. With PNG, you'd need to use canvas filters (<code class="code-inline">globalCompositeOperation</code>)
+                or WebGL shaders, which is significantly more complex.
+            </div>
+
+            <h3>File Preparation Checklist</h3>
+            <div class="parameter-list">
+                <ul>
+                    <li><strong>Format:</strong> SVG files with transparent/no background fill</li>
+                    <li><strong>Paths:</strong> Ensure all shapes use <code class="code-inline">&lt;path&gt;</code> or <code class="code-inline">&lt;polygon&gt;</code> elements</li>
+                    <li><strong>Fill Attribute:</strong> Set default fill color or leave empty for dynamic filling</li>
+                    <li><strong>Viewbox:</strong> Include proper viewBox attribute for scaling</li>
+                    <li><strong>Organization:</strong> Group related paths in <code class="code-inline">&lt;g&gt;</code> elements</li>
+                    <li><strong>Naming:</strong> Use descriptive IDs for body parts (e.g., "body-bear", "limb-arm-left")</li>
+                </ul>
+            </div>
+
+            <h2>🏗️ Implementation Architecture</h2>
+
+            <div class="event-section">
+                <h3>Component Structure</h3>
+                <div class="query-box">BuildYourOwn.jsx (Main Component)
+├── Canvas Area (Stage + Layer)
+│   ├── Body Shape (Image/Shape)
+│   ├── Placed Objects (Draggable Group)
+│   │   ├── Object 1 (Image/Shape)
+│   │   ├── Object 2 (Image/Shape)
+│   │   └── ...
+│   ├── Transformer (for resize/rotate)
+│   └── Free Draw Lines (Line components)
+├── Control Panel
+│   ├── Body Type Selector
+│   ├── Category Toggles
+│   ├── Object Palette
+│   ├── Color Picker
+│   └── Free Draw Toggle
+└── Export/Save Controls</div>
+            </div>
+
+            <h3>Core Data Structure</h3>
+            <div class="query-box">const [selectedBody, setSelectedBody] = useState(null);
+const [activeCategory, setActiveCategory] = useState('accessories');
+const [placedObjects, setPlacedObjects] = useState([]);
+const [selectedId, setSelectedId] = useState(null);
+const [currentColor, setCurrentColor] = useState('#ff69b4');
+const [isDrawing, setIsDrawing] = useState(false);
+const [freeDrawMode, setFreeDrawMode] = useState(false);
+const [lines, setLines] = useState([]);</div>
+
+            <h2>📋 Implementation Phases</h2>
+
+            <div class="phase-header">Phase 1: Setup & Canvas Foundation</div>
+            <ol>
+                <li>Install dependencies: <code class="code-inline">npm install react-konva konva</code></li>
+                <li>Create BuildYourOwn.jsx component structure</li>
+                <li>Set up Stage and Layer components with proper dimensions</li>
+                <li>Implement responsive canvas sizing for mobile</li>
+            </ol>
+
+            <div class="phase-header">Phase 2: Body Selection System</div>
+            <ol start="5">
+                <li>Create body type data structure with SVG paths</li>
+                <li>Build body selector UI with thumbnail previews</li>
+                <li>Implement body placement in canvas center</li>
+                <li>Add color picker that updates body fill color</li>
+            </ol>
+
+            <div class="phase-header">Phase 3: Object Palette & Categories</div>
+            <ol start="9">
+                <li>Create category system (accessories, limbs, eyes, etc.)</li>
+                <li>Build toggle UI for category switching</li>
+                <li>Implement object palette with draggable thumbnails</li>
+                <li>Add drag-from-palette-to-canvas functionality</li>
+            </ol>
+
+            <div class="phase-header">Phase 4: Transform Controls</div>
+            <ol start="13">
+                <li>Implement object selection on canvas click</li>
+                <li>Add Transformer component for resize handles</li>
+                <li>Enable rotation with Transformer</li>
+                <li>Add mobile touch gestures (pinch-to-zoom, two-finger rotate)</li>
+            </ol>
+
+            <div class="phase-header">Phase 5: Color System</div>
+            <ol start="17">
+                <li>Integrate HTML color picker input</li>
+                <li>Implement color fill for selected object</li>
+                <li>Add color swatch history/palette</li>
+            </ol>
+
+            <div class="phase-header">Phase 6: Free Draw Mode</div>
+            <ol start="20">
+                <li>Create free draw toggle button</li>
+                <li>Implement mouse/touch drawing with Line component</li>
+                <li>Add brush size control</li>
+                <li>Enable eraser mode</li>
+            </ol>
+
+            <div class="phase-header">Phase 7: Polish & Export</div>
+            <ol start="24">
+                <li>Add layer ordering (bring to front/send to back)</li>
+                <li>Implement undo/redo functionality</li>
+                <li>Add canvas export as PNG image</li>
+                <li>Create save/load creature design feature</li>
+                <li>Mobile optimization and testing</li>
+            </ol>
+
+            <h2>💻 Key Code Patterns</h2>
+
+            <h3>1. Basic Stage Setup</h3>
+            <div class="query-box">import { Stage, Layer, Image, Transformer } from 'react-konva';
+import useImage from 'use-image';
+
+function BuildYourOwn() {
+  const stageRef = useRef(null);
+  const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
+
+  return (
+    &lt;Stage
+      ref={stageRef}
+      width={stageSize.width}
+      height={stageSize.height}
+    &gt;
+      &lt;Layer&gt;
+        {/* Canvas content here */}
+      &lt;/Layer&gt;
+    &lt;/Stage&gt;
+  );
+}</div>
+
+            <h3>2. Draggable Object</h3>
+            <div class="query-box">&lt;Image
+  image={imageObj}
+  x={object.x}
+  y={object.y}
+  draggable={true}
+  fill={object.color}
+  onDragEnd={(e) => {
+    updateObjectPosition(object.id, e.target.x(), e.target.y());
+  }}
+  onClick={() => setSelectedId(object.id)}
+/&gt;</div>
+
+            <h3>3. Color Picker Integration</h3>
+            <div class="query-box">&lt;input
+  type="color"
+  value={currentColor}
+  onChange={(e) => {
+    setCurrentColor(e.target.value);
+    if (selectedId) {
+      updateObjectColor(selectedId, e.target.value);
+    }
+  }}
+/&gt;</div>
+
+            <h3>4. Free Drawing Implementation</h3>
+            <div class="query-box">const handleMouseDown = (e) => {
+  if (!freeDrawMode) return;
+  setIsDrawing(true);
+  const pos = e.target.getStage().getPointerPosition();
+  setLines([...lines, { points: [pos.x, pos.y], color: currentColor }]);
+};
+
+const handleMouseMove = (e) => {
+  if (!isDrawing) return;
+  const stage = e.target.getStage();
+  const point = stage.getPointerPosition();
+  let lastLine = lines[lines.length - 1];
+  lastLine.points = lastLine.points.concat([point.x, point.y]);
+  setLines([...lines.slice(0, -1), lastLine]);
+};
+
+// In render:
+{lines.map((line, i) => (
+  &lt;Line
+    key={i}
+    points={line.points}
+    stroke={line.color}
+    strokeWidth={5}
+    tension={0.5}
+    lineCap="round"
+    globalCompositeOperation="source-over"
+  /&gt;
+))}</div>
+
+            <h3>5. Transformer for Resize/Rotate</h3>
+            <div class="query-box">const trRef = useRef();
+const shapeRef = useRef();
+
+useEffect(() => {
+  if (selectedId) {
+    trRef.current.nodes([shapeRef.current]);
+    trRef.current.getLayer().batchDraw();
+  }
+}, [selectedId]);
+
+return (
+  &lt;&gt;
+    &lt;Image ref={shapeRef} {...shapeProps} /&gt;
+    &lt;Transformer
+      ref={trRef}
+      boundBoxFunc={(oldBox, newBox) => {
+        // Limit resize dimensions
+        if (newBox.width < 20 || newBox.height < 20) {
+          return oldBox;
+        }
+        return newBox;
+      }}
+    /&gt;
+  &lt;/&gt;
+);</div>
+
+            <h2>📱 Mobile Considerations</h2>
+
+            <div class="event-section">
+                <h3>Touch Event Handling</h3>
+                <p>React-Konva automatically handles touch events and maps them to mouse events. However, for optimal mobile experience:</p>
+
+                <div class="parameter-list">
+                    <ul>
+                        <li><strong>touchstart:</strong> Equivalent to mousedown - initiates drag or draw</li>
+                        <li><strong>touchmove:</strong> Equivalent to mousemove - continues drag or draw</li>
+                        <li><strong>touchend:</strong> Equivalent to mouseup - completes action</li>
+                        <li><strong>Pinch gesture:</strong> Use Konva's built-in <code class="code-inline">wheel</code> event for zoom</li>
+                        <li><strong>Two-finger rotate:</strong> Enable with Transformer's rotation handles</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <strong>💡 Mobile UX Tips:</strong>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>Make touch targets at least 44x44px for comfortable tapping</li>
+                    <li>Add visual feedback for drag operations (shadow, opacity change)</li>
+                    <li>Implement long-press for additional options menu</li>
+                    <li>Use larger Transformer handles on mobile (scaled by device pixel ratio)</li>
+                    <li>Consider a floating toolbar instead of sidebar on small screens</li>
+                </ul>
+            </div>
+
+            <h2>🎨 SVG vs PNG Color Filling</h2>
+
+            <div class="event-section">
+                <h3>SVG Color Filling <span class="priority-badge priority-high">Recommended</span></h3>
+                <div class="query-box">// Load SVG as image
+const [image] = useImage('/path/to/shape.svg');
+
+// Apply color with fill prop
+&lt;Image
+  image={image}
+  fill={selectedColor}  // ← Direct color change
+  fillAfterStrokeEnabled={true}
+/&gt;</div>
+            </div>
+
+            <div class="event-section">
+                <h3>PNG Color Filling <span class="priority-badge priority-medium">Limited</span></h3>
+                <p>PNG color changes require filters or pixel manipulation:</p>
+                <div class="query-box">// Method 1: Color filters (tinting only)
+&lt;Image
+  image={pngImage}
+  filters={[Konva.Filters.RGB]}
+  red={colorValues.r}
+  green={colorValues.g}
+  blue={colorValues.b}
+/&gt;
+
+// Method 2: Canvas pixel manipulation (complex)
+// Requires iterating through pixels and replacing colors manually</div>
+                <p style="margin-top: 15px;"><strong>Limitation:</strong> PNG color changes are approximations and don't work well for precise recoloring. Use PNG only for textures/details that don't need recoloring.</p>
+            </div>
+
+            <h2>🚀 Getting Started</h2>
+
+            <div class="parameter-list">
+                <h4 style="margin-bottom: 15px;">Quick Start Checklist</h4>
+                <ul>
+                    <li><strong>Step 1:</strong> Install packages: <code class="code-inline">npm install react-konva konva use-image</code></li>
+                    <li><strong>Step 2:</strong> Prepare SVG files with transparent backgrounds and proper viewBox</li>
+                    <li><strong>Step 3:</strong> Create data structure for body types and objects</li>
+                    <li><strong>Step 4:</strong> Build basic Stage/Layer with body selector</li>
+                    <li><strong>Step 5:</strong> Add drag-and-drop object palette</li>
+                    <li><strong>Step 6:</strong> Implement Transformer for resize/rotate</li>
+                    <li><strong>Step 7:</strong> Add color picker with fill functionality</li>
+                    <li><strong>Step 8:</strong> Implement free draw mode with Line components</li>
+                    <li><strong>Step 9:</strong> Test on mobile devices and optimize touch controls</li>
+                    <li><strong>Step 10:</strong> Add export/save functionality</li>
+                </ul>
+            </div>
+
+            <h2>📖 Resources</h2>
+
+            <div class="parameter-list">
+                <ul>
+                    <li><strong>React-Konva Docs:</strong> https://konvajs.org/docs/react/</li>
+                    <li><strong>Konva API Reference:</strong> https://konvajs.org/api/Konva.html</li>
+                    <li><strong>Drag & Drop Example:</strong> https://konvajs.org/docs/drag_and_drop/Drag_and_Drop.html</li>
+                    <li><strong>Transformer Example:</strong> https://konvajs.org/docs/react/Transformer.html</li>
+                    <li><strong>Free Drawing Example:</strong> https://konvajs.org/docs/sandbox/Free_Drawing.html</li>
+                    <li><strong>Touch Events:</strong> https://konvajs.org/docs/events/Mobile_Scrolling.html</li>
+                </ul>
+            </div>
+
+            <div class="tip-box">
+                <strong>🎯 Next Steps:</strong>
+                After reviewing this guide, we'll proceed with the implementation following the 29-step phase breakdown above.
+                The implementation will be iterative, starting with core functionality and progressively adding advanced features.
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Build Your Own Crochet Creature - Implementation Guide</strong></p>
+            <p style="margin-top: 10px;">Created with React-Konva • Supports Desktop & Mobile</p>
+            <p style="margin-top: 5px; font-size: 12px;">✨ Part of the fairykun ♡ kirametki magical realm ✨</p>
+        </div>
+    </div>
+</body>
+</html>

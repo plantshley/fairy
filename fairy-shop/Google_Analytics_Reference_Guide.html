@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Analytics Reference Guide - Universe of Tools Persona Quest</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalnia+Glaze:wght@100..700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #4a4a4a;
+            background: linear-gradient(135deg, #ffd1dc 0%, #e0b0ff 50%, #ffc8dd 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #fff5f7 0%, #fef6fb 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid rgba(255, 182, 243, 0.5);
+        }
+
+        header {
+            background: linear-gradient(135deg, #ffb6f0 0%, #d4a5ff 50%, #ffccf9 100%);
+            color: #663366;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-family: 'Kalnia Glaze', serif;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        h2 {
+            color: #c084fc;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #f9a8d4;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: #d946ef;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        h4 {
+            color: #a855f7;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .event-section {
+            background: linear-gradient(135deg, #fef3f9 0%, #fdf4ff 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #f9a8d4;
+        }
+
+        .parameter-list {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            border: 1px solid rgba(249, 168, 212, 0.2);
+        }
+
+        .parameter-item {
+            display: flex;
+            align-items: baseline;
+            margin: 8px 0;
+            padding: 10px;
+            background: linear-gradient(135deg, #fef9fc 0%, #fdf6ff 100%);
+            border-radius: 8px;
+            border: 1px solid rgba(232, 121, 249, 0.15);
+        }
+
+        .parameter-name {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #e879f9 0%, #d8b4fe 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-right: 10px;
+            font-weight: bold;
+            min-width: 250px;
+        }
+
+        .parameter-desc {
+            color: #555;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .high-priority {
+            background: linear-gradient(135deg, #fda4af 0%, #fb7185 100%);
+            color: white;
+        }
+
+        .medium-priority {
+            background: linear-gradient(135deg, #ffc4df 0%, #f1a8ff 100%);
+            color: #ffffff;
+        }
+
+        .low-priority {
+            background: linear-gradient(135deg, #d8b4fe 0%, #c084fc 100%);
+            color: white;
+        }
+
+        .query-box {
+            background: linear-gradient(135deg, #fff0f9 0%, #fef3fb 100%);
+            color: #7c3668;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #f9a8d4;
+        }
+
+        .query-title {
+            color: #c084fc;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .query-details {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #fff5f0 0%, #ffe9e0 100%);
+            border-left: 5px solid #ffb89d;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .tip-box strong {
+            color: #b45309;
+        }
+
+        ol, ul {
+            margin-left: 30px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .section-nav {
+            background: linear-gradient(135deg, #ffe9f5 0%, #f8e9ff 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #f9a8d4;
+        }
+
+        .section-nav a {
+            color: #c084fc;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .section-nav a:hover {
+            color: #d946ef;
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #ffd1f7 0%, #e8c5ff 100%);
+            color: #d946ef;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Google Analytics Reference Guide</h1>
+            <p>Universe of Tools Persona Quest - Custom Event Parameters & Analytics Queries</p>
+        </header>
+
+        <div class="content">
+            <div class="section-nav">
+                <strong>Quick Navigation:</strong><br><br>
+                <a href="#sample-queries">Sample Queries</a>
+                <a href="#parameters-by-event">Parameters by Event</a>
+                <a href="#all-parameters">All Parameters</a>
+                <a href="#priority-list">Priority List</a>
+            </div>
+
+            <!-- SAMPLE QUERIES SECTION -->
+            <h2 id="sample-queries"><span class="emoji">🌈</span>Sample Queries You Can Run</h2>
+            <p>Once you have data in Google Analytics, try these queries in <strong>Explore</strong> mode:</p>
+
+            <div class="query-box">
+                <div class="query-title">🦋 "Which creature leads to the most tool clicks?"</div>
+                <div class="query-details">
+                    <strong>Dimensions:</strong> creature, tool_name<br>
+                    <strong>Metrics:</strong> Event count<br>
+                    <strong>Filter:</strong> Event name = tool_clicked
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">🌺 "What's the completion rate?"</div>
+                <div class="query-details">
+                    <strong>Compare counts of:</strong><br>
+                    - question_answered (question_number = 1) [Quiz starts]<br>
+                    - quiz_completed [Quiz finishes]<br>
+                    <strong>Calculation:</strong> (quiz_completed / quiz_starts) × 100 = completion rate %
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">💖 "Which tools have the highest compatibility scores when clicked?"</div>
+                <div class="query-details">
+                    <strong>Dimension:</strong> tool_name<br>
+                    <strong>Metrics:</strong> Event count, Average of compatibility_percentage<br>
+                    <strong>Result:</strong> Shows which tools users click AND their average cosmic compatibility
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">🌷 "Which planet is most popular?"</div>
+                <div class="query-details">
+                    <strong>Dimension:</strong> planet<br>
+                    <strong>Metrics:</strong> Event count<br>
+                    <strong>Filter:</strong> Event name = quiz_completed<br>
+                    <strong>Visualization:</strong> Bar chart or pie chart
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">🐰 "Do users click position 1 or position 2 more?"</div>
+                <div class="query-details">
+                    <strong>Dimension:</strong> tool_rank<br>
+                    <strong>Metrics:</strong> Event count<br>
+                    <strong>Filter:</strong> Event name = tool_clicked<br>
+                    <strong>Result:</strong> Shows if #1 or #2 recommendation gets more clicks
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">🦄 "Where do users drop off in the quiz?"</div>
+                <div class="query-details">
+                    <strong>Dimension:</strong> question_number<br>
+                    <strong>Metrics:</strong> Event count<br>
+                    <strong>Filter:</strong> Event name = question_answered<br>
+                    <strong>Visualization:</strong> Line chart showing drop-off by question
+                </div>
+            </div>
+
+            <!-- PARAMETERS BY EVENT TYPE SECTION -->
+            <h2 id="parameters-by-event"><span class="emoji">🌻</span>Custom Parameters by Event Type</h2>
+
+            <div class="event-section">
+                <h3><span class="emoji">🌼</span>question_answered Event</h3>
+                <p>Tracks when a user answers any question in the quiz</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">question_number</span>
+                        <span class="parameter-desc">Which question (1-8)</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">question_id</span>
+                        <span class="parameter-desc">The question's ID</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">answer_text</span>
+                        <span class="parameter-desc">The text of the answer chosen (truncated to 100 chars)</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">is_final_question</span>
+                        <span class="parameter-desc">Whether this was the last question (true/false)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">💕</span>quiz_completed Event</h3>
+                <p>Tracks when a user finishes the entire quiz</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">planet</span>
+                        <span class="parameter-desc">Selected planet (e.g., "Visualis", "Textara", "Codion")</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">creature</span>
+                        <span class="parameter-desc">Selected creature (e.g., "Nebula Neko", "Speech Sprite")</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">top_tool</span>
+                        <span class="parameter-desc">Name of the #1 recommended tool</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">top_tool_score</span>
+                        <span class="parameter-desc">Score of the #1 recommended tool</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">total_questions</span>
+                        <span class="parameter-desc">How many questions were answered</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">total_tools_recommended</span>
+                        <span class="parameter-desc">How many tools were recommended (should be 10)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">🐱</span>tool_clicked Event</h3>
+                <p>Tracks when a user clicks on a tool link</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">tool_name</span>
+                        <span class="parameter-desc">Name of the tool that was clicked</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">tool_url</span>
+                        <span class="parameter-desc">URL of the tool</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">tool_rank</span>
+                        <span class="parameter-desc">Position in recommendations (1 or 2)</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">compatibility_percentage</span>
+                        <span class="parameter-desc">Cosmic compatibility percentage shown</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">tool_category</span>
+                        <span class="parameter-desc">Category of the tool</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">tool_price</span>
+                        <span class="parameter-desc">Price type (free, freemium, paid)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">☁️</span>quiz_restarted Event</h3>
+                <p>Tracks when a user restarts the quiz</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">from_question</span>
+                        <span class="parameter-desc">Which question they were on when they restarted</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">had_completed</span>
+                        <span class="parameter-desc">Whether they had finished the quiz (true/false)</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">answers_given</span>
+                        <span class="parameter-desc">How many answers they had provided</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALL UNIQUE PARAMETERS SECTION -->
+            <h2 id="all-parameters"><span class="emoji">🌙</span>All Unique Parameters (Alphabetical)</h2>
+            <p>Every parameter you can register as a custom dimension:</p>
+
+            <div class="parameter-list">
+                <div class="parameter-item">
+                    <span class="parameter-name">answer_text</span>
+                    <span class="parameter-desc">The answer text chosen</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">answers_given</span>
+                    <span class="parameter-desc">Number of answers given before restart</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">compatibility_percentage</span>
+                    <span class="parameter-desc">Cosmic compatibility %</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">creature</span>
+                    <span class="parameter-desc">Creature selected (Q2)</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">from_question</span>
+                    <span class="parameter-desc">Question number when restarted</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">had_completed</span>
+                    <span class="parameter-desc">Boolean if quiz was completed</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">is_final_question</span>
+                    <span class="parameter-desc">Boolean if last question</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">planet</span>
+                    <span class="parameter-desc">Planet selected (Q1)</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">question_id</span>
+                    <span class="parameter-desc">Question identifier</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">question_number</span>
+                    <span class="parameter-desc">Question number (1-8)</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">tool_category</span>
+                    <span class="parameter-desc">Tool's category</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">tool_name</span>
+                    <span class="parameter-desc">Name of clicked tool</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">tool_price</span>
+                    <span class="parameter-desc">Price type of tool</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">tool_rank</span>
+                    <span class="parameter-desc">Position (1 or 2)</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">tool_url</span>
+                    <span class="parameter-desc">URL of clicked tool</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">top_tool</span>
+                    <span class="parameter-desc">#1 recommended tool name</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">top_tool_score</span>
+                    <span class="parameter-desc">Score of #1 tool</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">total_questions</span>
+                    <span class="parameter-desc">Total questions answered</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">total_tools_recommended</span>
+                    <span class="parameter-desc">Number of tools recommended</span>
+                </div>
+            </div>
+
+            <!-- PRIORITY LIST SECTION -->
+            <h2 id="priority-list"><span class="emoji">✨</span>Recommended Custom Dimensions to Register</h2>
+            <p>Prioritized list based on usefulness (you can register up to 50 in GA4):</p>
+
+            <h3><span class="emoji">💝</span>High Priority (Most Useful)</h3>
+            <div class="parameter-list">
+                <div class="parameter-item">
+                    <span class="parameter-name">planet</span>
+                    <span class="parameter-desc">See which planets are most popular</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">creature</span>
+                    <span class="parameter-desc">See which creatures are most popular</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">tool_name</span>
+                    <span class="parameter-desc">See which tools get clicked most</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">top_tool</span>
+                    <span class="parameter-desc">See which tools are recommended most often</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+            </div>
+
+            <h3><span class="emoji">🌟</span>Medium Priority (Good Insights)</h3>
+            <div class="parameter-list">
+                <div class="parameter-item">
+                    <span class="parameter-name">tool_rank</span>
+                    <span class="parameter-desc">See if users click #1 or #2 more</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">tool_category</span>
+                    <span class="parameter-desc">See which categories are most popular</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">tool_price</span>
+                    <span class="parameter-desc">See if users prefer free/freemium/paid</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">question_number</span>
+                    <span class="parameter-desc">See where users spend time/drop off</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">compatibility_percentage</span>
+                    <span class="parameter-desc">Average compatibility when tools are clicked</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+            </div>
+
+            <h3><span class="emoji">🌱</span>Low Priority (Nice to Have)</h3>
+            <div class="parameter-list">
+                <div class="parameter-item">
+                    <span class="parameter-name">from_question</span>
+                    <span class="parameter-desc">See where users restart from</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">had_completed</span>
+                    <span class="parameter-desc">See if restarts happen after completion</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">answers_given</span>
+                    <span class="parameter-desc">See how far users get before restarting</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <strong>🦋 Pro Tip:</strong> Start by registering the 4 High Priority dimensions first. Once you have data flowing and start analyzing it, you can always add more dimensions based on what insights you want to dig deeper into!
+            </div>
+
+            <h2><span class="emoji">🌺</span>How to Register Custom Dimensions</h2>
+            <ol>
+                <li>Go to <strong>Admin</strong> (gear icon in bottom left of Google Analytics)</li>
+                <li>In the <strong>Property</strong> column, click <strong>Custom definitions</strong></li>
+                <li>Click <strong>Create custom dimension</strong></li>
+                <li>For each parameter:
+                    <ul>
+                        <li><strong>Dimension name:</strong> Use a friendly name (e.g., "Planet")</li>
+                        <li><strong>Scope:</strong> Select "Event"</li>
+                        <li><strong>Description:</strong> Add a brief description</li>
+                        <li><strong>Event parameter:</strong> Enter the exact parameter name (e.g., "planet")</li>
+                    </ul>
+                </li>
+                <li>Click <strong>Save</strong></li>
+                <li>Repeat for each parameter you want to track</li>
+            </ol>
+
+            <div class="tip-box">
+                <strong>💐 Important:</strong> Custom dimensions can take 24-48 hours to start collecting data. Events sent BEFORE you create the dimension won't be retroactively updated, but all new events will include the dimension automatically.
+            </div>
+        </div>
+
+        <footer>
+            <p>Universe of Tools Persona Quest - Google Analytics Reference Guide</p>
+            <p>Measurement ID: G-PF7YQKP864 | Stream URL: https://plantshley.github.io/web-tools-persona-quest/</p>
+        </footer>
+    </div>
+</body>
+</html>
