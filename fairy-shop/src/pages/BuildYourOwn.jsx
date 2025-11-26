@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Image as KonvaImage, Line, Transformer, Circle } from 'react-konva';
 import useImage from 'use-image';
+import { Sparkle } from '../components/Sparkle';
 
 // Placeholder body types - will be replaced with actual SVG/image files
 const bodyTypes = [
@@ -43,8 +44,8 @@ const DraggableObject = ({ object, isSelected, onSelect, onChange, onDelete, sta
   }, [isSelected]);
 
   const checkIfInTrash = (x, y) => {
-    const trashX = stageSize.width - 150;
-    const trashY = stageSize.height - 80;
+    const trashX = 60; // Left side position
+    const trashY = stageSize.height - 60; // Bottom position
     const distance = Math.sqrt(Math.pow(x - trashX, 2) + Math.pow(y - trashY, 2));
     return distance < 60;
   };
@@ -122,6 +123,8 @@ export const BuildYourOwn = () => {
   const [trashHovered, setTrashHovered] = useState(false);
   const stageRef = useRef(null);
   const containerRef = useRef(null);
+  const [trashImage] = useImage('/trash.png');
+  const [visualisImage] = useImage('/visualis.png');
 
   // Handle responsive canvas sizing
   useEffect(() => {
@@ -236,16 +239,17 @@ export const BuildYourOwn = () => {
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-3xl md:text-4xl mb-2 gradient-text text-center"
+        className="font-kalnia text-3xl md:text-4xl mb-2 gradient-text text-center relative"
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5 }}
       >
+        <Sparkle count={15} />
         ˗ˏˋ ★ ˎˊ˗ build your own ˗ˏˋ ★ ˎˊ˗
       </motion.h1>
 
       <p className="text-center mb-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
-        ★ design your dream creature ★
+        ⋆｡°✩ design your kirametki creature ✩°｡⋆
       </p>
 
       <div className="flex flex-col lg:flex-row gap-4 w-full max-w-7xl h-full">
@@ -344,8 +348,7 @@ export const BuildYourOwn = () => {
                   type="color"
                   value={selectedBody.color}
                   onChange={(e) => handleBodyColorChange(e.target.value)}
-                  className="w-10 h-10 rounded-full cursor-pointer border-0"
-                  style={{ padding: 0 }}
+                  className="w-10 h-10 rounded-full cursor-pointer color-picker-clean"
                 />
                 <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
                   Body Color
@@ -360,8 +363,7 @@ export const BuildYourOwn = () => {
                   type="color"
                   value={currentColor}
                   onChange={(e) => handleColorChange(e.target.value)}
-                  className="w-10 h-10 rounded-full cursor-pointer border-0"
-                  style={{ padding: 0 }}
+                  className="w-10 h-10 rounded-full cursor-pointer color-picker-clean"
                 />
                 <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
                   {selectedId ? 'Selected Object Color' : 'Drawing/Object Color'}
@@ -492,6 +494,19 @@ export const BuildYourOwn = () => {
             >
               {/* Layer 1: Body and Objects (won't be affected by eraser) */}
               <Layer>
+                {/* Trash Can Icon - positioned in bottom-left */}
+                {trashImage && (
+                  <KonvaImage
+                    image={trashImage}
+                    x={30}
+                    y={stageSize.height - 90}
+                    width={60}
+                    height={60}
+                    opacity={0.7}
+                    listening={false}
+                  />
+                )}
+
                 {/* Body */}
                 {selectedBody && (
                   <Circle
@@ -535,24 +550,16 @@ export const BuildYourOwn = () => {
             </Stage>
           </div>
 
-          {/* Trash Can Label */}
-          {placedObjects.length > 0 && (
-            <div
-              className="absolute text-center pointer-events-none"
-              style={{
-                bottom: '40px',
-                right: '110px',
-                fontSize: '40px',
-              }}
-            >
-              🗑️
-            </div>
-          )}
-
           {!selectedBody && placedObjects.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <div className="text-6xl mb-4 opacity-30">🎨</div>
+                {visualisImage && (
+                  <img
+                    src="/visualis.png"
+                    alt="Palette"
+                    className="w-24 h-24 mb-4 opacity-30 mx-auto"
+                  />
+                )}
                 <p className="text-lg font-medium opacity-50" style={{ color: 'var(--text-secondary)' }}>
                   Select a body type to start creating!
                 </p>

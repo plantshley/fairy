@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import { loadFull } from 'tsparticles';
 import Particles, { initParticlesEngine } from '@tsparticles/react';
+import { Sparkle } from '../components/Sparkle';
 
 const links = [
   { url: 'https://www.instagram.com/kirametki/', label: 'Instagram', labelSuffix: '(crochet)', emoji: '🪻', color: '#E4405F', subtitle: '@kirametki' },
@@ -192,11 +193,12 @@ export const Links = ({ currentTheme }) => {
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-4xl mb-4 gradient-text text-center"
+        className="font-kalnia text-4xl mb-4 gradient-text text-center relative"
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
+        <Sparkle count={15} />
         ⋆｡‧˚ʚ♡ɞ˚‧｡⋆ links ⋆｡‧˚ʚ♡ɞ˚‧｡⋆
       </motion.h1>
 

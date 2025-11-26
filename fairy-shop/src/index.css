@@ -179,3 +179,29 @@ body {
   right: 20%;
   top: 50%;
 }
+
+/* Color picker styling - removes all browser defaults */
+.color-picker-clean {
+  padding: 0;
+  border: none;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+.color-picker-clean::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border: none;
+}
+
+.color-picker-clean::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+.color-picker-clean::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
+}

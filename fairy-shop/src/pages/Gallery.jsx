@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Sparkle } from '../components/Sparkle';
 
 export const Gallery = () => {
   return (
@@ -10,11 +11,12 @@ export const Gallery = () => {
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-4xl mb-4 gradient-text text-center"
+        className="font-kalnia text-4xl mb-4 gradient-text text-center relative"
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
+        <Sparkle count={15} />
         ₊˚⊹♡ gallery ♡⊹˚₊
       </motion.h1>
 

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Sparkle } from '../components/Sparkle';
 
 export const Home = ({ currentTheme }) => {
   const getThemeEmojis = () => {
@@ -82,11 +83,12 @@ export const Home = ({ currentTheme }) => {
 
         {/* Main title */}
         <motion.h1
-          className="font-kalnia text-4xl md:text-5xl gradient-text leading-tight text-center"
+          className="font-kalnia text-4xl md:text-5xl gradient-text leading-tight text-center relative"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
+          <Sparkle count={15} />
           fairykun ♡ kirametki
         </motion.h1>
 
