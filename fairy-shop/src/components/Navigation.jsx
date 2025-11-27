@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 
 const tabs = [
-  { id: 'home', label: 'Home', icon: '/house.png' },
-  { id: 'shop', label: 'Shop', icon: '/rich.png' },
-  { id: 'links', label: 'Links', icon: '/moon.png' },
-  { id: 'gallery', label: 'Gallery', icon: '/rainbow.png' },
-  { id: 'build', label: 'Build', icon: '/visualis.png' },
+  { id: 'home', label: 'home', icon: '/house.png' },
+  { id: 'shop', label: 'shop', icon: '/rich.png' },
+  { id: 'links', label: 'links', icon: '/moon.png' },
+  { id: 'gallery', label: 'gallery', icon: '/rainbow.png' },
+  { id: 'build', label: 'build', icon: '/visualis.png' },
 ];
 
 export const Navigation = ({ activeTab, onTabChange }) => {
@@ -26,8 +26,8 @@ export const Navigation = ({ activeTab, onTabChange }) => {
             whileHover={{ scale: 1.05, x: 5 }}
             whileTap={{ scale: 0.95 }}
           >
-            <img src={tab.icon} alt={tab.label} className="w-6 h-6 object-contain" />
-            <span className="text-xs whitespace-nowrap">{tab.label}</span>
+            <img src={tab.icon} alt={tab.label} className="w-10 h-10 object-contain" />
+            <span className="text-base whitespace-nowrap font-bonbon">{tab.label}</span>
             {activeTab === tab.id && (
               <motion.span
                 className="ml-auto"

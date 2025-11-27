@@ -11,6 +11,8 @@ export const themes = {
       textPrimary: '#8b4f8a',
       textSecondary: '#9d6b9e',
       sparkleColor: '#ffe0f0',
+      gradientPrimary: '#d946a6',
+      gradientSecondary: '#9333ea',
     },
     fonts: {
       heading: '"Kalnia Glaze", serif',
@@ -29,9 +31,11 @@ export const themes = {
       bgGradientEnd: '#aa66ff',
       accentPrimary: '#ff0080',
       accentSecondary: '#ffdd00',
-      textPrimary: '#1a1a1a',
-      textSecondary: '#4a4a4a',
+      textPrimary: '#3500c6ff',
+      textSecondary: '#ff00f7ff',
       sparkleColor: '#ffdd00',
+      gradientPrimary: '#ff0080',
+      gradientSecondary: '#ffdd00',
     },
     fonts: {
       heading: '"Kalnia Glaze", serif',
@@ -52,6 +56,8 @@ export const themes = {
       textPrimary: '#8b7355',
       textSecondary: '#b5a089',
       sparkleColor: '#fff5e6',
+      gradientPrimary: '#f4d6cc',
+      gradientSecondary: '#e8c4a0',
     },
     fonts: {
       heading: '"Kalnia Glaze", serif',
@@ -72,6 +78,8 @@ export const themes = {
       textPrimary: '#4a6c7a',
       textSecondary: '#6b8d9c',
       sparkleColor: '#e0f7ff',
+      gradientPrimary: '#7cc6d9',
+      gradientSecondary: '#9b8fc9',
     },
     fonts: {
       heading: '"Kalnia Glaze", serif',

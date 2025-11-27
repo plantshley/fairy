@@ -11,7 +11,8 @@ export const Shop = () => {
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-4xl mb-4 gradient-text text-center relative"
+        className="font-kalnia text-4xl mb-4 gradient-text text-center relative z-10"
+        style={{ overflow: 'visible' }}
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -20,7 +21,7 @@ export const Shop = () => {
         ✧･ﾟ: *✧･ﾟ:* shop *:･ﾟ✧*:･ﾟ✧
       </motion.h1>
 
-      <p className="text-center mb-8 text-base" style={{ color: 'var(--text-secondary)' }}>
+      <p className="text-center mb-8 text-xl font-bonbon tracking-wide" style={{ color: 'var(--text-primary)' }}>
         ･ﾟ✧ browse my crochet creatures ✧ﾟ･
       </p>
 

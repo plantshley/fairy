@@ -10,7 +10,7 @@ const links = [
   { url: 'https://form.jotform.com/232175428265155', label: 'Customs Form', emoji: '💐', color: '#C5A3FF', subtitle: 'custom crochet requests' },
   { url: 'https://www.venmo.com/u/kirametki', label: 'Venmo', emoji: '💎', color: '#3D95CE', subtitle: '@kirametki' },
   { url: 'https://paypal.me/fairykun?country.x=US&locale.x=en_US', label: 'PayPal', emoji: '💝', color: '#0070BA', subtitle: '@fairykun' },
-  { url: 'https://packimals.co/fairy', label: 'Shop Packimals', emoji: '🦁', color: '#FFB6C1', subtitle: 'plushie backpacks' },
+  { url: 'https://packimals.co/fairy', label: 'Packimals.co', emoji: '🦁', color: '#FFB6C1', subtitle: 'plushie backpacks' },
   { url: 'http://fairykun.redbubble.com', label: 'Redbubble', emoji: '🫧', color: '#E41321', subtitle: 'stickers & merch' },
   { url: 'https://www.inprnt.com/gallery/fairy/', label: 'Art Prints', emoji: '🎨', color: '#FF69B4', subtitle: 'gallery prints' },
   { url: 'https://www.behance.net/gallery/73695003/Ashley-Geraets-Digital-Portfolio-%282015-present%29', label: 'Art Portfolio', emoji: '🎀', color: '#1769FF', subtitle: '2015 to present' },
@@ -163,7 +163,7 @@ const LinkCard = ({ link, index, currentTheme }) => {
             {link.emoji}
           </motion.div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-xl font-semibold gradient-text">
+            <h3 className="text-2xl font-semibold gradient-text font-bonbon tracking-wide">
               {link.label}
               {link.labelSuffix && (
                 <div className="text-xs font-normal opacity-70">
@@ -186,14 +186,15 @@ export const Links = ({ currentTheme }) => {
 
   return (
     <motion.div
-      className="w-full h-full flex flex-col items-center justify-center p-8"
+      className="w-full h-full flex flex-col items-center p-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-4xl mb-4 gradient-text text-center relative"
+        className="font-kalnia text-4xl mb-4 gradient-text text-center relative z-10"
+        style={{ overflow: 'visible' }}
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -202,7 +203,7 @@ export const Links = ({ currentTheme }) => {
         ⋆｡‧˚ʚ♡ɞ˚‧｡⋆ links ⋆｡‧˚ʚ♡ɞ˚‧｡⋆
       </motion.h1>
 
-      <p className="text-center mb-12 text-base" style={{ color: 'var(--text-secondary)' }}>
+      <p className="text-center mb-8 text-xl font-bonbon tracking-wide" style={{ color: 'var(--text-primary)' }}>
         ʚ♡ɞ connect with me across the web ʚ♡ɞ
       </p>
 

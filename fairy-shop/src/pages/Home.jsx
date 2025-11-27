@@ -83,7 +83,8 @@ export const Home = ({ currentTheme }) => {
 
         {/* Main title */}
         <motion.h1
-          className="font-kalnia text-4xl md:text-5xl gradient-text leading-tight text-center relative"
+          className="font-kalnia text-5xl md:text-6xl gradient-text leading-tight text-center relative z-10"
+          style={{ overflow: 'visible', paddingBottom: '8px' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -94,7 +95,7 @@ export const Home = ({ currentTheme }) => {
 
         {/* Subtitle */}
         <motion.p
-          className="text-lg md:text-xl font-medium text-center"
+          className="text-xl md:text-2xl font-medium text-center font-bonbon tracking-wide"
           style={{ color: 'var(--text-primary)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -173,7 +174,7 @@ export const Home = ({ currentTheme }) => {
 
         {/* Call to action */}
         <motion.p
-          className="text-sm"
+          className="text-xs"
           style={{ color: 'var(--text-secondary)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

@@ -72,7 +72,7 @@ export const Sparkle = ({ count = 31 }) => {
   }, [count]);
 
   return (
-    <div ref={containerRef} className="absolute inset-0 pointer-events-none overflow-visible">
+    <div ref={containerRef} className="absolute inset-0 pointer-events-none -z-10" style={{ overflow: 'visible' }}>
       {sparkles.map((sparkle) => (
         sparkle.visible && (
           <div
@@ -85,6 +85,7 @@ export const Sparkle = ({ count = 31 }) => {
               transform: `scale(${sparkle.scale})`,
               width: '35px',
               height: '35px',
+              opacity: 0.9,
             }}
           >
             <svg

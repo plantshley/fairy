@@ -233,13 +233,14 @@ export const BuildYourOwn = () => {
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center p-4 overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-3xl md:text-4xl mb-2 gradient-text text-center relative"
+        className="font-kalnia text-4xl mb-4 gradient-text text-center relative z-10"
+        style={{ overflow: 'visible', paddingBottom: '0px' }}
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -248,7 +249,7 @@ export const BuildYourOwn = () => {
         ˗ˏˋ ★ ˎˊ˗ build your own ˗ˏˋ ★ ˎˊ˗
       </motion.h1>
 
-      <p className="text-center mb-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+      <p className="text-center mb-4 text-xl font-bonbon tracking-wide" style={{ color: 'var(--text-primary)' }}>
         ⋆｡°✩ design your kirametki creature ✩°｡⋆
       </p>
 
