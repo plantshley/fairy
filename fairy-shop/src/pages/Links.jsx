@@ -163,7 +163,7 @@ const LinkCard = ({ link, index, currentTheme }) => {
             {link.emoji}
           </motion.div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-2xl font-semibold gradient-text font-bonbon tracking-wider">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold gradient-text font-bonbon tracking-wider">
               {link.label}
               {link.labelSuffix && (
                 <div className="text-xs font-normal tracking-wider opacity-80">
@@ -186,14 +186,14 @@ export const Links = ({ currentTheme }) => {
 
   return (
     <motion.div
-      className="w-full h-full flex flex-col items-center p-8"
+      className="w-full h-full flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-4xl mb-4 gradient-text text-center relative z-10"
+        className="font-kalnia text-2xl sm:text-3xl md:text-4xl mb-4 gradient-text text-center relative z-10"
         style={{ overflow: 'visible' }}
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
@@ -203,7 +203,7 @@ export const Links = ({ currentTheme }) => {
         ⋆｡‧˚ʚ♡ɞ˚‧｡⋆ links ⋆｡‧˚ʚ♡ɞ˚‧｡⋆
       </motion.h1>
 
-      <p className="text-center mb-8 text-xl font-bonbon tracking-wider" style={{ color: 'var(--text-primary)' }}>
+      <p className="text-center mb-8 text-base sm:text-lg md:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
         ʚ♡ɞ connect with me across the web ʚ♡ɞ
       </p>
 

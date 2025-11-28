@@ -43,7 +43,7 @@ function App() {
 
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <main className="ml-24 min-h-screen flex items-center justify-center">
+      <main className="lg:ml-20 min-h-screen flex items-center justify-center">
         <AnimatePresence mode="wait">
           {renderPage()}
         </AnimatePresence>
