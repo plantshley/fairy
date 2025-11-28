@@ -21,7 +21,7 @@ export const Shop = () => {
         ✧･ﾟ: *✧･ﾟ:* shop *:･ﾟ✧*:･ﾟ✧
       </motion.h1>
 
-      <p className="text-center mb-8 text-xl font-bonbon tracking-wide" style={{ color: 'var(--text-primary)' }}>
+      <p className="text-center mb-8 text-xl font-bonbon tracking-wider" style={{ color: 'var(--text-primary)' }}>
         ･ﾟ✧ browse my crochet creatures ✧ﾟ･
       </p>
 

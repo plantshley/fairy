@@ -26,7 +26,7 @@ const objectCategories = {
   ],
   facial: [
     { id: 'eyes-round', name: 'Round Eyes', emoji: '👀', color: '#000000' },
-    { id: 'nose', name: 'Nose', emoji: '👃', color: '#FFB6C1' },
+    { id: 'nose', name: 'Nose', emoji: '👃', color: '#ffe2e6ff' },
     { id: 'mouth-smile', name: 'Smile', emoji: '😊', color: '#FF69B4' },
   ],
 };
@@ -232,7 +232,7 @@ export const BuildYourOwn = () => {
 
   return (
     <motion.div
-      className="w-full h-full flex flex-col items-center p-4 overflow-hidden"
+      className="w-full h-full flex flex-col items-center py-4 pr-4 pl-4 lg:pl-8 overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -240,16 +240,16 @@ export const BuildYourOwn = () => {
     >
       <motion.h1
         className="font-kalnia text-4xl mb-4 gradient-text text-center relative z-10"
-        style={{ overflow: 'visible', paddingBottom: '0px' }}
+        style={{ overflow: 'visible' }}
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <Sparkle count={15} />
         ˗ˏˋ ★ ˎˊ˗ build your own ˗ˏˋ ★ ˎˊ˗
       </motion.h1>
 
-      <p className="text-center mb-4 text-xl font-bonbon tracking-wide" style={{ color: 'var(--text-primary)' }}>
+      <p className="text-center mb-4 text-xl font-bonbon tracking-wider" style={{ color: 'var(--text-primary)' }}>
         ⋆｡°✩ design your kirametki creature ✩°｡⋆
       </p>
 

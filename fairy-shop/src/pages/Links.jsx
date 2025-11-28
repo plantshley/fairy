@@ -163,10 +163,10 @@ const LinkCard = ({ link, index, currentTheme }) => {
             {link.emoji}
           </motion.div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-2xl font-semibold gradient-text font-bonbon tracking-wide">
+            <h3 className="text-2xl font-semibold gradient-text font-bonbon tracking-wider">
               {link.label}
               {link.labelSuffix && (
-                <div className="text-xs font-normal opacity-70">
+                <div className="text-xs font-normal tracking-wider opacity-80">
                   {link.labelSuffix}
                 </div>
               )}
@@ -203,7 +203,7 @@ export const Links = ({ currentTheme }) => {
         ⋆｡‧˚ʚ♡ɞ˚‧｡⋆ links ⋆｡‧˚ʚ♡ɞ˚‧｡⋆
       </motion.h1>
 
-      <p className="text-center mb-8 text-xl font-bonbon tracking-wide" style={{ color: 'var(--text-primary)' }}>
+      <p className="text-center mb-8 text-xl font-bonbon tracking-wider" style={{ color: 'var(--text-primary)' }}>
         ʚ♡ɞ connect with me across the web ʚ♡ɞ
       </p>
 

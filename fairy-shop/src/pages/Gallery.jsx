@@ -21,7 +21,7 @@ export const Gallery = () => {
         ₊˚⊹♡ gallery ♡⊹˚₊
       </motion.h1>
 
-      <p className="text-center mb-8 text-xl font-bonbon tracking-wide" style={{ color: 'var(--text-primary)' }}>
+      <p className="text-center mb-8 text-xl font-bonbon tracking-wider" style={{ color: 'var(--text-primary)' }}>
         ⊹ creations & artwork ⊹
       </p>
 

@@ -95,7 +95,7 @@ export const Home = ({ currentTheme }) => {
 
         {/* Subtitle */}
         <motion.p
-          className="text-xl md:text-2xl font-medium text-center font-bonbon tracking-wide"
+          className="text-xl md:text-2xl font-medium text-center font-bonbon tracking-wider"
           style={{ color: 'var(--text-primary)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
