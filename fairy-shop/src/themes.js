@@ -88,6 +88,28 @@ export const themes = {
     emojis: ['🐚', '💎', '🌊', '🫧', '🪸', '💠'],
     decorations: ['～ ♡', '⋆｡°✩', '｡ﾟ･ ✧', '･ﾟ･｡'],
   },
+  midnightVelvetMeadow: {
+    id: 'midnightVelvetMeadow',
+    name: 'Midnight Velvet Meadow',
+    colors: {
+      bgGradientStart: '#a700a7ff',
+      bgGradientMid: '#650087ff',
+      bgGradientEnd: '#9a0033ff',
+      accentPrimary: '#c500b4ff',
+      accentSecondary: '#d30066ff',
+      textPrimary: '#e8b4d9',
+      textSecondary: '#c298b8',
+      sparkleColor: '#d57da0ff',
+      gradientPrimary: '#cb0054ff',
+      gradientSecondary: '#6d0088ff',
+    },
+    fonts: {
+      heading: '"Kalnia Glaze", serif',
+      body: '"JetBrains Mono", monospace',
+    },
+    emojis: ['🔮', '🥀', '🦇', '🌒', '🌙', '🖤'],
+    decorations: ['✧˖°', '⋆｡°✩', '･ﾟ✧', '˗ˏˋ ★ ˎˊ˗'],
+  },
 };
 
 export const applyTheme = (theme) => {

@@ -8,12 +8,17 @@ const tabs = [
   { id: 'build', label: 'build', icon: '/visualis.png' },
 ];
 
-export const Navigation = ({ activeTab, onTabChange }) => {
+export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
   return (
     <>
       {/* Desktop Navigation - hidden on mobile */}
       <nav className="fixed left-2 top-1/2 -translate-y-1/2 z-30 hidden lg:block">
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-2 space-y-1">
+        <div
+          className="backdrop-blur-md rounded-2xl shadow-2xl p-2 space-y-1"
+          style={{
+            backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+          }}
+        >
           {tabs.map((tab) => (
             <motion.button
               key={tab.id}
@@ -46,7 +51,13 @@ export const Navigation = ({ activeTab, onTabChange }) => {
 
       {/* Mobile Navigation - bottom tab bar */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 lg:hidden">
-        <div className="bg-white/90 backdrop-blur-md shadow-2xl border-t-2 border-white/50">
+        <div
+          className="backdrop-blur-md shadow-2xl border-t-2"
+          style={{
+            backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+            borderColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+          }}
+        >
           <div className="flex justify-around items-center p-2">
             {tabs.map((tab) => (
               <motion.button

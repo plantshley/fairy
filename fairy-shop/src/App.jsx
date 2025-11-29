@@ -24,13 +24,13 @@ function App() {
       case 'home':
         return <Home key="home" currentTheme={currentTheme} />;
       case 'shop':
-        return <Shop key="shop" />;
+        return <Shop key="shop" currentTheme={currentTheme} />;
       case 'links':
         return <Links key="links" currentTheme={currentTheme} />;
       case 'gallery':
-        return <Gallery key="gallery" />;
+        return <Gallery key="gallery" currentTheme={currentTheme} />;
       case 'build':
-        return <BuildYourOwn key="build" />;
+        return <BuildYourOwn key="build" currentTheme={currentTheme} />;
       default:
         return <Home key="home" currentTheme={currentTheme} />;
     }
@@ -41,7 +41,7 @@ function App() {
       <AnimatedBackground themeEmojis={currentTheme.emojis} />
       <CursorSparkles currentTheme={currentTheme} />
 
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navigation activeTab={activeTab} onTabChange={setActiveTab} currentTheme={currentTheme} />
 
       <main className="lg:ml-20 min-h-screen flex items-center justify-center">
         <AnimatePresence mode="wait">

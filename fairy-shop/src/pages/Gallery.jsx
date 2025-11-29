@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Sparkle } from '../components/Sparkle';
 
-export const Gallery = () => {
+export const Gallery = ({ currentTheme }) => {
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
@@ -26,7 +26,10 @@ export const Gallery = () => {
       </p>
 
       <motion.div
-        className="bg-white/90 backdrop-blur-md rounded-3xl p-12 shadow-2xl max-w-2xl"
+        className="backdrop-blur-md rounded-3xl p-12 shadow-2xl max-w-2xl"
+        style={{
+          backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+        }}
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2 }}

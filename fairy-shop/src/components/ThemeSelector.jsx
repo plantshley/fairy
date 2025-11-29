@@ -9,9 +9,10 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
   useEffect(() => {
     const imagesToPreload = [
       '/heart-bright1.png',
-      '/cherry-bing-frootie1.png',
+      '/disco-fever-griffon.png',
       '/moon-custom1.png',
       '/glacial-seas-dolphin1.png',
+      '/homura1.png',
     ];
 
     imagesToPreload.forEach((src) => {
@@ -25,11 +26,13 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
       case 'twinkleFairyDream':
         return '/heart-bright1.png';
       case 'glitterGroovyRainbow':
-        return '/cherry-bing-frootie1.png';
+        return '/disco-fever-griffon.png';
       case 'celestialAngelicClouds':
         return '/moon-custom1.png';
       case 'crystalSeasideGarden':
         return '/glacial-seas-dolphin1.png';
+      case 'midnightVelvetMeadow':
+        return '/homura1.png';
       default:
         return '/heart-bright1.png';
     }
@@ -75,7 +78,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
             >
               {/* Modal */}
               <motion.div
-                className="bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-2xl"
+                className="backdrop-blur-md rounded-3xl p-6 shadow-2xl"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
@@ -84,6 +87,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
                   width: '500px',
                   maxHeight: '80vh',
                   overflowY: 'auto',
+                  backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                 }}
                 onClick={(e) => e.stopPropagation()}
               >

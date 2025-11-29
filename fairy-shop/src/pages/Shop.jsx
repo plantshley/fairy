@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Sparkle } from '../components/Sparkle';
 
-export const Shop = () => {
+export const Shop = ({ currentTheme }) => {
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
@@ -27,8 +27,12 @@ export const Shop = () => {
 
       {/* Ko-fi Shop Embed */}
       <motion.div
-        className="w-full max-w-5xl bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden mx-2 sm:mx-4"
-        style={{ height: '75vh', minHeight: '500px' }}
+        className="w-full max-w-5xl backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden mx-2 sm:mx-4"
+        style={{
+          height: '75vh',
+          minHeight: '500px',
+          backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+        }}
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2 }}

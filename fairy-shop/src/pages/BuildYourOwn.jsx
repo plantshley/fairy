@@ -1,65 +1,201 @@
 import { motion } from 'framer-motion';
-import { useState, useRef, useEffect } from 'react';
-import { Stage, Layer, Image as KonvaImage, Line, Transformer, Circle } from 'react-konva';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { Stage, Layer, Image as KonvaImage, Line, Transformer } from 'react-konva';
 import useImage from 'use-image';
 import { Sparkle } from '../components/Sparkle';
 
-// Placeholder body types - will be replaced with actual SVG/image files
+// Body types with SVG files (using versions with "2" in filename for canvas)
 const bodyTypes = [
-  { id: 'bear', name: 'Bear', emoji: '🧸', color: '#D4A574' },
-  { id: 'bunny', name: 'Bunny', emoji: '🐰', color: '#FFB6C1' },
-  { id: 'cat', name: 'Cat', emoji: '🐱', color: '#FFA07A' },
-  { id: 'dragon', name: 'Dragon', emoji: '🐉', color: '#9370DB' },
+  { id: 'kirarin', name: 'Kirarin', emoji: '🦄', svgPath: '/build-svgs/body-kirarin-white.svg' },
+  { id: 'frootie', name: 'Toodie Frootie', emoji: '🍋', svgPath: '/build-svgs/body-frootie-white.svg' },
 ];
 
-// Object categories with placeholder items
-const objectCategories = {
-  accessories: [
-    { id: 'bow', name: 'Bow', emoji: '🎀', color: '#FF69B4' },
-    { id: 'hat', name: 'Hat', emoji: '🎩', color: '#8B4513' },
-    { id: 'scarf', name: 'Scarf', emoji: '🧣', color: '#FF6347' },
+// Parts to add (preview uses v1, canvas uses white2)
+const parts = {
+  eyes: [
+    {
+      id: 'eyes-sad',
+      name: 'Sad Eyes',
+      previewPath: '/build-svgs/eyes-sad v1.svg',
+      canvasPath: '/build-svgs/eyes-sad v1.svg'
+    },
   ],
   limbs: [
-    { id: 'arms', name: 'Arms', emoji: '💪', color: '#D4A574' },
-    { id: 'legs', name: 'Legs', emoji: '🦵', color: '#D4A574' },
-    { id: 'wings', name: 'Wings', emoji: '🦋', color: '#E6E6FA' },
-  ],
-  facial: [
-    { id: 'eyes-round', name: 'Round Eyes', emoji: '👀', color: '#000000' },
-    { id: 'nose', name: 'Nose', emoji: '👃', color: '#ffe2e6ff' },
-    { id: 'mouth-smile', name: 'Smile', emoji: '😊', color: '#FF69B4' },
+    {
+      id: 'limb-long',
+      name: 'Long Limb',
+      previewPath: '/build-svgs/limb-long1.svg',
+      canvasPath: '/build-svgs/limb-long-white.svg'
+    },
   ],
 };
 
-// Individual draggable object component
-const DraggableObject = ({ object, isSelected, onSelect, onChange, onDelete, stageSize }) => {
-  const shapeRef = useRef();
-  const trRef = useRef();
+// Body SVG component with color filter
+const BodyImage = ({ body, x, y, onClick, stageSize }) => {
+  const [image] = useImage(body.svgPath);
+  const [filterImage, setFilterImage] = useState(null);
+
+  // Calculate responsive body size - larger on small screens, 85% on desktop
+  const screenSize = Math.min(stageSize.width, stageSize.height);
+  const sizeMultiplier = screenSize < 600 ? 0.92 : 0.5;
+  const bodySize = screenSize * sizeMultiplier;
+  const bodyOffset = bodySize / 2;
 
   useEffect(() => {
-    if (isSelected) {
+    if (image && body.color) {
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d');
+
+      // Draw the original image
+      ctx.drawImage(image, 0, 0);
+
+      // Get image data to manipulate pixels
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      // Parse the color to RGB
+      const hexToRgb = (hex) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null;
+      };
+
+      const newColor = hexToRgb(body.color);
+
+      // Replace white/light pixels with the new color, keep dark pixels (outlines)
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const alpha = data[i + 3];
+
+        // If pixel is mostly white (above threshold) and not transparent
+        if (r > 200 && g > 200 && b > 200 && alpha > 0) {
+          data[i] = newColor.r;
+          data[i + 1] = newColor.g;
+          data[i + 2] = newColor.b;
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+
+      const coloredImage = new window.Image();
+      coloredImage.src = canvas.toDataURL();
+      coloredImage.onload = () => setFilterImage(coloredImage);
+    } else {
+      setFilterImage(image);
+    }
+  }, [image, body.color]);
+
+  // Adjust y position for toodie frootie - move it higher (scale adjustment with body size)
+  const yAdjustment = body.id === 'frootie' ? bodySize * 0.2 : 0;
+  const bodyY = y - yAdjustment;
+
+  return (
+    <KonvaImage
+      image={filterImage || image}
+      x={x}
+      y={bodyY}
+      width={bodySize}
+      height={bodySize}
+      offsetX={bodyOffset}
+      offsetY={bodyOffset}
+      onClick={onClick}
+    />
+  );
+};
+
+// Individual draggable SVG image component with color filter
+const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stageSize }) => {
+  const shapeRef = useRef();
+  const trRef = useRef();
+  const [image] = useImage(object.svgPath);
+  const [filterImage, setFilterImage] = useState(null);
+
+  useEffect(() => {
+    if (isSelected && trRef.current) {
       trRef.current.nodes([shapeRef.current]);
       trRef.current.getLayer().batchDraw();
     }
   }, [isSelected]);
 
+  useEffect(() => {
+    if (image && object.color) {
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d');
+
+      // Draw the original image
+      ctx.drawImage(image, 0, 0);
+
+      // Get image data to manipulate pixels
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      // Parse the color to RGB
+      const hexToRgb = (hex) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null;
+      };
+
+      const newColor = hexToRgb(object.color);
+
+      // Replace white/light pixels with the new color, keep dark pixels (outlines)
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const alpha = data[i + 3];
+
+        // If pixel is mostly white (above threshold) and not transparent
+        if (r > 200 && g > 200 && b > 200 && alpha > 0) {
+          data[i] = newColor.r;
+          data[i + 1] = newColor.g;
+          data[i + 2] = newColor.b;
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+
+      const coloredImage = new window.Image();
+      coloredImage.src = canvas.toDataURL();
+      coloredImage.onload = () => setFilterImage(coloredImage);
+    } else {
+      setFilterImage(image);
+    }
+  }, [image, object.color]);
+
   const checkIfInTrash = (x, y) => {
-    const trashX = 60; // Left side position
-    const trashY = stageSize.height - 60; // Bottom position
+    const trashX = 60;
+    const trashY = stageSize.height - 60;
     const distance = Math.sqrt(Math.pow(x - trashX, 2) + Math.pow(y - trashY, 2));
     return distance < 60;
   };
 
   return (
     <>
-      <Circle
+      <KonvaImage
         ref={shapeRef}
+        image={filterImage || image}
         x={object.x}
         y={object.y}
-        radius={object.radius || 30}
-        scaleX={object.scaleX || 1}
+        width={object.width || 100}
+        height={object.height || 100}
+        offsetX={(object.width || 100) / 2}
+        offsetY={(object.height || 100) / 2}
+        scaleX={(object.scaleX || 1) * (object.flipped ? -1 : 1)}
         scaleY={object.scaleY || 1}
-        fill={object.color}
+        rotation={object.rotation || 0}
         draggable
         onClick={onSelect}
         onTap={onSelect}
@@ -86,12 +222,13 @@ const DraggableObject = ({ object, isSelected, onSelect, onChange, onDelete, sta
             ...object,
             x: node.x(),
             y: node.y(),
-            scaleX: scaleX,
+            scaleX: Math.abs(scaleX) * (object.flipped ? 1 : 1),
             scaleY: scaleY,
             rotation: node.rotation(),
+            width: object.width,
+            height: object.height,
           });
         }}
-        rotation={object.rotation || 0}
       />
       {isSelected && (
         <Transformer
@@ -108,23 +245,24 @@ const DraggableObject = ({ object, isSelected, onSelect, onChange, onDelete, sta
   );
 };
 
-export const BuildYourOwn = () => {
+export const BuildYourOwn = ({ currentTheme }) => {
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
   const [selectedBody, setSelectedBody] = useState(null);
-  const [activeCategory, setActiveCategory] = useState('accessories');
   const [placedObjects, setPlacedObjects] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-  const [currentColor, setCurrentColor] = useState('#ff69b4');
+  const [currentColor, setCurrentColor] = useState('#ffffff');
   const [freeDrawMode, setFreeDrawMode] = useState(false);
   const [eraserMode, setEraserMode] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [lines, setLines] = useState([]);
   const [brushSize, setBrushSize] = useState(5);
   const [trashHovered, setTrashHovered] = useState(false);
+  const [history, setHistory] = useState([]);
   const stageRef = useRef(null);
   const containerRef = useRef(null);
   const [trashImage] = useImage('/trash.png');
   const [visualisImage] = useImage('/visualis.png');
+  const [undoImage] = useImage('/icons/refresh-data.png');
 
   // Handle responsive canvas sizing
   useEffect(() => {
@@ -144,22 +282,97 @@ export const BuildYourOwn = () => {
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  const handleBodySelect = (body) => {
-    setSelectedBody(body);
+  // Save current state to history
+  const saveToHistory = () => {
+    setHistory([...history, {
+      placedObjects: [...placedObjects],
+      lines: [...lines],
+      selectedBody: selectedBody ? { ...selectedBody } : null,
+    }]);
   };
 
-  const handleAddObject = (object) => {
+  // Undo last action
+  const handleUndo = () => {
+    if (history.length === 0) return;
+
+    const lastState = history[history.length - 1];
+    setPlacedObjects(lastState.placedObjects);
+    setLines(lastState.lines);
+    setSelectedBody(lastState.selectedBody);
+    setHistory(history.slice(0, -1));
+    setSelectedId(null);
+  };
+
+  const handleBodySelect = (body) => {
+    setHistory(prev => [...prev, {
+      placedObjects: placedObjects,
+      lines: lines,
+      selectedBody: selectedBody ? { ...selectedBody } : null,
+    }]);
+    setSelectedBody({ ...body, color: body.color || '#ffffff' });
+  };
+
+  const handleAddObject = (part) => {
+    setHistory(prev => [...prev, {
+      placedObjects: placedObjects,
+      lines: lines,
+      selectedBody: selectedBody ? { ...selectedBody } : null,
+    }]);
     const newObject = {
-      id: `${object.id}-${Date.now()}`,
-      type: object.id,
+      id: `${part.id}-${Date.now()}`,
+      type: part.id,
       x: stageSize.width / 2,
       y: stageSize.height / 2,
-      color: object.color,
-      emoji: object.emoji,
+      svgPath: part.canvasPath,
       rotation: 0,
-      radius: 30,
+      width: 100,
+      height: 100,
+      scaleX: 1,
+      scaleY: 1,
+      flipped: false,
+      color: currentColor,
+      zIndex: 0, // 0 = in front of body, negative = behind body
     };
-    setPlacedObjects([...placedObjects, newObject]);
+    setPlacedObjects(prev => [...prev, newObject]);
+  };
+
+  const handleFlipObject = () => {
+    if (selectedId) {
+      saveToHistory();
+      setPlacedObjects(
+        placedObjects.map((obj) =>
+          obj.id === selectedId ? { ...obj, flipped: !obj.flipped } : obj
+        )
+      );
+    }
+  };
+
+  const handleMoveLayer = (direction) => {
+    if (!selectedId) return;
+
+    saveToHistory();
+    const index = placedObjects.findIndex(obj => obj.id === selectedId);
+    if (index === -1) return;
+
+    const newObjects = [...placedObjects];
+
+    if (direction === 'up' && index < newObjects.length - 1) {
+      [newObjects[index], newObjects[index + 1]] = [newObjects[index + 1], newObjects[index]];
+    } else if (direction === 'down' && index > 0) {
+      [newObjects[index], newObjects[index - 1]] = [newObjects[index - 1], newObjects[index]];
+    } else if (direction === 'front') {
+      // Move to front: set zIndex to positive (in front of body)
+      newObjects[index] = { ...newObjects[index], zIndex: 0 };
+      const obj = newObjects.splice(index, 1)[0];
+      newObjects.push(obj);
+    } else if (direction === 'back') {
+      // Move to back: set zIndex to negative (behind body)
+      newObjects[index] = { ...newObjects[index], zIndex: -1 };
+      const obj = newObjects.splice(index, 1)[0];
+      newObjects.unshift(obj);
+    }
+
+    setPlacedObjects(newObjects);
   };
 
   const handleObjectChange = (id, newAttrs) => {
@@ -171,6 +384,7 @@ export const BuildYourOwn = () => {
   const handleColorChange = (newColor) => {
     setCurrentColor(newColor);
     if (selectedId) {
+      saveToHistory();
       setPlacedObjects(
         placedObjects.map((obj) =>
           obj.id === selectedId ? { ...obj, color: newColor } : obj
@@ -181,6 +395,7 @@ export const BuildYourOwn = () => {
 
   const handleBodyColorChange = (newColor) => {
     if (selectedBody) {
+      saveToHistory();
       setSelectedBody({ ...selectedBody, color: newColor });
     }
   };
@@ -194,6 +409,7 @@ export const BuildYourOwn = () => {
       return;
     }
 
+    saveToHistory();
     setIsDrawing(true);
     const pos = e.target.getStage().getPointerPosition();
     setLines([...lines, { points: [pos.x, pos.y], color: currentColor, size: brushSize, eraser: eraserMode }]);
@@ -214,6 +430,7 @@ export const BuildYourOwn = () => {
   };
 
   const handleClear = () => {
+    saveToHistory();
     setPlacedObjects([]);
     setLines([]);
     setSelectedBody(null);
@@ -229,6 +446,17 @@ export const BuildYourOwn = () => {
     link.click();
     document.body.removeChild(link);
   };
+
+  // Memoize filtered objects for better performance
+  const objectsBehindBody = useMemo(
+    () => placedObjects.filter(obj => (obj.zIndex || 0) < 0),
+    [placedObjects]
+  );
+
+  const objectsInFrontOfBody = useMemo(
+    () => placedObjects.filter(obj => (obj.zIndex || 0) >= 0),
+    [placedObjects]
+  );
 
   return (
     <motion.div
@@ -256,11 +484,14 @@ export const BuildYourOwn = () => {
       <div className="flex flex-col lg:flex-row gap-4 w-full max-w-7xl h-full">
         {/* Left Control Panel */}
         <motion.div
-          className="bg-white/90 backdrop-blur-md rounded-3xl p-4 shadow-xl lg:w-64 flex-shrink-0 overflow-y-auto"
+          className="backdrop-blur-md rounded-3xl p-4 shadow-xl lg:w-64 flex-shrink-0 overflow-y-auto"
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          style={{ maxHeight: 'calc(100vh - 180px)' }}
+          style={{
+            maxHeight: 'calc(100vh - 180px)',
+            backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+          }}
         >
           {/* Body Type Selection */}
           <div className="mb-6">
@@ -269,19 +500,19 @@ export const BuildYourOwn = () => {
               {bodyTypes.map((body) => (
                 <button
                   key={body.id}
-                  className={`p-3 rounded-2xl transition-all ${
+                  className={`p-4 rounded-2xl transition-all shadow-md ${
                     selectedBody?.id === body.id
                       ? 'ring-2 ring-offset-2 scale-105'
                       : 'hover:scale-105'
                   }`}
                   style={{
-                    background: body.color,
                     ringColor: 'var(--accent-primary)',
+                    backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                   }}
                   onClick={() => handleBodySelect(body)}
                 >
-                  <div className="text-3xl">{body.emoji}</div>
-                  <div className="text-xs font-semibold mt-1 text-white drop-shadow">
+                  <div className="text-5xl mb-2">{body.emoji}</div>
+                  <div className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
                     {body.name}
                   </div>
                 </button>
@@ -289,54 +520,106 @@ export const BuildYourOwn = () => {
             </div>
           </div>
 
-          {/* Category Toggles */}
+          {/* Parts - Eyes */}
           <div className="mb-6">
-            <h3 className="font-kalnia text-xl gradient-text mb-3">Add Parts</h3>
-            <div className="space-y-2">
-              {Object.keys(objectCategories).map((category) => (
+            <h3 className="font-kalnia text-xl gradient-text mb-3">Eyes</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {parts.eyes.map((part) => (
                 <button
-                  key={category}
-                  className={`w-full py-2 px-4 rounded-xl font-medium transition-all ${
-                    activeCategory === category
-                      ? 'scale-105 shadow-lg'
-                      : 'opacity-70 hover:opacity-100'
-                  }`}
+                  key={part.id}
+                  className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md flex items-center justify-center"
                   style={{
-                    background:
-                      activeCategory === category
-                        ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
-                        : 'var(--bg-gradient-start)',
-                    color: activeCategory === category ? 'white' : 'var(--text-primary)',
+                    backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                   }}
-                  onClick={() => setActiveCategory(category)}
+                  onClick={() => handleAddObject(part)}
+                  title={`Add ${part.name}`}
                 >
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                  <img src={part.previewPath} alt={part.name} className="w-full h-16 object-contain" />
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Object Palette */}
+          {/* Parts - Limbs */}
           <div className="mb-6">
-            <h3 className="font-kalnia text-lg gradient-text mb-3">
-              {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)}
-            </h3>
+            <h3 className="font-kalnia text-xl gradient-text mb-3">Limbs</h3>
             <div className="grid grid-cols-2 gap-2">
-              {objectCategories[activeCategory].map((obj) => (
+              {parts.limbs.map((part) => (
                 <button
-                  key={obj.id}
-                  className="p-3 rounded-2xl transition-all hover:scale-110 bg-white/80 shadow-md"
-                  onClick={() => handleAddObject(obj)}
-                  title={`Add ${obj.name}`}
+                  key={part.id}
+                  className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md flex items-center justify-center"
+                  style={{
+                    backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                  }}
+                  onClick={() => handleAddObject(part)}
+                  title={`Add ${part.name}`}
                 >
-                  <div className="text-3xl">{obj.emoji}</div>
-                  <div className="text-xs font-medium mt-1" style={{ color: 'var(--text-secondary)' }}>
-                    {obj.name}
-                  </div>
+                  <img src={part.previewPath} alt={part.name} className="w-full h-16 object-contain" />
                 </button>
               ))}
             </div>
           </div>
+
+          {/* Layer and Flip Controls */}
+          {selectedId && (
+            <div className="mb-6">
+              <h3 className="font-kalnia text-lg gradient-text mb-3">Selected Object</h3>
+              <div className="space-y-2">
+                <button
+                  className="w-full py-2 px-4 rounded-xl font-medium transition-all hover:scale-105"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                    color: 'white',
+                  }}
+                  onClick={handleFlipObject}
+                >
+                  ↔️ Flip Horizontal
+                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    className="py-2 px-3 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                    style={{
+                      background: 'var(--bg-gradient-start)',
+                      color: 'var(--text-primary)',
+                    }}
+                    onClick={() => handleMoveLayer('front')}
+                  >
+                    ⬆️ To Front
+                  </button>
+                  <button
+                    className="py-2 px-3 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                    style={{
+                      background: 'var(--bg-gradient-start)',
+                      color: 'var(--text-primary)',
+                    }}
+                    onClick={() => handleMoveLayer('back')}
+                  >
+                    ⬇️ To Back
+                  </button>
+                  <button
+                    className="py-2 px-3 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                    style={{
+                      background: 'var(--bg-gradient-start)',
+                      color: 'var(--text-primary)',
+                    }}
+                    onClick={() => handleMoveLayer('up')}
+                  >
+                    ⏫ Move Up
+                  </button>
+                  <button
+                    className="py-2 px-3 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                    style={{
+                      background: 'var(--bg-gradient-start)',
+                      color: 'var(--text-primary)',
+                    }}
+                    onClick={() => handleMoveLayer('down')}
+                  >
+                    ⏬ Move Down
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Color Pickers */}
           <div className="mb-6 space-y-3">
@@ -347,7 +630,7 @@ export const BuildYourOwn = () => {
               <div className="flex items-center gap-3">
                 <input
                   type="color"
-                  value={selectedBody.color}
+                  value={selectedBody.color || '#ff69b4'}
                   onChange={(e) => handleBodyColorChange(e.target.value)}
                   className="w-10 h-10 rounded-full cursor-pointer color-picker-clean"
                 />
@@ -357,24 +640,17 @@ export const BuildYourOwn = () => {
               </div>
             )}
 
-            {/* Object Color */}
-            <div className="space-y-1">
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={currentColor}
-                  onChange={(e) => handleColorChange(e.target.value)}
-                  className="w-10 h-10 rounded-full cursor-pointer color-picker-clean"
-                />
-                <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                  {selectedId ? 'Selected Object Color' : 'Drawing/Object Color'}
-                </label>
-              </div>
-              {selectedId && (
-                <p className="text-xs italic" style={{ color: 'var(--text-secondary)' }}>
-                  Changes selected object
-                </p>
-              )}
+            {/* Object/Drawing Color */}
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={currentColor}
+                onChange={(e) => handleColorChange(e.target.value)}
+                className="w-10 h-10 rounded-full cursor-pointer color-picker-clean"
+              />
+              <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+                {selectedId ? 'Selected Object' : 'Parts & Drawing'}
+              </label>
             </div>
           </div>
 
@@ -475,7 +751,10 @@ export const BuildYourOwn = () => {
         {/* Canvas Area */}
         <motion.div
           ref={containerRef}
-          className="flex-1 bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-4 overflow-hidden"
+          className="flex-1 backdrop-blur-md rounded-3xl shadow-xl p-4 overflow-hidden"
+          style={{
+            backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+          }}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -508,20 +787,49 @@ export const BuildYourOwn = () => {
                   />
                 )}
 
-                {/* Body */}
-                {selectedBody && (
-                  <Circle
-                    x={stageSize.width / 2}
-                    y={stageSize.height / 2}
-                    radius={60}
-                    fill={selectedBody.color}
-                    onClick={() => setSelectedId(null)}
+                {/* Undo Button - positioned in bottom-right */}
+                {undoImage && (
+                  <KonvaImage
+                    image={undoImage}
+                    x={stageSize.width - 90}
+                    y={stageSize.height - 90}
+                    width={60}
+                    height={60}
+                    opacity={history.length > 0 ? 0.8 : 0.3}
+                    listening={history.length > 0}
+                    onClick={handleUndo}
+                    onTap={handleUndo}
+                    cursor={history.length > 0 ? 'pointer' : 'not-allowed'}
                   />
                 )}
 
-                {/* Placed Objects */}
-                {placedObjects.map((obj) => (
-                  <DraggableObject
+                {/* Objects behind body (negative zIndex) */}
+                {objectsBehindBody.map((obj) => (
+                  <DraggableImage
+                    key={obj.id}
+                    object={obj}
+                    isSelected={obj.id === selectedId}
+                    onSelect={() => setSelectedId(obj.id)}
+                    onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
+                    onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
+                    stageSize={stageSize}
+                  />
+                ))}
+
+                {/* Body SVG */}
+                {selectedBody && (
+                  <BodyImage
+                    body={selectedBody}
+                    x={stageSize.width / 2}
+                    y={stageSize.height / 2}
+                    onClick={() => setSelectedId(null)}
+                    stageSize={stageSize}
+                  />
+                )}
+
+                {/* Objects in front of body (zero or positive zIndex) */}
+                {objectsInFrontOfBody.map((obj) => (
+                  <DraggableImage
                     key={obj.id}
                     object={obj}
                     isSelected={obj.id === selectedId}
@@ -569,6 +877,26 @@ export const BuildYourOwn = () => {
           )}
         </motion.div>
       </div>
+
+      {/* Instagram Tag Text */}
+      <motion.p
+        className="mt-6 text-center text-sm px-4"
+        style={{ color: 'var(--text-secondary)' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+      >
+        {currentTheme?.decorations?.[0] || '～ ♡'} feel free to share your creations on instagram and tag me{' '}
+        <a
+          href="https://www.instagram.com/kirametki/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="gradient-text font-semibold hover:opacity-70 transition-opacity"
+        >
+          @kirametki
+        </a>{' '}
+        {currentTheme?.decorations?.[1] || '⋆｡°✩'}
+      </motion.p>
     </motion.div>
   );
 };

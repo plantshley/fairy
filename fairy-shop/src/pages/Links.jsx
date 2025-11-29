@@ -21,8 +21,8 @@ const LinkCard = ({ link, index, currentTheme }) => {
   const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
-    // Only initialize particles for themes that use them
-    const particleThemes = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden'];
+    // Only initialize particles for themes that use them (all non-rainbow themes)
+    const particleThemes = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden', 'midnightVelvetMeadow'];
     if (!particleThemes.includes(currentTheme?.id)) return;
 
     console.log('Initializing particles for card', index);
@@ -107,7 +107,7 @@ const LinkCard = ({ link, index, currentTheme }) => {
     return baseClass;
   };
 
-  const shouldShowParticles = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden'].includes(currentTheme?.id);
+  const shouldShowParticles = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden', 'midnightVelvetMeadow'].includes(currentTheme?.id);
 
   return (
     <motion.a
@@ -137,10 +137,13 @@ const LinkCard = ({ link, index, currentTheme }) => {
       )}
 
       <motion.div
-        className="relative bg-white/90 backdrop-blur-md rounded-3xl p-6 shadow-xl h-32 w-full"
+        className="relative backdrop-blur-md rounded-3xl p-6 shadow-xl h-32 w-full"
         style={{
           border: '3px solid transparent',
-          backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+          backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+          backgroundImage: currentTheme?.id === 'midnightVelvetMeadow'
+            ? 'linear-gradient(rgba(42, 16, 53, 0.9), rgba(42, 16, 53, 0.9)), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
+            : 'linear-gradient(white, white), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
           backgroundOrigin: 'border-box',
           backgroundClip: 'padding-box, border-box',
         }}

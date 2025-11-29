@@ -12,6 +12,8 @@ export const Home = ({ currentTheme }) => {
         return ['🤍', '☁️', '🕊️'];
       case 'crystalSeasideGarden':
         return ['🫧', '🪸', '💎'];
+      case 'midnightVelvetMeadow':
+        return ['🔮', '🥀', '🌙'];
       default:
         return ['🪻', '🦋', '🌷'];
     }
@@ -106,7 +108,10 @@ export const Home = ({ currentTheme }) => {
 
         {/* Description */}
         <motion.div
-          className="bg-white/80 backdrop-blur-md rounded-3xl p-4 sm:p-6 shadow-xl"
+          className="backdrop-blur-md rounded-3xl p-4 sm:p-6 shadow-xl"
+          style={{
+            backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+          }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
