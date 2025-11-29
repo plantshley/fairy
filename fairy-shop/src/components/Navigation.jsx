@@ -9,6 +9,23 @@ const tabs = [
 ];
 
 export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
+  const getThemeEmoji = () => {
+    switch (currentTheme?.id) {
+      case 'twinkleFairyDream':
+        return '🌷';
+      case 'glitterGroovyRainbow':
+        return '🌈';
+      case 'celestialAngelicClouds':
+        return '☁️';
+      case 'crystalSeasideGarden':
+        return '🌊';
+      case 'midnightVelvetMeadow':
+        return '🥀';
+      default:
+        return '💕';
+    }
+  };
+
   return (
     <>
       {/* Desktop Navigation - hidden on mobile */}
