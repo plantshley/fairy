@@ -117,13 +117,12 @@ export const Home = ({ currentTheme }) => {
           transition={{ delay: 0.6 }}
         >
           <p className="text-sm sm:text-base leading-relaxed text-center" style={{ color: 'var(--text-secondary)' }}>
-            In this enchanted garden where strength meets softness, I weave threads of wonder into creaturely companions
-            and paint digital dreams with pixels of stardust. 🌷 As an environmental engineer by day, I channel the earth's
-            rhythms into sustainable magic. By twilight, I'm a powerlifter sculpting strength like clay, discovering resilience
-            in every rep. Through my autistic lens, I perceive patterns invisible to most—transforming hyperfocus into
-            meticulous stitchwork and cascading watercolor galaxies. Here, science dances with whimsy, iron meets yarn,
-            and every creation blooms from the intersection of precision and poetry. 💫 Welcome to where all my worlds collide
-            in kaleidoscopic harmony.
+            In this enchanted garden where strength meets serenity, I weave threads of whimsy into 
+            creaturely companions and paint dreams with glittering stardust🌷
+            At dawn, I'm a powerlifter sculpting strength like clay, and by day I'm an environmental engineer, 
+            channeling the earth's rhythms into sustainable magic. Through my autistic lens, I perceive patterns 
+            invisible to most, transforming hyperfocus into cascading galaxies of art & research. Here, every creation blooms 
+            from the kaleidoscopic harmony of precision and poetry ✧･ﾟ⋆｡°✩｡° ♡ ⋆
           </p>
         </motion.div>
 

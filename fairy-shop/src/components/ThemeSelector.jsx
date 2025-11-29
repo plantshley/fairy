@@ -85,7 +85,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
                 style={{
                   maxWidth: '90vw',
                   width: '500px',
-                  maxHeight: '80vh',
+                  maxHeight: '90vh',
                   overflowY: 'auto',
                   backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                 }}

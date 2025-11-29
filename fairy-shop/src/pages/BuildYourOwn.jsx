@@ -24,7 +24,7 @@ const parts = {
     {
       id: 'limb-long',
       name: 'Long Limb',
-      previewPath: '/build-svgs/limb-long1.svg',
+      previewPath: '/build-svgs/limb-long-white.svg',
       canvasPath: '/build-svgs/limb-long-white.svg'
     },
   ],
