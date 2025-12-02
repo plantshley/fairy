@@ -8,6 +8,7 @@ import { Sparkle } from '../components/Sparkle';
 const bodyTypes = [
   { id: 'kirarin', name: 'Kirarin', emoji: '🦄', svgPath: '/build-svgs/body-kirarin-white.svg' },
   { id: 'frootie', name: 'Toodie Frootie', emoji: '🍋', svgPath: '/build-svgs/body-frootie-white.svg' },
+  { id: 'sylph', name: 'Sylph', emoji: '🦢', svgPath: '/build-svgs/body-sylph.svg' },
 ];
 
 // Parts to add (preview uses v1, canvas uses white2)
@@ -74,11 +75,17 @@ const BodyImage = ({ body, x, y, onClick, stageSize }) => {
         const b = data[i + 2];
         const alpha = data[i + 3];
 
-        // If pixel is mostly white (above threshold) and not transparent
-        if (r > 200 && g > 200 && b > 200 && alpha > 0) {
+        // If pixel is NOT the dark gray outline and has any opacity, color it
+        // Only color pixels that are significantly lighter than the outline OR have low alpha (anti-aliased edges)
+        // Outline is ~30-40 RGB with full alpha, gaps are lighter or semi-transparent
+        const isLightEnough = r > 50 || g > 50 || b > 50;
+        const isSemiTransparent = alpha > 0 && alpha < 200;
+
+        if (alpha > 0 && (isLightEnough || isSemiTransparent)) {
           data[i] = newColor.r;
           data[i + 1] = newColor.g;
           data[i + 2] = newColor.b;
+          // Keep original alpha for anti-aliasing
         }
       }
 
@@ -116,6 +123,7 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
   const trRef = useRef();
   const [image] = useImage(object.svgPath);
   const [filterImage, setFilterImage] = useState(null);
+  const [croppedDimensions, setCroppedDimensions] = useState({ width: object.width || 100, height: object.height || 100 });
 
   useEffect(() => {
     if (isSelected && trRef.current) {
@@ -150,28 +158,120 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
 
       const newColor = hexToRgb(object.color);
 
-      // Replace white/light pixels with the new color, keep dark pixels (outlines)
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const alpha = data[i + 3];
+      // Find the bounding box of non-transparent pixels
+      let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
 
-        // If pixel is mostly white (above threshold) and not transparent
-        if (r > 200 && g > 200 && b > 200 && alpha > 0) {
-          data[i] = newColor.r;
-          data[i + 1] = newColor.g;
-          data[i + 2] = newColor.b;
+      // Replace white/light pixels with the new color, keep dark pixels (outlines)
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const i = (y * canvas.width + x) * 4;
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const alpha = data[i + 3];
+
+          // Track bounding box of visible pixels
+          if (alpha > 10) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+
+          // If pixel is NOT the dark gray outline and has any opacity, color it
+          // Only color pixels that are significantly lighter than the outline OR have low alpha (anti-aliased edges)
+          // Outline is ~30-40 RGB with full alpha, gaps are lighter or semi-transparent
+          const isLightEnough = r > 50 || g > 50 || b > 50;
+          const isSemiTransparent = alpha > 0 && alpha < 200;
+
+          if (alpha > 0 && (isLightEnough || isSemiTransparent)) {
+            data[i] = newColor.r;
+            data[i + 1] = newColor.g;
+            data[i + 2] = newColor.b;
+            // Keep original alpha for anti-aliasing
+          }
         }
       }
 
+      // Create a cropped canvas with just the content
+      const croppedWidth = maxX - minX + 1;
+      const croppedHeight = maxY - minY + 1;
+      const croppedCanvas = document.createElement('canvas');
+      croppedCanvas.width = croppedWidth;
+      croppedCanvas.height = croppedHeight;
+      const croppedCtx = croppedCanvas.getContext('2d');
+
+      // Put the colored data back first
       ctx.putImageData(imageData, 0, 0);
 
+      // Draw only the cropped region
+      croppedCtx.drawImage(
+        canvas,
+        minX, minY, croppedWidth, croppedHeight,
+        0, 0, croppedWidth, croppedHeight
+      );
+
       const coloredImage = new window.Image();
-      coloredImage.src = canvas.toDataURL();
-      coloredImage.onload = () => setFilterImage(coloredImage);
-    } else {
-      setFilterImage(image);
+      coloredImage.src = croppedCanvas.toDataURL();
+      coloredImage.onload = () => {
+        setFilterImage(coloredImage);
+        // Scale the cropped dimensions to match the desired initial size
+        const aspectRatio = croppedWidth / croppedHeight;
+        const targetWidth = object.width || 100;
+        const targetHeight = targetWidth / aspectRatio;
+        setCroppedDimensions({ width: targetWidth, height: targetHeight });
+      };
+    } else if (image) {
+      // Even without color, crop to content bounds
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      // Find the bounding box of non-transparent pixels
+      let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
+
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const i = (y * canvas.width + x) * 4;
+          const alpha = data[i + 3];
+
+          if (alpha > 10) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+
+      const croppedWidth = maxX - minX + 1;
+      const croppedHeight = maxY - minY + 1;
+      const croppedCanvas = document.createElement('canvas');
+      croppedCanvas.width = croppedWidth;
+      croppedCanvas.height = croppedHeight;
+      const croppedCtx = croppedCanvas.getContext('2d');
+
+      croppedCtx.drawImage(
+        canvas,
+        minX, minY, croppedWidth, croppedHeight,
+        0, 0, croppedWidth, croppedHeight
+      );
+
+      const croppedImage = new window.Image();
+      croppedImage.src = croppedCanvas.toDataURL();
+      croppedImage.onload = () => {
+        setFilterImage(croppedImage);
+        // Scale the cropped dimensions to match the desired initial size
+        const aspectRatio = croppedWidth / croppedHeight;
+        const targetWidth = object.width || 100;
+        const targetHeight = targetWidth / aspectRatio;
+        setCroppedDimensions({ width: targetWidth, height: targetHeight });
+      };
     }
   }, [image, object.color]);
 
@@ -189,10 +289,10 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
         image={filterImage || image}
         x={object.x}
         y={object.y}
-        width={object.width || 100}
-        height={object.height || 100}
-        offsetX={(object.width || 100) / 2}
-        offsetY={(object.height || 100) / 2}
+        width={croppedDimensions.width}
+        height={croppedDimensions.height}
+        offsetX={croppedDimensions.width / 2}
+        offsetY={croppedDimensions.height / 2}
         scaleX={(object.scaleX || 1) * (object.flipped ? -1 : 1)}
         scaleY={object.scaleY || 1}
         rotation={object.rotation || 0}
@@ -225,8 +325,8 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
             scaleX: Math.abs(scaleX) * (object.flipped ? 1 : 1),
             scaleY: scaleY,
             rotation: node.rotation(),
-            width: object.width,
-            height: object.height,
+            width: croppedDimensions.width,
+            height: croppedDimensions.height,
           });
         }}
       />
@@ -318,6 +418,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
       lines: lines,
       selectedBody: selectedBody ? { ...selectedBody } : null,
     }]);
+
+    // Calculate responsive initial size - much smaller for added parts
+    const screenSize = Math.min(stageSize.width, stageSize.height);
+    const initialSize = screenSize < 600 ? screenSize * 0.12 : screenSize * 0.06;
+
     const newObject = {
       id: `${part.id}-${Date.now()}`,
       type: part.id,
@@ -325,8 +430,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
       y: stageSize.height / 2,
       svgPath: part.canvasPath,
       rotation: 0,
-      width: 100,
-      height: 100,
+      width: initialSize,
+      height: initialSize,
       scaleX: 1,
       scaleY: 1,
       flipped: false,
