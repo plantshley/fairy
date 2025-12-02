@@ -16,7 +16,7 @@ export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
       case 'glitterGroovyRainbow':
         return '🌈';
       case 'celestialAngelicClouds':
-        return '☁️';
+        return '🤍';
       case 'crystalSeasideGarden':
         return '🌊';
       case 'midnightVelvetMeadow':
@@ -54,11 +54,11 @@ export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
               <span className="text-base whitespace-nowrap font-bonbon tracking-wider">{tab.label}</span>
               {activeTab === tab.id && (
                 <motion.span
-                  className="ml-auto text-sm"
+                  className="ml-auto text-normal"
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                 >
-                  💕
+                  {getThemeEmoji()}
                 </motion.span>
               )}
             </motion.button>
