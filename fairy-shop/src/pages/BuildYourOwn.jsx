@@ -985,7 +985,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
       {/* Instagram Tag Text */}
       <motion.p
-        className="mt-6 text-center text-sm px-4"
+        className="mt-6 text-center text-xs sm:text-sm px-4 max-w-2xl mx-auto"
         style={{ color: 'var(--text-secondary)' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
