@@ -72,9 +72,8 @@ const CategoryBox = ({ category, isHovered, currentTheme, onMouseEnter, onMouseL
   useEffect(() => {
     if (previewImage) {
       console.log(`[${category.name}] Attempting to load:`, previewImage);
-      // Encode the path to handle spaces and special characters
-      const encodedPath = previewImage.split('/').map(part => encodeURIComponent(part)).join('/');
-      const fullPath = `/${encodedPath}`;
+      // Only encode spaces in the path, leave other special characters
+      const fullPath = `/${previewImage.replace(/ /g, '%20')}`;
 
       // Directly set the image URL
       setImageUrl(fullPath);
@@ -263,14 +262,14 @@ const CategoryBox = ({ category, isHovered, currentTheme, onMouseEnter, onMouseL
 
         {/* Category info */}
         <div
-          className="absolute bottom-0 left-0 right-0 p-3 sm:p-6 text-white transition-all duration-500"
+          className={`absolute left-0 right-0 p-2 sm:p-4 md:p-6 text-white transition-all duration-500 ${isMobile ? 'top-1/2 -translate-y-1/2' : 'bottom-0'}`}
           style={{
             opacity: isHovered ? 1 : 0.9,
-            transform: isHovered ? 'translateY(0)' : 'translateY(10px)',
+            transform: isHovered && !isMobile ? 'translateY(0)' : !isMobile ? 'translateY(10px)' : undefined,
           }}
         >
-          <h2 className="text-center font-bonbon tracking-wider text-base sm:text-2xl mb-1">{category.name}</h2>
-          {isHovered && (
+          <h2 className={`font-bonbon tracking-wider text-xs sm:text-lg md:text-2xl mb-0.5 sm:mb-1 px-1 ${isMobile ? 'text-left break-words' : 'text-center'}`}>{category.name}</h2>
+          {isHovered && !isMobile && (
             <p className="text-center text-xs sm:text-sm opacity-90 font-jetbrains transition-opacity duration-300">
               {category.description}
             </p>
@@ -289,22 +288,8 @@ export const Gallery = ({ currentTheme }) => {
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
 
   const getCategoryImages = (key) => {
-    const allImages = galleryManifest[key] || [];
-
-    // Separate preview image from the rest
-    const previewImg = allImages.find(img => img.toLowerCase().includes('/preview.'));
-    const otherImages = allImages.filter(img => !img.toLowerCase().includes('/preview.'));
-
-    // Sort other images by filename in descending order (most recent first)
-    // This works because filenames often have dates like 20251106_161813.jpg
-    const sortedImages = otherImages.sort((a, b) => {
-      const filenameA = a.split('/').pop();
-      const filenameB = b.split('/').pop();
-      return filenameB.localeCompare(filenameA);
-    });
-
-    // Put preview first if it exists, then sorted images
-    return previewImg ? [previewImg, ...sortedImages] : sortedImages;
+    // Images are already sorted by modification date in the manifest (preview first, then newest to oldest)
+    return galleryManifest[key] || [];
   };
 
   // Reset zoom when image changes
@@ -338,9 +323,9 @@ export const Gallery = ({ currentTheme }) => {
         transition={{ duration: 0.3 }}
       >
         {/* Header with back button */}
-        <div className="w-full max-w-7xl mb-6 flex items-center justify-between">
+        <div className="w-full max-w-7xl mb-4 sm:mb-6 flex items-center justify-between px-2 sm:px-0">
           <motion.button
-            className="flex items-center gap-2 px-4 py-2 rounded-full font-bonbon tracking-wider text-lg"
+            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bonbon tracking-wider text-sm sm:text-lg"
             style={{
               background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
               color: 'white',
@@ -353,22 +338,22 @@ export const Gallery = ({ currentTheme }) => {
           </motion.button>
 
           <motion.h1
-            className="font-kalnia text-2xl sm:text-3xl gradient-text text-center"
+            className="font-kalnia text-lg sm:text-2xl md:text-3xl gradient-text text-center"
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
           >
             {selectedCategory.name}
           </motion.h1>
 
-          <div className="w-24" /> {/* Spacer for centering */}
+          <div className="w-16 sm:w-24" /> {/* Spacer for centering */}
         </div>
 
         {/* Category navigation tabs */}
-        <div className="flex gap-2 mb-6 flex-wrap justify-center">
+        <div className="flex gap-1.5 sm:gap-2 mb-4 sm:mb-6 flex-wrap justify-center px-2 sm:px-0">
           {categories.map((cat) => (
             <motion.button
               key={cat.id}
-              className="px-4 py-2 rounded-full font-bonbon tracking-wider text-sm"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full font-bonbon tracking-wider text-xs sm:text-sm"
               style={{
                 background: selectedCategory.id === cat.id
                   ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
@@ -394,28 +379,35 @@ export const Gallery = ({ currentTheme }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          {images.map((imagePath, index) => (
-            <motion.div
-              key={imagePath}
-              className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-xl"
-              style={{
-                backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.3)' : 'rgba(255, 255, 255, 0.3)',
-              }}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.02 }}
-              whileHover={{ scale: 1.05, zIndex: 10 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setSelectedImage(imagePath)}
-            >
-              <img
-                src={`/${imagePath.split('/').map(part => encodeURIComponent(part)).join('/')}`}
-                alt=""
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </motion.div>
-          ))}
+          {images.map((imagePath, index) => {
+            // Only encode spaces in the path, leave other special characters
+            const encodedSrc = `/${imagePath.replace(/ /g, '%20')}`;
+            return (
+              <motion.div
+                key={imagePath}
+                className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-xl"
+                style={{
+                  backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.3)' : 'rgba(255, 255, 255, 0.3)',
+                }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.02 }}
+                whileHover={{ scale: 1.05, zIndex: 10 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedImage(imagePath)}
+              >
+                <img
+                  src={encodedSrc}
+                  alt=""
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    console.error(`Failed to load image: ${imagePath}`, `Encoded: ${encodedSrc}`);
+                  }}
+                />
+              </motion.div>
+            );
+          })}
         </motion.div>
 
         {/* Lightbox for selected image */}
@@ -439,7 +431,8 @@ export const Gallery = ({ currentTheme }) => {
               }}
             >
               <motion.button
-                className="absolute top-4 right-4 text-white text-4xl font-bold hover:opacity-70 z-60"
+                className="absolute top-4 right-4 text-white text-4xl font-bold hover:opacity-70"
+                style={{ zIndex: 100 }}
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedImage(null);
@@ -453,9 +446,10 @@ export const Gallery = ({ currentTheme }) => {
               {/* Zoom indicator */}
               {zoomLevel > 1 && (
                 <motion.div
-                  className="absolute top-4 left-4 text-white text-sm font-bonbon tracking-wider z-60 px-3 py-2 rounded-full pointer-events-none"
+                  className="absolute top-4 left-4 text-white text-sm font-bonbon tracking-wider px-3 py-2 rounded-full pointer-events-none"
                   style={{
                     background: 'rgba(255, 255, 255, 0.1)',
+                    zIndex: 100,
                   }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -467,7 +461,8 @@ export const Gallery = ({ currentTheme }) => {
               {/* Previous button */}
               {currentIndex > 0 && (
                 <motion.button
-                  className="absolute left-4 text-white text-4xl font-bold hover:opacity-70 z-60"
+                  className="absolute left-4 text-white text-4xl font-bold hover:opacity-70"
+                  style={{ zIndex: 100 }}
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedImage(images[currentIndex - 1]);
@@ -482,7 +477,8 @@ export const Gallery = ({ currentTheme }) => {
               {/* Next button */}
               {currentIndex < images.length - 1 && (
                 <motion.button
-                  className="absolute right-4 text-white text-4xl font-bold hover:opacity-70 z-60"
+                  className="absolute right-4 text-white text-4xl font-bold hover:opacity-70"
+                  style={{ zIndex: 100 }}
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedImage(images[currentIndex + 1]);
@@ -495,7 +491,7 @@ export const Gallery = ({ currentTheme }) => {
               )}
 
               <motion.img
-                src={`/${selectedImage.split('/').map(part => encodeURIComponent(part)).join('/')}`}
+                src={`/${selectedImage.replace(/ /g, '%20')}`}
                 alt="Selected gallery image"
                 className="max-w-full max-h-full object-contain select-none"
                 style={{
@@ -561,7 +557,12 @@ export const Gallery = ({ currentTheme }) => {
       </p>
 
       {/* Expandable category boxes */}
-      <div className="flex flex-row gap-2 sm:gap-4 w-full max-w-6xl items-stretch overflow-x-auto pb-4">
+      <div
+        className="flex flex-row gap-2 sm:gap-4 w-full max-w-6xl items-stretch pb-4 pt-8 overflow-x-auto sm:overflow-x-visible"
+        style={{
+          overflowY: 'visible'
+        }}
+      >
         {categories.map((category) => (
           <CategoryBox
             key={category.id}
