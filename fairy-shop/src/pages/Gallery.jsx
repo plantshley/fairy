@@ -8,33 +8,33 @@ import galleryManifest from '../galleryManifest.json';
 const categories = [
   {
     id: 'crochet',
-    name: 'Crochet',
+    name: 'crochet',
     key: 'crochet',
-    description: 'Handmade creaturely companions',
+    description: 'handmade creaturely companions',
   },
   {
     id: 'digital',
-    name: 'Digital Works',
+    name: 'digital works',
     key: 'digital works',
-    description: 'Digital art & illustrations',
+    description: 'digital illustrations, logos, & stickers',
   },
   {
     id: 'traditional',
-    name: 'Traditional Works',
+    name: 'traditional works',
     key: 'traditional works',
-    description: 'Traditional art & paintings',
+    description: 'colored pencil, graphite, & painted art',
   },
   {
     id: 'cards',
-    name: 'Cards & Sketches',
+    name: 'cards & sketches',
     key: 'cards-and-sketches',
-    description: 'Sketches, cards & quick art',
+    description: 'a peek into my sketchbook & hand-painted cards',
   },
   {
     id: 'plantshley',
-    name: 'Plantshley Books',
+    name: 'plantshley books',
     key: 'plantshley books',
-    description: 'Plant-themed book series',
+    description: 'illustrations from my childrens book series',
   },
 ];
 
@@ -224,15 +224,33 @@ const CategoryBox = ({ category, isHovered, currentTheme, onMouseEnter, onMouseL
         style={{
           width: '100%',
           height: '100%',
-          backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
-          backgroundColor: imageUrl ? 'transparent' : (currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)'),
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
           border: `3px solid ${isHovered ? 'var(--accent-primary)' : 'transparent'}`,
           transition: 'all 0.3s ease',
         }}
       >
+        {/* Background image layer */}
+        {imageUrl && (
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url(${imageUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          />
+        )}
+
+        {/* Fallback background for missing images */}
+        {!imageUrl && (
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+            }}
+          />
+        )}
+
         {/* Overlay gradient */}
         <div
           className="absolute inset-0 transition-all duration-500"
@@ -251,16 +269,11 @@ const CategoryBox = ({ category, isHovered, currentTheme, onMouseEnter, onMouseL
             transform: isHovered ? 'translateY(0)' : 'translateY(10px)',
           }}
         >
-          <h2 className="font-kalnia text-base sm:text-2xl mb-1">{category.name}</h2>
+          <h2 className="text-center font-bonbon tracking-wider text-base sm:text-2xl mb-1">{category.name}</h2>
           {isHovered && (
-            <>
-              <p className="text-xs sm:text-sm opacity-90 font-bonbon tracking-wider transition-opacity duration-300">
-                {category.description}
-              </p>
-              <p className="text-xs opacity-70 mt-1 sm:mt-2 font-bonbon tracking-wider">
-                {images.length} images
-              </p>
-            </>
+            <p className="text-center text-xs sm:text-sm opacity-90 font-jetbrains transition-opacity duration-300">
+              {category.description}
+            </p>
           )}
         </div>
       </div>
@@ -272,6 +285,8 @@ export const Gallery = ({ currentTheme }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
 
   const getCategoryImages = (key) => {
     const allImages = galleryManifest[key] || [];
@@ -291,6 +306,24 @@ export const Gallery = ({ currentTheme }) => {
     // Put preview first if it exists, then sorted images
     return previewImg ? [previewImg, ...sortedImages] : sortedImages;
   };
+
+  // Reset zoom when image changes
+  useEffect(() => {
+    setZoomLevel(1);
+    setDragPosition({ x: 0, y: 0 });
+  }, [selectedImage]);
+
+  // Lock body scroll when lightbox is open
+  useEffect(() => {
+    if (selectedImage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedImage]);
 
   if (selectedCategory) {
     const images = getCategoryImages(selectedCategory.key);
@@ -389,18 +422,47 @@ export const Gallery = ({ currentTheme }) => {
         <AnimatePresence>
           {selectedImage && (
             <motion.div
-              className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+              className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 overflow-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setSelectedImage(null)}
+              onClick={() => {
+                setSelectedImage(null);
+                setZoomLevel(1);
+                setDragPosition({ x: 0, y: 0 });
+              }}
+              onWheel={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const delta = e.deltaY * -0.001;
+                setZoomLevel((prev) => Math.max(1, Math.min(5, prev + delta)));
+              }}
             >
               <motion.button
                 className="absolute top-4 right-4 text-white text-4xl font-bold hover:opacity-70 z-60"
-                onClick={() => setSelectedImage(null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedImage(null);
+                  setZoomLevel(1);
+                  setDragPosition({ x: 0, y: 0 });
+                }}
               >
                 ×
               </motion.button>
+
+              {/* Zoom indicator */}
+              {zoomLevel > 1 && (
+                <motion.div
+                  className="absolute top-4 left-4 text-white text-sm font-bonbon tracking-wider z-60 px-3 py-2 rounded-full pointer-events-none"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                  }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  {Math.round(zoomLevel * 100)}%
+                </motion.div>
+              )}
 
               {/* Previous button */}
               {currentIndex > 0 && (
@@ -435,12 +497,39 @@ export const Gallery = ({ currentTheme }) => {
               <motion.img
                 src={`/${selectedImage.split('/').map(part => encodeURIComponent(part)).join('/')}`}
                 alt="Selected gallery image"
-                className="max-w-full max-h-full object-contain"
+                className="max-w-full max-h-full object-contain select-none"
+                style={{
+                  cursor: zoomLevel > 1 ? 'grab' : 'default',
+                }}
                 initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
+                animate={{
+                  scale: 0.8 * zoomLevel,
+                  x: dragPosition.x,
+                  y: dragPosition.y,
+                }}
                 exit={{ scale: 0.8 }}
                 onClick={(e) => e.stopPropagation()}
+                drag={zoomLevel > 1}
+                dragConstraints={{ left: -1000, right: 1000, top: -1000, bottom: 1000 }}
+                dragElastic={0.05}
+                onDragEnd={(_e, info) => {
+                  setDragPosition({
+                    x: dragPosition.x + info.offset.x,
+                    y: dragPosition.y + info.offset.y,
+                  });
+                }}
+                whileDrag={{ cursor: 'grabbing' }}
               />
+
+              {/* Instructions hint */}
+              <motion.p
+                className="absolute bottom-4 text-white text-xs font-bonbon tracking-wider opacity-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                transition={{ delay: 1 }}
+              >
+                scroll to zoom • drag to pan
+              </motion.p>
             </motion.div>
           )}
         </AnimatePresence>
