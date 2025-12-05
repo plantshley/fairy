@@ -506,6 +506,12 @@ export const BuildYourOwn = ({ currentTheme }) => {
   };
 
   const handleMouseDown = (e) => {
+    // Check if clicking on the undo button (let it handle its own click)
+    const clickedNode = e.target;
+    if (clickedNode.attrs && clickedNode.attrs.id === 'undo-button') {
+      return;
+    }
+
     if (!freeDrawMode) {
       const clickedOnEmpty = e.target === e.target.getStage();
       if (clickedOnEmpty) {
@@ -600,7 +606,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
         >
           {/* Body Type Selection */}
           <div className="mb-6">
-            <h3 className="font-kalnia text-xl gradient-text mb-3">Body Type</h3>
+            <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Body Type</h3>
             <div className="grid grid-cols-2 gap-2">
               {bodyTypes.map((body) => (
                 <button
@@ -627,7 +633,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
           {/* Parts - Eyes */}
           <div className="mb-6">
-            <h3 className="font-kalnia text-xl gradient-text mb-3">Eyes</h3>
+            <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Eyes</h3>
             <div className="grid grid-cols-2 gap-2">
               {parts.eyes.map((part) => (
                 <button
@@ -647,7 +653,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
           {/* Parts - Limbs */}
           <div className="mb-6">
-            <h3 className="font-kalnia text-xl gradient-text mb-3">Limbs</h3>
+            <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Limbs</h3>
             <div className="grid grid-cols-2 gap-2">
               {parts.limbs.map((part) => (
                 <button
@@ -668,7 +674,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
           {/* Layer and Flip Controls */}
           {selectedId && (
             <div className="mb-6">
-              <h3 className="font-kalnia text-lg gradient-text mb-3">Selected Object</h3>
+              <h3 className="font-bonbon tracking-wider text-xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Selected Object</h3>
               <div className="space-y-2">
                 <button
                   className="w-full py-2 px-4 rounded-xl font-medium transition-all hover:scale-105"
@@ -728,7 +734,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
           {/* Color Pickers */}
           <div className="mb-6 space-y-3">
-            <h3 className="font-kalnia text-lg gradient-text mb-3">Colors</h3>
+            <h3 className="font-bonbon tracking-wider text-xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Colors</h3>
 
             {/* Body Color */}
             {selectedBody && (
@@ -761,7 +767,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
           {/* Draw Mode */}
           <div className="mb-6">
-            <h3 className="font-kalnia text-lg gradient-text mb-3">Free Draw</h3>
+            <h3 className="font-bonbon tracking-wider text-xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Free Draw</h3>
             <button
               className={`w-full py-2 px-4 rounded-xl font-medium transition-all ${
                 freeDrawMode ? 'scale-105 shadow-lg' : 'opacity-70'
@@ -802,7 +808,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     }`}
                     style={{
                       background: eraserMode
-                        ? 'linear-gradient(135deg, #94a3b8, #64748b)'
+                        ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
                         : '#e5e7eb',
                       color: eraserMode ? 'white' : '#6b7280',
                     }}
@@ -821,7 +827,10 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     max="20"
                     value={brushSize}
                     onChange={(e) => setBrushSize(parseInt(e.target.value))}
-                    className="w-full mt-1"
+                    className="w-full mt-1 brush-slider"
+                    style={{
+                      '--slider-color': 'var(--accent-primary)',
+                    }}
                   />
                 </div>
               </div>
@@ -833,7 +842,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
             <button
               className="w-full py-2 px-4 rounded-xl font-medium transition-all hover:scale-105"
               style={{
-                background: 'linear-gradient(135deg, #4ade80, #22c55e)',
+                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
                 color: 'white',
               }}
               onClick={handleExport}
@@ -843,7 +852,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
             <button
               className="w-full py-2 px-4 rounded-xl font-medium transition-all hover:scale-105"
               style={{
-                background: 'linear-gradient(135deg, #f87171, #ef4444)',
+                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
                 color: 'white',
               }}
               onClick={handleClear}
@@ -895,16 +904,48 @@ export const BuildYourOwn = ({ currentTheme }) => {
                 {/* Undo Button - positioned in bottom-right */}
                 {undoImage && (
                   <KonvaImage
+                    id="undo-button"
                     image={undoImage}
                     x={stageSize.width - 90}
                     y={stageSize.height - 90}
                     width={60}
                     height={60}
-                    opacity={history.length > 0 ? 0.8 : 0.3}
-                    listening={history.length > 0}
-                    onClick={handleUndo}
-                    onTap={handleUndo}
-                    cursor={history.length > 0 ? 'pointer' : 'not-allowed'}
+                    opacity={history.length > 0 ? 1 : 0.3}
+                    listening={true}
+                    onClick={(e) => {
+                      if (history.length > 0) {
+                        e.cancelBubble = true;
+                        handleUndo();
+                      }
+                    }}
+                    onTap={(e) => {
+                      if (history.length > 0) {
+                        e.cancelBubble = true;
+                        handleUndo();
+                      }
+                    }}
+                    onMouseEnter={(e) => {
+                      if (history.length > 0) {
+                        const container = e.target.getStage().container();
+                        container.style.cursor = 'pointer';
+                        // Scale up on hover
+                        e.target.to({
+                          scaleX: 1.15,
+                          scaleY: 1.15,
+                          duration: 0.1,
+                        });
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      const container = e.target.getStage().container();
+                      container.style.cursor = 'default';
+                      // Scale back down
+                      e.target.to({
+                        scaleX: 1,
+                        scaleY: 1,
+                        duration: 0.1,
+                      });
+                    }}
                   />
                 )}
 

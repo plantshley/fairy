@@ -209,3 +209,60 @@ body {
   border: none;
   border-radius: 50%;
 }
+
+/* Brush slider styling with theme colors */
+.brush-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+
+.brush-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-color, #3b82f6);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.brush-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.brush-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-color, #3b82f6);
+  cursor: pointer;
+  border: none;
+  transition: transform 0.2s;
+}
+
+.brush-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+.brush-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, var(--slider-color, #3b82f6) 0%, var(--slider-color, #3b82f6) var(--slider-progress, 0%), rgba(0, 0, 0, 0.1) var(--slider-progress, 0%));
+  height: 6px;
+  border-radius: 3px;
+}
+
+.brush-slider::-moz-range-track {
+  background: rgba(0, 0, 0, 0.1);
+  height: 6px;
+  border-radius: 3px;
+}
+
+.brush-slider::-moz-range-progress {
+  background: var(--slider-color, #3b82f6);
+  height: 6px;
+  border-radius: 3px;
+}

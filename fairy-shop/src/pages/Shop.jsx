@@ -50,7 +50,7 @@ export const Shop = ({ currentTheme }) => {
       </motion.div>
 
       <p className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
-        💞 handmade with love & care 💞
+        ⋆⁺₊⋆ handmade with love & care ⋆⁺₊⋆
       </p>
     </motion.div>
   );
