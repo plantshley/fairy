@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Stage, Layer, Image as KonvaImage, Line, Transformer } from 'react-konva';
+import { Stage, Layer, Image as KonvaImage, Line, Transformer, Rect, Text, Group } from 'react-konva';
 import useImage from 'use-image';
 import { Sparkle } from '../components/Sparkle';
 
@@ -32,13 +32,14 @@ const parts = {
 };
 
 // Body SVG component with color filter
-const BodyImage = ({ body, x, y, onClick, stageSize }) => {
+const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
   const [image] = useImage(body.svgPath);
   const [filterImage, setFilterImage] = useState(null);
 
-  // Calculate responsive body size - larger on small screens, 85% on desktop
+  // Calculate responsive body size - use bodySizeMultiplier prop
   const screenSize = Math.min(stageSize.width, stageSize.height);
-  const sizeMultiplier = screenSize < 600 ? 0.92 : 0.5;
+  const baseSizeMultiplier = screenSize < 600 ? 0.92 : 0.5;
+  const sizeMultiplier = bodySizeMultiplier || baseSizeMultiplier;
   const bodySize = screenSize * sizeMultiplier;
   const bodyOffset = bodySize / 2;
 
@@ -76,12 +77,12 @@ const BodyImage = ({ body, x, y, onClick, stageSize }) => {
         const alpha = data[i + 3];
 
         // If pixel is NOT the dark gray outline and has any opacity, color it
-        // Only color pixels that are significantly lighter than the outline OR have low alpha (anti-aliased edges)
-        // Outline is ~30-40 RGB with full alpha, gaps are lighter or semi-transparent
-        const isLightEnough = r > 50 || g > 50 || b > 50;
-        const isSemiTransparent = alpha > 0 && alpha < 200;
+        // Only color pixels that are significantly lighter than the outline
+        // Outline is ~30-40 RGB with full alpha, so we need a higher threshold
+        // Changed from 50 to 100 to avoid coloring edge pixels
+        const isLightEnough = r > 100 || g > 100 || b > 100;
 
-        if (alpha > 0 && (isLightEnough || isSemiTransparent)) {
+        if (alpha > 0 && isLightEnough) {
           data[i] = newColor.r;
           data[i + 1] = newColor.g;
           data[i + 2] = newColor.b;
@@ -118,7 +119,7 @@ const BodyImage = ({ body, x, y, onClick, stageSize }) => {
 };
 
 // Individual draggable SVG image component with color filter
-const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stageSize }) => {
+const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stageSize, currentTheme }) => {
   const shapeRef = useRef();
   const trRef = useRef();
   const [image] = useImage(object.svgPath);
@@ -333,6 +334,11 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
       {isSelected && (
         <Transformer
           ref={trRef}
+          borderStroke={currentTheme?.colors?.accentPrimary || '#ff9dda'}
+          anchorStroke={currentTheme?.colors?.accentPrimary || '#ff9dda'}
+          anchorFill={currentTheme?.colors?.accentSecondary || '#c5a3ff'}
+          borderStrokeWidth={2}
+          anchorSize={8}
           boundBoxFunc={(oldBox, newBox) => {
             if (newBox.width < 20 || newBox.height < 20) {
               return oldBox;
@@ -358,6 +364,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
   const [brushSize, setBrushSize] = useState(5);
   const [trashHovered, setTrashHovered] = useState(false);
   const [history, setHistory] = useState([]);
+  const [bodySizeMultiplier, setBodySizeMultiplier] = useState(null);
+  const [showBodySizeSlider, setShowBodySizeSlider] = useState(false);
   const stageRef = useRef(null);
   const containerRef = useRef(null);
   const [trashImage] = useImage('/trash.png');
@@ -888,6 +896,151 @@ export const BuildYourOwn = ({ currentTheme }) => {
             >
               {/* Layer 1: Body and Objects (won't be affected by eraser) */}
               <Layer>
+                {/* Body Size Controls - positioned in top-left */}
+                {selectedBody && (
+                  <Group>
+                    {/* Button - responsive sizing */}
+                    <Rect
+                      x={15}
+                      y={15}
+                      width={stageSize.width < 600 ? 80 : 100}
+                      height={stageSize.width < 600 ? 28 : 35}
+                      fill={currentTheme?.colors?.accentPrimary || '#ff9dda'}
+                      cornerRadius={10}
+                      onClick={() => setShowBodySizeSlider(!showBodySizeSlider)}
+                      onTap={() => setShowBodySizeSlider(!showBodySizeSlider)}
+                      onMouseEnter={(e) => {
+                        const container = e.target.getStage().container();
+                        container.style.cursor = 'pointer';
+                        e.target.to({
+                          shadowColor: currentTheme?.colors?.accentPrimary || '#ff9dda',
+                          shadowBlur: 20,
+                          shadowOpacity: 0.8,
+                          duration: 0.2
+                        });
+                      }}
+                      onMouseLeave={(e) => {
+                        const container = e.target.getStage().container();
+                        container.style.cursor = 'default';
+                        e.target.to({
+                          shadowBlur: 0,
+                          shadowOpacity: 0,
+                          duration: 0.2
+                        });
+                      }}
+                    />
+                    <Text
+                      x={15}
+                      y={15}
+                      width={stageSize.width < 600 ? 80 : 100}
+                      height={stageSize.width < 600 ? 28 : 35}
+                      text="Body Size"
+                      fontSize={stageSize.width < 600 ? 11 : 14}
+                      fontFamily="JetBrains Mono, monospace"
+                      fill="white"
+                      align="center"
+                      verticalAlign="middle"
+                      listening={false}
+                    />
+
+                    {/* Slider Panel - appears below button when open */}
+                    {showBodySizeSlider && (
+                      <Group>
+                        <Rect
+                          x={15}
+                          y={stageSize.width < 600 ? 50 : 60}
+                          width={stageSize.width < 600 ? 150 : 180}
+                          height={stageSize.width < 600 ? 70 : 80}
+                          fill={currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.95)' : 'rgba(255, 255, 255, 0.95)'}
+                          cornerRadius={12}
+                          shadowColor="black"
+                          shadowBlur={10}
+                          shadowOpacity={0.3}
+                          shadowOffset={{ x: 0, y: 2 }}
+                        />
+                        <Text
+                          x={stageSize.width < 600 ? 25 : 30}
+                          y={stageSize.width < 600 ? 60 : 70}
+                          text={`Size: ${Math.round((bodySizeMultiplier || (stageSize.width < 600 ? 0.92 : 0.5)) * 100)}%`}
+                          fontSize={stageSize.width < 600 ? 10 : 12}
+                          fontFamily="JetBrains Mono, monospace"
+                          fill={currentTheme?.colors?.textPrimary || '#8b4f8a'}
+                        />
+                        {/* Slider track */}
+                        <Rect
+                          x={stageSize.width < 600 ? 25 : 30}
+                          y={stageSize.width < 600 ? 85 : 95}
+                          width={stageSize.width < 600 ? 115 : 140}
+                          height={6}
+                          fill="rgba(0, 0, 0, 0.1)"
+                          cornerRadius={3}
+                        />
+                        {/* Slider filled portion */}
+                        <Rect
+                          x={stageSize.width < 600 ? 25 : 30}
+                          y={stageSize.width < 600 ? 85 : 95}
+                          width={(stageSize.width < 600 ? 115 : 140) * ((bodySizeMultiplier || (stageSize.width < 600 ? 0.92 : 0.5)) / 2)}
+                          height={6}
+                          fill={currentTheme?.colors?.accentPrimary || '#ff9dda'}
+                          cornerRadius={3}
+                        />
+                        {/* Slider thumb */}
+                        <Rect
+                          x={(stageSize.width < 600 ? 25 : 30) + (stageSize.width < 600 ? 115 : 140) * ((bodySizeMultiplier || (stageSize.width < 600 ? 0.92 : 0.5)) / 2) - 9}
+                          y={stageSize.width < 600 ? 79 : 89}
+                          width={18}
+                          height={18}
+                          fill={currentTheme?.colors?.accentPrimary || '#ff9dda'}
+                          cornerRadius={9}
+                          draggable
+                          dragBoundFunc={(pos) => {
+                            const minX = (stageSize.width < 600 ? 25 : 30) - 9;
+                            const maxX = (stageSize.width < 600 ? 25 : 30) + (stageSize.width < 600 ? 115 : 140) - 9;
+                            const newX = Math.max(minX, Math.min(maxX, pos.x));
+                            return { x: newX, y: stageSize.width < 600 ? 79 : 89 };
+                          }}
+                          onDragMove={(e) => {
+                            const x = e.target.x();
+                            const baseX = stageSize.width < 600 ? 25 : 30;
+                            const sliderWidth = stageSize.width < 600 ? 115 : 140;
+                            const percent = (x + 9 - baseX) / sliderWidth;
+                            const newValue = percent * 2;
+                            setBodySizeMultiplier(Math.max(0, Math.min(2.0, newValue)));
+                          }}
+                          onMouseEnter={(e) => {
+                            const container = e.target.getStage().container();
+                            container.style.cursor = 'pointer';
+                            e.target.to({ scaleX: 1.2, scaleY: 1.2, duration: 0.1 });
+                          }}
+                          onMouseLeave={(e) => {
+                            const container = e.target.getStage().container();
+                            container.style.cursor = 'default';
+                            e.target.to({ scaleX: 1, scaleY: 1, duration: 0.1 });
+                          }}
+                        />
+                        {/* Close button */}
+                        <Text
+                          x={stageSize.width < 600 ? 150 : 175}
+                          y={stageSize.width < 600 ? 55 : 65}
+                          text="✕"
+                          fontSize={stageSize.width < 600 ? 14 : 16}
+                          fill={currentTheme?.colors?.textSecondary || '#9d6b9e'}
+                          onClick={() => setShowBodySizeSlider(false)}
+                          onTap={() => setShowBodySizeSlider(false)}
+                          onMouseEnter={(e) => {
+                            const container = e.target.getStage().container();
+                            container.style.cursor = 'pointer';
+                          }}
+                          onMouseLeave={(e) => {
+                            const container = e.target.getStage().container();
+                            container.style.cursor = 'default';
+                          }}
+                        />
+                      </Group>
+                    )}
+                  </Group>
+                )}
+
                 {/* Trash Can Icon - positioned in bottom-left */}
                 {trashImage && (
                   <KonvaImage
@@ -928,22 +1081,21 @@ export const BuildYourOwn = ({ currentTheme }) => {
                       if (history.length > 0) {
                         const container = e.target.getStage().container();
                         container.style.cursor = 'pointer';
-                        // Scale up on hover
                         e.target.to({
-                          scaleX: 1.15,
-                          scaleY: 1.15,
-                          duration: 0.1,
+                          shadowColor: currentTheme?.colors?.accentPrimary || '#ff9dda',
+                          shadowBlur: 20,
+                          shadowOpacity: 0.8,
+                          duration: 0.2,
                         });
                       }
                     }}
                     onMouseLeave={(e) => {
                       const container = e.target.getStage().container();
                       container.style.cursor = 'default';
-                      // Scale back down
                       e.target.to({
-                        scaleX: 1,
-                        scaleY: 1,
-                        duration: 0.1,
+                        shadowBlur: 0,
+                        shadowOpacity: 0,
+                        duration: 0.2,
                       });
                     }}
                   />
@@ -959,6 +1111,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
                     onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
                     stageSize={stageSize}
+                    currentTheme={currentTheme}
                   />
                 ))}
 
@@ -970,6 +1123,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     y={stageSize.height / 2}
                     onClick={() => setSelectedId(null)}
                     stageSize={stageSize}
+                    bodySizeMultiplier={bodySizeMultiplier}
                   />
                 )}
 
@@ -983,6 +1137,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
                     onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
                     stageSize={stageSize}
+                    currentTheme={currentTheme}
                   />
                 ))}
               </Layer>
