@@ -557,13 +557,31 @@ export const BuildYourOwn = ({ currentTheme }) => {
   };
 
   const handleExport = () => {
-    const uri = stageRef.current.toDataURL();
+    // Get only the content layers (first two layers), excluding UI controls layer (third layer)
+    const stage = stageRef.current;
+    const contentLayer = stage.children[0]; // Layer 1: Body and Objects
+    const drawingLayer = stage.children[1]; // Layer 2: Free Draw Lines
+    // Layer 3 (UI controls) is NOT included
+
+    // Temporarily create a new stage with just the content layers
+    const tempStage = stage.clone();
+    tempStage.children = [contentLayer.clone(), drawingLayer.clone()];
+
+    // Export at higher quality: pixelRatio 2-3x for sharper images
+    const uri = tempStage.toDataURL({
+      pixelRatio: 3, // 3x resolution for crisp, high-quality export
+      mimeType: 'image/png', // PNG for lossless quality
+    });
+
     const link = document.createElement('a');
     link.download = 'my-creature.png';
     link.href = uri;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    // Clean up
+    tempStage.destroy();
   };
 
   // Memoize filtered objects for better performance
@@ -894,7 +912,66 @@ export const BuildYourOwn = ({ currentTheme }) => {
               onTouchEnd={handleMouseUp}
               style={{ background: '#f0f0f0', borderRadius: '12px' }}
             >
-              {/* Layer 1: Body and Objects (won't be affected by eraser) */}
+              {/* Layer 1: Body and Objects (content layer - will be exported) */}
+              <Layer>
+                {/* Objects behind body (negative zIndex) */}
+                {objectsBehindBody.map((obj) => (
+                  <DraggableImage
+                    key={obj.id}
+                    object={obj}
+                    isSelected={obj.id === selectedId}
+                    onSelect={() => setSelectedId(obj.id)}
+                    onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
+                    onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
+                    stageSize={stageSize}
+                    currentTheme={currentTheme}
+                  />
+                ))}
+
+                {/* Body SVG */}
+                {selectedBody && (
+                  <BodyImage
+                    body={selectedBody}
+                    x={stageSize.width / 2}
+                    y={stageSize.height / 2}
+                    onClick={() => setSelectedId(null)}
+                    stageSize={stageSize}
+                    bodySizeMultiplier={bodySizeMultiplier}
+                  />
+                )}
+
+                {/* Objects in front of body (zero or positive zIndex) */}
+                {objectsInFrontOfBody.map((obj) => (
+                  <DraggableImage
+                    key={obj.id}
+                    object={obj}
+                    isSelected={obj.id === selectedId}
+                    onSelect={() => setSelectedId(obj.id)}
+                    onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
+                    onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
+                    stageSize={stageSize}
+                    currentTheme={currentTheme}
+                  />
+                ))}
+              </Layer>
+
+              {/* Layer 2: Free Draw Lines (eraser only affects this layer) */}
+              <Layer>
+                {lines.map((line, i) => (
+                  <Line
+                    key={i}
+                    points={line.points}
+                    stroke={line.color}
+                    strokeWidth={line.size}
+                    tension={0.5}
+                    lineCap="round"
+                    lineJoin="round"
+                    globalCompositeOperation={line.eraser ? "destination-out" : "source-over"}
+                  />
+                ))}
+              </Layer>
+
+              {/* Layer 3: UI Controls (NOT exported) */}
               <Layer>
                 {/* Body Size Controls - positioned in top-left */}
                 {selectedBody && (
@@ -1100,62 +1177,6 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     }}
                   />
                 )}
-
-                {/* Objects behind body (negative zIndex) */}
-                {objectsBehindBody.map((obj) => (
-                  <DraggableImage
-                    key={obj.id}
-                    object={obj}
-                    isSelected={obj.id === selectedId}
-                    onSelect={() => setSelectedId(obj.id)}
-                    onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
-                    onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
-                    stageSize={stageSize}
-                    currentTheme={currentTheme}
-                  />
-                ))}
-
-                {/* Body SVG */}
-                {selectedBody && (
-                  <BodyImage
-                    body={selectedBody}
-                    x={stageSize.width / 2}
-                    y={stageSize.height / 2}
-                    onClick={() => setSelectedId(null)}
-                    stageSize={stageSize}
-                    bodySizeMultiplier={bodySizeMultiplier}
-                  />
-                )}
-
-                {/* Objects in front of body (zero or positive zIndex) */}
-                {objectsInFrontOfBody.map((obj) => (
-                  <DraggableImage
-                    key={obj.id}
-                    object={obj}
-                    isSelected={obj.id === selectedId}
-                    onSelect={() => setSelectedId(obj.id)}
-                    onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
-                    onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
-                    stageSize={stageSize}
-                    currentTheme={currentTheme}
-                  />
-                ))}
-              </Layer>
-
-              {/* Layer 2: Free Draw Lines (eraser only affects this layer) */}
-              <Layer>
-                {lines.map((line, i) => (
-                  <Line
-                    key={i}
-                    points={line.points}
-                    stroke={line.color}
-                    strokeWidth={line.size}
-                    tension={0.5}
-                    lineCap="round"
-                    lineJoin="round"
-                    globalCompositeOperation={line.eraser ? "destination-out" : "source-over"}
-                  />
-                ))}
               </Layer>
             </Stage>
           </div>
