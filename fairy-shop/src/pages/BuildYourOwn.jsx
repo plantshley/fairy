@@ -372,6 +372,24 @@ export const BuildYourOwn = ({ currentTheme }) => {
   const [visualisImage] = useImage('/visualis.png');
   const [undoImage] = useImage('/icons/refresh-data.png');
 
+  // Get current font from CSS variable - recompute when body class changes
+  const [currentFont, setCurrentFont] = useState('JetBrains Mono, monospace');
+
+  useEffect(() => {
+    const updateFont = () => {
+      const bodyFont = getComputedStyle(document.body).getPropertyValue('--font-body').trim();
+      setCurrentFont(bodyFont || 'JetBrains Mono, monospace');
+    };
+
+    updateFont();
+
+    // Listen for class changes on body
+    const observer = new MutationObserver(updateFont);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+
   // Handle responsive canvas sizing
   useEffect(() => {
     const updateSize = () => {
@@ -1013,7 +1031,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                       height={stageSize.width < 600 ? 28 : 35}
                       text="Body Size"
                       fontSize={stageSize.width < 600 ? 11 : 14}
-                      fontFamily="JetBrains Mono, monospace"
+                      fontFamily={currentFont}
                       fill="white"
                       align="center"
                       verticalAlign="middle"
@@ -1040,7 +1058,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                           y={stageSize.width < 600 ? 60 : 70}
                           text={`Size: ${Math.round((bodySizeMultiplier || (stageSize.width < 600 ? 0.92 : 0.5)) * 100)}%`}
                           fontSize={stageSize.width < 600 ? 10 : 12}
-                          fontFamily="JetBrains Mono, monospace"
+                          fontFamily={currentFont}
                           fill={currentTheme?.colors?.textPrimary || '#8b4f8a'}
                         />
                         {/* Slider track */}

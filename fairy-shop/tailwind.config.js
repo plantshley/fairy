@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'kalnia': ['"Kalnia Glaze"', 'serif'],
-        'mono': ['"JetBrains Mono"', 'monospace'],
+        'kalnia': 'var(--font-heading)',
+        'mono': 'var(--font-body)',
       },
       animation: {
         'float': 'float 3s ease-in-out infinite',

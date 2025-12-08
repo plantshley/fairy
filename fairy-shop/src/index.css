@@ -1,4 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Kalnia+Glaze:wght@100..700&family=JetBrains+Mono:wght@300;400;500;600&family=Bonbon&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap');
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-Italic.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-BoldItalic.otf') format('opentype');
+  font-weight: bold;
+  font-style: italic;
+}
 
 @tailwind base;
 @tailwind components;
@@ -14,12 +43,24 @@
   --text-primary: #8b4f8a;
   --text-secondary: #9d6b9e;
   --sparkle-color: #ffe0f0;
+
+  /* Font families - Default */
+  --font-heading: 'Kalnia Glaze', serif;
+  --font-body: 'JetBrains Mono', monospace;
+  --font-decorative: 'Bonbon', cursive;
+}
+
+/* Accessible fonts mode */
+.accessible-fonts {
+  --font-heading: 'OpenDyslexic', sans-serif;
+  --font-body: 'Comic Sans MS', cursive, sans-serif;
+  --font-decorative: 'Inclusive Sans', sans-serif;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-body);
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -37,7 +78,15 @@ body {
   }
 
   .font-bonbon {
-    font-family: 'Bonbon', cursive;
+    font-family: var(--font-decorative);
+  }
+
+  .font-kalnia {
+    font-family: var(--font-heading);
+  }
+
+  .font-mono {
+    font-family: var(--font-body);
   }
 
   .animated-gradient-bg {

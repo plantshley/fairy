@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { themes } from '../themes';
 
-export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
+export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // Preload all creature images on mount
@@ -40,29 +40,61 @@ export const ThemeSelector = ({ currentTheme, onThemeChange }) => {
 
   return (
     <>
-      {/* Corner creature button */}
-      <motion.button
-        className="fixed bottom-20 right-2 sm:bottom-6 sm:right-6 z-50 cursor-pointer bg-transparent border-none p-0"
-        onClick={() => setIsOpen(!isOpen)}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        title="Change theme"
-      >
-        <motion.img
-          src={getModalCreature()}
-          alt="Change theme"
-          className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"
-          animate={{
-            y: [0, -8, 0],
-            rotate: [0, 5, -5, 0],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-      </motion.button>
+      {/* Corner creature button with speech bubble */}
+      <div className="fixed bottom-20 right-2 sm:bottom-6 sm:right-6 z-50">
+        {/* Speech bubble - only show on home page */}
+        {activeTab === 'home' && (
+          <div
+            className="absolute top-6 sm:top-8 -left-4 sm:-left-5 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-sm text-[8px] sm:text-[9px] text-center flex flex-col items-center relative overflow-visible"
+            style={{
+              background: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+              color: 'var(--text-primary)',
+              lineHeight: '1.1',
+              paddingTop: '2px',
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              <div>choose</div>
+              <div>your</div>
+              <div>magic</div>
+              <div>♡</div>
+            </div>
+            {/* Speech bubble tail - triangular */}
+            <div
+              className="absolute bottom-2.5 right-0 w-0 h-0"
+              style={{
+                borderLeft: '4px solid transparent',
+                borderRight: '4px solid transparent',
+                borderTop: currentTheme?.id === 'midnightVelvetMeadow' ? '6px solid rgba(42, 16, 53, 0.9)' : '6px solid rgba(255, 255, 255, 0.9)',
+                transform: 'rotate(45deg)',
+              }}
+            />
+          </div>
+        )}
+
+        <motion.button
+          className="cursor-pointer bg-transparent border-none p-0"
+          onClick={() => setIsOpen(!isOpen)}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          title="Change theme"
+        >
+          <motion.img
+            src={getModalCreature()}
+            alt="Change theme"
+            className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"
+            animate={{
+              y: [0, -8, 0],
+              rotate: [0, 5, -5, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        </motion.button>
+      </div>
 
       {/* Theme selection modal */}
       <AnimatePresence>
