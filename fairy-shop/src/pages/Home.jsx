@@ -117,12 +117,12 @@ export const Home = ({ currentTheme }) => {
           transition={{ delay: 0.6 }}
         >
           <p className="text-sm sm:text-base leading-relaxed text-center" style={{ color: 'var(--text-secondary)' }}>
-            In this enchanted garden where strength meets serenity, I weave threads of whimsy into 
-            creaturely companions and paint dreams with glittering stardust🌷
-            At dawn, I'm a powerlifter sculpting strength like clay, and by day I'm an environmental engineer, 
-            channeling the earth's rhythms into sustainable magic. Through my autistic lens, I perceive patterns 
-            invisible to most, transforming hyperfocus into cascading galaxies of art & research. Here, every creation blooms 
-            from the kaleidoscopic harmony of precision and poetry ✧･ﾟ⋆｡°✩｡° ♡ ⋆
+            In this twinkling realm where strength meets serenity, fairy weave threads of whimsy into 
+            creaturely companions and paint dreams with glittering stardust✧･ﾟ⋆｡°🌷🌈
+            By dawn, she's a powerlifter divining strength and sculpting muscles, and by day an environmental engineer, 
+            channeling the earth's rhythms into sustainable magic. Through her autistic lens, she can fathom patterns 
+            hidden to many, transforming hyperfocus into cascading streams of art & research. At fairy's nexus, every creation blooms 
+            from the kaleidoscopic harmony that binds fae with factuality ⋆｡✩｡°⁺₊♡ ⋆
           </p>
         </motion.div>
 

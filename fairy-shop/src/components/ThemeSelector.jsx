@@ -57,7 +57,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
               <div>choose</div>
               <div>your</div>
               <div>magic</div>
-              <div>♡</div>
+              <div>♡⋆｡°✩</div>
             </div>
             {/* Speech bubble tail - triangular */}
             <div
@@ -125,7 +125,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
               >
               <div className="relative">
                 <h2 className="font-kalnia text-4xl mb-2 gradient-text text-center">
-                  Choose Your Magic
+                  ✧ Choose Your Magic ✧
                 </h2>
 
                 <p className="text-center text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
@@ -151,7 +151,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="flex flex-col items-center justify-center gap-1 text-center">
-                        <div className="font-semibold text-base" style={{ color: theme.colors.textPrimary }}>
+                        <div className="font-bonbon tracking-wider text-xl" style={{ color: theme.colors.textPrimary }}>
                           {theme.name}
                         </div>
                         <div className="text-base">

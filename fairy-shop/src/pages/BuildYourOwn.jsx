@@ -651,11 +651,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
           {/* Body Type Selection */}
           <div className="mb-6">
             <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Body Type</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {bodyTypes.map((body) => (
                 <button
                   key={body.id}
-                  className={`p-4 rounded-2xl transition-all shadow-md ${
+                  className={`p-1 rounded-2xl transition-all shadow-md ${
                     selectedBody?.id === body.id
                       ? 'ring-2 ring-offset-2 scale-105'
                       : 'hover:scale-105'
@@ -666,7 +666,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                   }}
                   onClick={() => handleBodySelect(body)}
                 >
-                  <div className="text-5xl mb-2">{body.emoji}</div>
+                  <div className="text-2xl mb-0">{body.emoji}</div>
                   <div className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
                     {body.name}
                   </div>
@@ -678,7 +678,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
           {/* Parts - Eyes */}
           <div className="mb-6">
             <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Eyes</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {parts.eyes.map((part) => (
                 <button
                   key={part.id}
@@ -689,7 +689,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                   onClick={() => handleAddObject(part)}
                   title={`Add ${part.name}`}
                 >
-                  <img src={part.previewPath} alt={part.name} className="w-full h-16 object-contain" />
+                  <img src={part.previewPath} alt={part.name} className="w-full h-full object-contain" />
                 </button>
               ))}
             </div>
@@ -698,7 +698,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
           {/* Parts - Limbs */}
           <div className="mb-6">
             <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Limbs</h3>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {parts.limbs.map((part) => (
                 <button
                   key={part.id}
@@ -709,7 +709,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                   onClick={() => handleAddObject(part)}
                   title={`Add ${part.name}`}
                 >
-                  <img src={part.previewPath} alt={part.name} className="w-full h-16 object-contain" />
+                  <img src={part.previewPath} alt={part.name} className="w-full h-full object-contain" />
                 </button>
               ))}
             </div>
