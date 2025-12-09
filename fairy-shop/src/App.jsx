@@ -5,6 +5,7 @@ import { Navigation } from './components/Navigation';
 import { ThemeSelector } from './components/ThemeSelector';
 import { AccessibilityToggle } from './components/AccessibilityToggle';
 import { CursorSparkles } from './components/CursorSparkles';
+import BackgroundMusic from './components/BackgroundMusic';
 import { Home } from './pages/Home';
 import { Shop } from './pages/Shop';
 import { Links } from './pages/Links';
@@ -69,6 +70,9 @@ function App() {
         accessibleFonts={accessibleFonts}
         activeTab={activeTab}
       />
+
+      {/* Background music control (place after theme selector so it appears above other UI) */}
+      <BackgroundMusic src="/audio/background-music.mp3" />
 
       <AccessibilityToggle
         accessibleFonts={accessibleFonts}

@@ -9,6 +9,7 @@ const bodyTypes = [
   { id: 'kirarin', name: 'Kirarin', emoji: '🦄', svgPath: '/build-svgs/body-kirarin-white.svg' },
   { id: 'frootie', name: 'Toodie Frootie', emoji: '🍋', svgPath: '/build-svgs/body-frootie-white.svg' },
   { id: 'sylph', name: 'Sylph', emoji: '🦢', svgPath: '/build-svgs/body-sylph.svg' },
+  { id: 'griffon', name: 'Griffon', emoji: '🦉', svgPath: '/build-svgs/body-griffon.svg' },
 ];
 
 // Parts to add (preview uses v1, canvas uses white2)
@@ -68,24 +69,31 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
       };
 
       const newColor = hexToRgb(body.color);
+      const outlineColor = body.outlineColor ? hexToRgb(body.outlineColor) : null;
 
-      // Replace white/light pixels with the new color, keep dark pixels (outlines)
+      // Replace white/light pixels with the new color, dark pixels with outline color
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
         const alpha = data[i + 3];
 
-        // If pixel is NOT the dark gray outline and has any opacity, color it
-        // Only color pixels that are significantly lighter than the outline
-        // Outline is ~30-40 RGB with full alpha, so we need a higher threshold
-        // Changed from 50 to 100 to avoid coloring edge pixels
-        const isLightEnough = r > 100 || g > 100 || b > 100;
+        // Only process pixels with opacity
+        if (alpha > 0) {
+          // Outline is ~30-40 RGB with full alpha, threshold at 100
+          const isLightEnough = r > 100 || g > 100 || b > 100;
 
-        if (alpha > 0 && isLightEnough) {
-          data[i] = newColor.r;
-          data[i + 1] = newColor.g;
-          data[i + 2] = newColor.b;
+          if (isLightEnough) {
+            // Light pixels = body fill color
+            data[i] = newColor.r;
+            data[i + 1] = newColor.g;
+            data[i + 2] = newColor.b;
+          } else if (outlineColor) {
+            // Dark pixels = outline color (if specified)
+            data[i] = outlineColor.r;
+            data[i + 1] = outlineColor.g;
+            data[i + 2] = outlineColor.b;
+          }
           // Keep original alpha for anti-aliasing
         }
       }
@@ -98,7 +106,7 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
     } else {
       setFilterImage(image);
     }
-  }, [image, body.color]);
+  }, [image, body.color, body.outlineColor]);
 
   // Adjust y position for toodie frootie - move it higher (scale adjustment with body size)
   const yAdjustment = body.id === 'frootie' ? bodySize * 0.2 : 0;
@@ -158,11 +166,12 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
       };
 
       const newColor = hexToRgb(object.color);
+      const outlineColor = object.outlineColor ? hexToRgb(object.outlineColor) : null;
 
       // Find the bounding box of non-transparent pixels
       let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
 
-      // Replace white/light pixels with the new color, keep dark pixels (outlines)
+      // Replace white/light pixels with the new color, dark pixels with outline color
       for (let y = 0; y < canvas.height; y++) {
         for (let x = 0; x < canvas.width; x++) {
           const i = (y * canvas.width + x) * 4;
@@ -179,16 +188,23 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
             maxY = Math.max(maxY, y);
           }
 
-          // If pixel is NOT the dark gray outline and has any opacity, color it
-          // Only color pixels that are significantly lighter than the outline OR have low alpha (anti-aliased edges)
-          // Outline is ~30-40 RGB with full alpha, gaps are lighter or semi-transparent
-          const isLightEnough = r > 50 || g > 50 || b > 50;
-          const isSemiTransparent = alpha > 0 && alpha < 200;
+          // Only process pixels with opacity
+          if (alpha > 0) {
+            // Outline is ~30-40 RGB with full alpha, threshold at 50
+            const isLightEnough = r > 50 || g > 50 || b > 50;
+            const isSemiTransparent = alpha > 0 && alpha < 200;
 
-          if (alpha > 0 && (isLightEnough || isSemiTransparent)) {
-            data[i] = newColor.r;
-            data[i + 1] = newColor.g;
-            data[i + 2] = newColor.b;
+            if (isLightEnough || isSemiTransparent) {
+              // Light pixels = object fill color
+              data[i] = newColor.r;
+              data[i + 1] = newColor.g;
+              data[i + 2] = newColor.b;
+            } else if (outlineColor) {
+              // Dark pixels = outline color (if specified)
+              data[i] = outlineColor.r;
+              data[i + 1] = outlineColor.g;
+              data[i + 2] = outlineColor.b;
+            }
             // Keep original alpha for anti-aliasing
           }
         }
@@ -274,7 +290,7 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
         setCroppedDimensions({ width: targetWidth, height: targetHeight });
       };
     }
-  }, [image, object.color]);
+  }, [image, object.color, object.outlineColor]);
 
   const checkIfInTrash = (x, y) => {
     const trashX = 60;
@@ -524,10 +540,28 @@ export const BuildYourOwn = ({ currentTheme }) => {
     }
   };
 
+  const handleObjectOutlineColorChange = (newColor) => {
+    if (selectedId) {
+      saveToHistory();
+      setPlacedObjects(
+        placedObjects.map((obj) =>
+          obj.id === selectedId ? { ...obj, outlineColor: newColor } : obj
+        )
+      );
+    }
+  };
+
   const handleBodyColorChange = (newColor) => {
     if (selectedBody) {
       saveToHistory();
       setSelectedBody({ ...selectedBody, color: newColor });
+    }
+  };
+
+  const handleBodyOutlineColorChange = (newColor) => {
+    if (selectedBody) {
+      saveToHistory();
+      setSelectedBody({ ...selectedBody, outlineColor: newColor });
     }
   };
 
@@ -655,7 +689,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
               {bodyTypes.map((body) => (
                 <button
                   key={body.id}
-                  className={`p-1 rounded-2xl transition-all shadow-md ${
+                  className={`p-1 rounded-2xl transition-all shadow-md aspect-square flex flex-col items-center justify-center ${
                     selectedBody?.id === body.id
                       ? 'ring-2 ring-offset-2 scale-105'
                       : 'hover:scale-105'
@@ -666,8 +700,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
                   }}
                   onClick={() => handleBodySelect(body)}
                 >
-                  <div className="text-2xl mb-0">{body.emoji}</div>
-                  <div className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  <div className="text-2xl mb-0.5">{body.emoji}</div>
+                  <div className="text-[10px] font-semibold leading-tight" style={{ color: 'var(--text-primary)' }}>
                     {body.name}
                   </div>
                 </button>
@@ -682,7 +716,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
               {parts.eyes.map((part) => (
                 <button
                   key={part.id}
-                  className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md flex items-center justify-center"
+                  className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
                   style={{
                     backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                   }}
@@ -702,7 +736,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
               {parts.limbs.map((part) => (
                 <button
                   key={part.id}
-                  className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md flex items-center justify-center"
+                  className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
                   style={{
                     backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                   }}
@@ -777,36 +811,80 @@ export const BuildYourOwn = ({ currentTheme }) => {
           )}
 
           {/* Color Pickers */}
-          <div className="mb-6 space-y-3">
+          <div className="mb-6 space-y-2">
             <h3 className="font-bonbon tracking-wider text-xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Colors</h3>
 
             {/* Body Color */}
             {selectedBody && (
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={selectedBody.color || '#ff69b4'}
-                  onChange={(e) => handleBodyColorChange(e.target.value)}
-                  className="w-10 h-10 rounded-full cursor-pointer color-picker-clean"
-                />
-                <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                  Body Color
-                </label>
-              </div>
+              <>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={selectedBody.color || '#ff69b4'}
+                    onChange={(e) => handleBodyColorChange(e.target.value)}
+                    className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
+                  />
+                  <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+                    Body Color
+                  </label>
+                </div>
+
+                {/* Body Outline Color */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={selectedBody.outlineColor || '#000000'}
+                    onChange={(e) => handleBodyOutlineColorChange(e.target.value)}
+                    className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
+                  />
+                  <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+                    Body Outline
+                  </label>
+                </div>
+              </>
             )}
 
             {/* Object/Drawing Color */}
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={currentColor}
-                onChange={(e) => handleColorChange(e.target.value)}
-                className="w-10 h-10 rounded-full cursor-pointer color-picker-clean"
-              />
-              <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                {selectedId ? 'Selected Object' : 'Parts & Drawing'}
-              </label>
-            </div>
+            {selectedId ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={currentColor}
+                    onChange={(e) => handleColorChange(e.target.value)}
+                    className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
+                  />
+                  <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+                    Object/Pen Color
+                  </label>
+                </div>
+
+                {/* Object Outline Color */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={placedObjects.find(obj => obj.id === selectedId)?.outlineColor || '#000000'}
+                    onChange={(e) => handleObjectOutlineColorChange(e.target.value)}
+                    className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
+                  />
+                  <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+                    Object Outline
+                  </label>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={currentColor}
+                  onChange={(e) => handleColorChange(e.target.value)}
+                  className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
+                />
+                <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+                  Parts & Drawing
+                </label>
+              </div>
+            )}
           </div>
 
           {/* Draw Mode */}
