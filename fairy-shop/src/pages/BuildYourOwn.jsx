@@ -292,11 +292,13 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
     }
   }, [image, object.color, object.outlineColor]);
 
-  const checkIfInTrash = (x, y) => {
+  const checkIfInTrash = (x, y, scale = 1) => {
     const trashX = 60;
     const trashY = stageSize.height - 60;
     const distance = Math.sqrt(Math.pow(x - trashX, 2) + Math.pow(y - trashY, 2));
-    return distance < 60;
+    // Increase detection radius based on object scale, with a reasonable upper limit
+    const detectionRadius = Math.min(60 + (Math.max(scale - 1, 0) * 100), 200);
+    return distance < detectionRadius;
   };
 
   return (
@@ -319,8 +321,9 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
         onDragEnd={(e) => {
           const newX = e.target.x();
           const newY = e.target.y();
+          const scale = Math.max(Math.abs(object.scaleX || 1), Math.abs(object.scaleY || 1));
 
-          if (checkIfInTrash(newX, newY)) {
+          if (checkIfInTrash(newX, newY, scale)) {
             onDelete();
           } else {
             onChange({
@@ -565,6 +568,23 @@ export const BuildYourOwn = ({ currentTheme }) => {
     }
   };
 
+  const handleDuplicateObject = () => {
+    if (selectedId) {
+      const objectToDuplicate = placedObjects.find(obj => obj.id === selectedId);
+      if (objectToDuplicate) {
+        saveToHistory();
+        const duplicatedObject = {
+          ...objectToDuplicate,
+          id: `${objectToDuplicate.type}-${Date.now()}`,
+          x: objectToDuplicate.x + 20,
+          y: objectToDuplicate.y + 20,
+        };
+        setPlacedObjects(prev => [...prev, duplicatedObject]);
+        setSelectedId(duplicatedObject.id);
+      }
+    }
+  };
+
   const handleMouseDown = (e) => {
     // Check if clicking on the undo button (let it handle its own click)
     const clickedNode = e.target;
@@ -695,7 +715,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
                       : 'hover:scale-105'
                   }`}
                   style={{
-                    ringColor: 'var(--accent-primary)',
+                    '--tw-ring-color': currentTheme?.colors?.accentPrimary || '#ff9dda',
+                    '--tw-ring-offset-color': currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 1)' : 'rgba(255, 255, 255, 1)',
                     backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                   }}
                   onClick={() => handleBodySelect(body)}
@@ -754,19 +775,31 @@ export const BuildYourOwn = ({ currentTheme }) => {
             <div className="mb-6">
               <h3 className="font-bonbon tracking-wider text-xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Selected Object</h3>
               <div className="space-y-2">
-                <button
-                  className="w-full py-2 px-4 rounded-xl font-medium transition-all hover:scale-105"
-                  style={{
-                    background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                    color: 'white',
-                  }}
-                  onClick={handleFlipObject}
-                >
-                  ↔️ Flip Horizontal
-                </button>
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    className="py-2 px-3 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
+                    style={{
+                      background: 'var(--bg-gradient-start)',
+                      color: 'var(--text-primary)',
+                    }}
+                    onClick={handleFlipObject}
+                  >
+                    ↔️ Flip
+                  </button>
+                  <button
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
+                    style={{
+                      background: 'var(--bg-gradient-start)',
+                      color: 'var(--text-primary)',
+                    }}
+                    onClick={handleDuplicateObject}
+                  >
+                    📋 Duplicate
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -776,7 +809,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     ⬆️ To Front
                   </button>
                   <button
-                    className="py-2 px-3 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -786,7 +819,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     ⬇️ To Back
                   </button>
                   <button
-                    className="py-2 px-3 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -796,7 +829,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     ⏫ Move Up
                   </button>
                   <button
-                    className="py-2 px-3 rounded-xl text-sm font-medium transition-all hover:scale-105"
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -855,7 +888,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
                   />
                   <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                    Object/Pen Color
+                    Object & Drawing Color
                   </label>
                 </div>
 
@@ -881,7 +914,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                   className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
                 />
                 <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                  Parts & Drawing
+                  Object & Drawing Color
                 </label>
               </div>
             )}
