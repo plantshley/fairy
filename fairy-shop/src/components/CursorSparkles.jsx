@@ -180,6 +180,16 @@ export const CursorSparkles = ({ currentTheme }) => {
     function onMouseMove(e) {
       if (!sparklesEnabled) return;
 
+      // Check if mouse is over a Konva canvas element
+      const target = e.target;
+      if (target && target.tagName === 'CANVAS') {
+        // Check if parent has konvajs-content class
+        const parent = target.parentElement;
+        if (parent && (parent.className.includes('konvajs-content') || parent.classList?.contains('konvajs-content'))) {
+          return; // Disable sparkles on Konva canvas
+        }
+      }
+
       const now = performance.now();
       if (now - lastSpawnTime < 16) return;
       lastSpawnTime = now;
