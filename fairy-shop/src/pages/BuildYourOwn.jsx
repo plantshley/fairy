@@ -30,6 +30,38 @@ const parts = {
       canvasPath: '/build-svgs/limb-long-white.svg'
     },
   ],
+  accessories: [
+    {
+      id: 'acc-faceplate',
+      name: 'Faceplate',
+      previewPath: '/build-svgs/acc-faceplate.svg',
+      canvasPath: '/build-svgs/acc-faceplate.svg'
+    },
+    {
+      id: 'acc-horn1',
+      name: 'Horn 1',
+      previewPath: '/build-svgs/acc-horn1.svg',
+      canvasPath: '/build-svgs/acc-horn1.svg'
+    },
+    {
+      id: 'acc-horn2',
+      name: 'Horn 2',
+      previewPath: '/build-svgs/acc-horn2.svg',
+      canvasPath: '/build-svgs/acc-horn2.svg'
+    },
+    {
+      id: 'acc-horn3',
+      name: 'Horn 3',
+      previewPath: '/build-svgs/acc-horn3.svg',
+      canvasPath: '/build-svgs/acc-horn3.svg'
+    },
+    {
+      id: 'acc-horn4',
+      name: 'Horn 4',
+      previewPath: '/build-svgs/acc-horn4.svg',
+      canvasPath: '/build-svgs/acc-horn4.svg'
+    },
+  ],
 };
 
 // Body SVG component with color filter
@@ -385,6 +417,12 @@ export const BuildYourOwn = ({ currentTheme }) => {
   const [history, setHistory] = useState([]);
   const [bodySizeMultiplier, setBodySizeMultiplier] = useState(null);
   const [showBodySizeSlider, setShowBodySizeSlider] = useState(false);
+  const [collapsedSections, setCollapsedSections] = useState({
+    bodyType: false,
+    facial: true,
+    limbs: true,
+    accessories: true,
+  });
   const stageRef = useRef(null);
   const containerRef = useRef(null);
   const [trashImage] = useImage('/trash.png');
@@ -704,70 +742,122 @@ export const BuildYourOwn = ({ currentTheme }) => {
         >
           {/* Body Type Selection */}
           <div className="mb-6">
-            <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Body Type</h3>
-            <div className="grid grid-cols-3 gap-2">
-              {bodyTypes.map((body) => (
-                <button
-                  key={body.id}
-                  className={`p-1 rounded-2xl transition-all shadow-md aspect-square flex flex-col items-center justify-center ${
-                    selectedBody?.id === body.id
-                      ? 'ring-2 ring-offset-2 scale-105'
-                      : 'hover:scale-105'
-                  }`}
-                  style={{
-                    '--tw-ring-color': currentTheme?.colors?.accentPrimary || '#ff9dda',
-                    '--tw-ring-offset-color': currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 1)' : 'rgba(255, 255, 255, 1)',
-                    backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-                  }}
-                  onClick={() => handleBodySelect(body)}
-                >
-                  <div className="text-2xl mb-0.5">{body.emoji}</div>
-                  <div className="text-[10px] font-semibold leading-tight" style={{ color: 'var(--text-primary)' }}>
-                    {body.name}
-                  </div>
-                </button>
-              ))}
-            </div>
+            <button
+              className="w-full flex items-center justify-between mb-3 hover:opacity-70 transition-opacity"
+              onClick={() => setCollapsedSections({ ...collapsedSections, bodyType: !collapsedSections.bodyType })}
+            >
+              <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Body Type</h3>
+              <span className={collapsedSections.bodyType ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.bodyType ? '▶' : '▼'}</span>
+            </button>
+            {!collapsedSections.bodyType && (
+              <div className="grid grid-cols-3 gap-2">
+                {bodyTypes.map((body) => (
+                  <button
+                    key={body.id}
+                    className={`p-1 rounded-2xl transition-all shadow-md aspect-square flex flex-col items-center justify-center ${
+                      selectedBody?.id === body.id
+                        ? 'ring-2 ring-offset-2 scale-105'
+                        : 'hover:scale-105'
+                    }`}
+                    style={{
+                      '--tw-ring-color': currentTheme?.colors?.accentPrimary || '#ff9dda',
+                      '--tw-ring-offset-color': currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 1)' : 'rgba(255, 255, 255, 1)',
+                      backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                    }}
+                    onClick={() => handleBodySelect(body)}
+                  >
+                    <div className="text-2xl mb-0.5">{body.emoji}</div>
+                    <div className="text-[10px] font-semibold leading-tight" style={{ color: 'var(--text-primary)' }}>
+                      {body.name}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Parts - Eyes */}
+          {/* Parts - Facial */}
           <div className="mb-6">
-            <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Eyes</h3>
-            <div className="grid grid-cols-3 gap-2">
-              {parts.eyes.map((part) => (
-                <button
-                  key={part.id}
-                  className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
-                  style={{
-                    backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-                  }}
-                  onClick={() => handleAddObject(part)}
-                  title={`Add ${part.name}`}
-                >
-                  <img src={part.previewPath} alt={part.name} className="w-full h-full object-contain" />
-                </button>
-              ))}
-            </div>
+            <button
+              className="w-full flex items-center justify-between mb-3 hover:opacity-70 transition-opacity"
+              onClick={() => setCollapsedSections({ ...collapsedSections, facial: !collapsedSections.facial })}
+            >
+              <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Facial</h3>
+              <span className={collapsedSections.facial ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.facial ? '▶' : '▼'}</span>
+            </button>
+            {!collapsedSections.facial && (
+              <div className="grid grid-cols-3 gap-2">
+                {parts.eyes.map((part) => (
+                  <button
+                    key={part.id}
+                    className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
+                    style={{
+                      backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                    }}
+                    onClick={() => handleAddObject(part)}
+                    title={`Add ${part.name}`}
+                  >
+                    <img src={part.previewPath} alt={part.name} className="w-full h-full object-contain" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Parts - Limbs */}
           <div className="mb-6">
-            <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Limbs</h3>
-            <div className="grid grid-cols-3 gap-2">
-              {parts.limbs.map((part) => (
-                <button
-                  key={part.id}
-                  className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
-                  style={{
-                    backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-                  }}
-                  onClick={() => handleAddObject(part)}
-                  title={`Add ${part.name}`}
-                >
-                  <img src={part.previewPath} alt={part.name} className="w-full h-full object-contain" />
-                </button>
-              ))}
-            </div>
+            <button
+              className="w-full flex items-center justify-between mb-3 hover:opacity-70 transition-opacity"
+              onClick={() => setCollapsedSections({ ...collapsedSections, limbs: !collapsedSections.limbs })}
+            >
+              <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Limbs</h3>
+              <span className={collapsedSections.limbs ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.limbs ? '▶' : '▼'}</span>
+            </button>
+            {!collapsedSections.limbs && (
+              <div className="grid grid-cols-3 gap-2">
+                {parts.limbs.map((part) => (
+                  <button
+                    key={part.id}
+                    className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
+                    style={{
+                      backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                    }}
+                    onClick={() => handleAddObject(part)}
+                    title={`Add ${part.name}`}
+                  >
+                    <img src={part.previewPath} alt={part.name} className="w-full h-full object-contain" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Parts - Accessories */}
+          <div className="mb-6">
+            <button
+              className="w-full flex items-center justify-between mb-3 hover:opacity-70 transition-opacity"
+              onClick={() => setCollapsedSections({ ...collapsedSections, accessories: !collapsedSections.accessories })}
+            >
+              <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Accessories</h3>
+              <span className={collapsedSections.accessories ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.accessories ? '▶' : '▼'}</span>
+            </button>
+            {!collapsedSections.accessories && (
+              <div className="grid grid-cols-5 gap-2">
+                {parts.accessories.map((part) => (
+                  <button
+                    key={part.id}
+                    className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
+                    style={{
+                      backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                    }}
+                    onClick={() => handleAddObject(part)}
+                    title={`Add ${part.name}`}
+                  >
+                    <img src={part.previewPath} alt={part.name} className="w-full h-full object-contain" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Layer and Flip Controls */}
@@ -1039,7 +1129,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
               onTouchStart={handleMouseDown}
               onTouchMove={handleMouseMove}
               onTouchEnd={handleMouseUp}
-              style={{ background: '#f0f0f0', borderRadius: '12px' }}
+              style={{ background: currentTheme?.id === 'midnightVelvetMeadow' ? '#1a0a1f' : '#f0f0f0', borderRadius: '12px' }}
             >
               {/* Layer 1: Body and Objects (content layer - will be exported) */}
               <Layer>
