@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Image as KonvaImage, Line, Transformer, Rect, Text, Group } from 'react-konva';
 import useImage from 'use-image';
 import { Sparkle } from '../components/Sparkle';
 
 // Body types with SVG files (using versions with "2" in filename for canvas)
 const bodyTypes = [
-  { id: 'kirarin', name: 'Kirarin', emoji: '🦄', svgPath: '/build-svgs/body-kirarin-white.svg' },
-  { id: 'frootie', name: 'Toodie Frootie', emoji: '🍋', svgPath: '/build-svgs/body-frootie-white.svg' },
+  { id: 'kirarin', name: 'Kirarin', emoji: '🦄', svgPath: '/build-svgs/body-kirarin.svg' },
+  { id: 'frootie', name: 'Toodie Frootie', emoji: '🍋', svgPath: '/build-svgs/body-frootie.svg' },
   { id: 'sylph', name: 'Sylph', emoji: '🦢', svgPath: '/build-svgs/body-sylph.svg' },
   { id: 'griffon', name: 'Griffon', emoji: '🦉', svgPath: '/build-svgs/body-griffon.svg' },
 ];
@@ -26,8 +26,8 @@ const parts = {
     {
       id: 'limb-long',
       name: 'Long Limb',
-      previewPath: '/build-svgs/limb-long-white.svg',
-      canvasPath: '/build-svgs/limb-long-white.svg'
+      previewPath: '/build-svgs/limb-long.svg',
+      canvasPath: '/build-svgs/limb-long.svg'
     },
   ],
   accessories: [
@@ -154,12 +154,55 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
       offsetX={bodyOffset}
       offsetY={bodyOffset}
       onClick={onClick}
+      hitFunc={(context, shape) => {
+        // Custom hit detection - only register hits on non-transparent pixels
+        const img = filterImage || image;
+        if (!img) return;
+
+        context.beginPath();
+        const width = shape.width();
+        const height = shape.height();
+
+        // Create a rectangular hit region for the image bounds
+        context.rect(0, 0, width, height);
+        context.closePath();
+
+        // Let Konva check if the point is in bounds, then we'll check alpha
+        const pos = shape.getStage().getPointerPosition();
+        const transform = shape.getAbsoluteTransform().copy();
+        transform.invert();
+        const localPos = transform.point(pos);
+
+        // Convert to image coordinates
+        const imgX = Math.floor((localPos.x + shape.offsetX()) / width * img.width);
+        const imgY = Math.floor((localPos.y + shape.offsetY()) / height * img.height);
+
+        // Check if within image bounds
+        if (imgX < 0 || imgX >= img.width || imgY < 0 || imgY >= img.height) {
+          return;
+        }
+
+        // Sample pixel alpha
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        const imageData = ctx.getImageData(imgX, imgY, 1, 1);
+        const alpha = imageData.data[3];
+
+        // Only register hit if alpha is significant (not transparent)
+        if (alpha > 10) {
+          context.fillStrokeShape(shape);
+        }
+      }}
     />
   );
 };
 
 // Individual draggable SVG image component with color filter
-const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stageSize, currentTheme }) => {
+const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stageSize, currentTheme, onTransformStart, onDragStart, freeDrawMode }) => {
   const shapeRef = useRef();
   const trRef = useRef();
   const [image] = useImage(object.svgPath);
@@ -347,9 +390,10 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
         scaleX={(object.scaleX || 1) * (object.flipped ? -1 : 1)}
         scaleY={object.scaleY || 1}
         rotation={object.rotation || 0}
-        draggable
-        onClick={onSelect}
-        onTap={onSelect}
+        draggable={!freeDrawMode}
+        onClick={freeDrawMode ? undefined : onSelect}
+        onTap={freeDrawMode ? undefined : onSelect}
+        onDragStart={freeDrawMode ? undefined : onDragStart}
         onDragEnd={(e) => {
           const newX = e.target.x();
           const newY = e.target.y();
@@ -365,6 +409,7 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
             });
           }
         }}
+        onTransformStart={onTransformStart}
         onTransformEnd={(e) => {
           const node = shapeRef.current;
           const scaleX = node.scaleX();
@@ -374,7 +419,7 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
             ...object,
             x: node.x(),
             y: node.y(),
-            scaleX: Math.abs(scaleX) * (object.flipped ? 1 : 1),
+            scaleX: Math.abs(scaleX) * (object.flipped ? -1 : 1),
             scaleY: scaleY,
             rotation: node.rotation(),
             width: croppedDimensions.width,
@@ -382,7 +427,7 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
           });
         }}
       />
-      {isSelected && (
+      {isSelected && !freeDrawMode && (
         <Transformer
           ref={trRef}
           borderStroke={currentTheme?.colors?.accentPrimary || '#ff9dda'}
@@ -423,8 +468,16 @@ export const BuildYourOwn = ({ currentTheme }) => {
     limbs: true,
     accessories: true,
   });
+  const [stageScale, setStageScale] = useState(1);
+  const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [spacePressed, setSpacePressed] = useState(false);
+  const [panMode, setPanMode] = useState(false);
   const stageRef = useRef(null);
   const containerRef = useRef(null);
+  // Refs to track current zoom/pan state for smooth touch gestures
+  const stageScaleRef = useRef(1);
+  const stagePositionRef = useRef({ x: 0, y: 0 });
   const [trashImage] = useImage('/trash.png');
   const [visualisImage] = useImage('/visualis.png');
   const [undoImage] = useImage('/icons/refresh-data.png');
@@ -519,7 +572,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
       scaleY: 1,
       flipped: false,
       color: currentColor,
-      zIndex: 0, // 0 = in front of body, negative = behind body
+      zIndex: 1, // Start at 1 = in front of body (0), negative = behind body
     };
     setPlacedObjects(prev => [...prev, newObject]);
   };
@@ -567,6 +620,14 @@ export const BuildYourOwn = ({ currentTheme }) => {
     setPlacedObjects(
       placedObjects.map((obj) => (obj.id === id ? newAttrs : obj))
     );
+  };
+
+  const handleTransformStart = () => {
+    saveToHistory();
+  };
+
+  const handleDragStart = () => {
+    saveToHistory();
   };
 
   const handleColorChange = (newColor) => {
@@ -622,6 +683,250 @@ export const BuildYourOwn = ({ currentTheme }) => {
       }
     }
   };
+
+  // Zoom and pan handlers
+  const handleZoom = (direction) => {
+    const scaleBy = 1.1;
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const oldScale = stageScale;
+    const newScale = direction === 'in'
+      ? Math.min(oldScale * scaleBy, 3) // Max zoom 3x
+      : Math.max(oldScale / scaleBy, 0.5); // Min zoom 0.5x
+
+    // Zoom towards center
+    const centerX = stageSize.width / 2;
+    const centerY = stageSize.height / 2;
+
+    const mousePointTo = {
+      x: (centerX - stagePosition.x) / oldScale,
+      y: (centerY - stagePosition.y) / oldScale,
+    };
+
+    const newPos = {
+      x: centerX - mousePointTo.x * newScale,
+      y: centerY - mousePointTo.y * newScale,
+    };
+
+    setStageScale(newScale);
+    setStagePosition(newPos);
+  };
+
+  const handleResetView = () => {
+    setStageScale(1);
+    setStagePosition({ x: 0, y: 0 });
+  };
+
+  const handleWheel = (e) => {
+    e.evt.preventDefault();
+
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const scaleBy = 1.05;
+    const oldScale = stageScale;
+
+    // Get pointer position relative to stage
+    const pointer = stage.getPointerPosition();
+
+    const mousePointTo = {
+      x: (pointer.x - stagePosition.x) / oldScale,
+      y: (pointer.y - stagePosition.y) / oldScale,
+    };
+
+    const direction = e.evt.deltaY > 0 ? -1 : 1;
+    const newScale = direction > 0
+      ? Math.min(oldScale * scaleBy, 3)
+      : Math.max(oldScale / scaleBy, 0.5);
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    };
+
+    setStageScale(newScale);
+    setStagePosition(newPos);
+  };
+
+  // Handle spacebar for panning
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.code === 'Space' && !e.repeat) {
+        e.preventDefault();
+        setSpacePressed(true);
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setSpacePressed(false);
+        setIsPanning(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  const handleStageMouseDown = (e) => {
+    // Enable panning with middle mouse button, when space is held, or when pan mode is active
+    if (e.evt.button === 1 || spacePressed || panMode) {
+      e.evt.preventDefault();
+      setIsPanning(true);
+      return;
+    }
+
+    // Otherwise handle normal mouse down
+    handleMouseDown(e);
+  };
+
+  const handleStageMouseUp = (e) => {
+    if (isPanning) {
+      setIsPanning(false);
+      return;
+    }
+    handleMouseUp(e);
+  };
+
+  const handleStageMouseMove = (e) => {
+    if (isPanning) {
+      const stage = stageRef.current;
+      if (!stage) return;
+
+      const pointer = stage.getPointerPosition();
+      const dx = pointer.x - (stage.getPointerPosition().x - e.evt.movementX);
+      const dy = pointer.y - (stage.getPointerPosition().y - e.evt.movementY);
+
+      setStagePosition({
+        x: stagePosition.x + e.evt.movementX,
+        y: stagePosition.y + e.evt.movementY,
+      });
+      return;
+    }
+
+    handleMouseMove(e);
+  };
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    stageScaleRef.current = stageScale;
+    stagePositionRef.current = stagePosition;
+  }, [stageScale, stagePosition]);
+
+  // Improved touch gestures: simultaneous pinch-to-zoom and two-finger pan using refs for smooth performance
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    let lastDist = null;
+    let lastCenter = null;
+
+    const getDistance = (p1, p2) => {
+      return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+    };
+
+    const getCenter = (p1, p2) => {
+      return {
+        x: (p1.x + p2.x) / 2,
+        y: (p1.y + p2.y) / 2,
+      };
+    };
+
+    const handleTouchStart = (e) => {
+      const touches = e.touches;
+      if (touches && touches.length === 2) {
+        e.preventDefault();
+
+        const p1 = { x: touches[0].clientX, y: touches[0].clientY };
+        const p2 = { x: touches[1].clientX, y: touches[1].clientY };
+
+        lastDist = getDistance(p1, p2);
+        lastCenter = getCenter(p1, p2);
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      const touches = e.touches;
+
+      if (touches && touches.length === 2) {
+        e.preventDefault();
+
+        const p1 = { x: touches[0].clientX, y: touches[0].clientY };
+        const p2 = { x: touches[1].clientX, y: touches[1].clientY };
+
+        const newCenter = getCenter(p1, p2);
+        const newDist = getDistance(p1, p2);
+
+        if (lastDist === null || lastCenter === null) {
+          lastDist = newDist;
+          lastCenter = newCenter;
+          return;
+        }
+
+        const stageBox = stage.container().getBoundingClientRect();
+
+        // Read current values from refs instead of stale closures
+        const currentScale = stageScaleRef.current;
+        const currentPosition = stagePositionRef.current;
+
+        // Calculate the scale change from pinch
+        const scaleChange = newDist / lastDist;
+        let newScale = currentScale * scaleChange;
+        newScale = Math.max(0.5, Math.min(newScale, 3));
+
+        // Calculate the content point under the last gesture center
+        const contentX = (lastCenter.x - stageBox.left - currentPosition.x) / currentScale;
+        const contentY = (lastCenter.y - stageBox.top - currentPosition.y) / currentScale;
+
+        // Calculate new position to keep content point under new center after zoom
+        let newX = newCenter.x - stageBox.left - contentX * newScale;
+        let newY = newCenter.y - stageBox.top - contentY * newScale;
+
+        const newPos = {
+          x: newX,
+          y: newY,
+        };
+
+        // Update refs immediately for next touch event
+        stageScaleRef.current = newScale;
+        stagePositionRef.current = newPos;
+
+        // Update state directly (no requestAnimationFrame for immediate response)
+        setStageScale(newScale);
+        setStagePosition(newPos);
+
+        lastDist = newDist;
+        lastCenter = newCenter;
+      }
+    };
+
+    const handleTouchEnd = (e) => {
+      if (!e.touches || e.touches.length < 2) {
+        lastDist = null;
+        lastCenter = null;
+      }
+    };
+
+    const stageContainer = stage.container();
+    stageContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+    stageContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+    stageContainer.addEventListener('touchend', handleTouchEnd, { passive: false });
+    stageContainer.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+
+    return () => {
+      stageContainer.removeEventListener('touchstart', handleTouchStart);
+      stageContainer.removeEventListener('touchmove', handleTouchMove);
+      stageContainer.removeEventListener('touchend', handleTouchEnd);
+      stageContainer.removeEventListener('touchcancel', handleTouchEnd);
+    };
+  }, []); // No dependencies - event listeners set up once and use refs
 
   const handleMouseDown = (e) => {
     // Check if clicking on the undo button (let it handle its own click)
@@ -693,17 +998,6 @@ export const BuildYourOwn = ({ currentTheme }) => {
     // Clean up
     tempStage.destroy();
   };
-
-  // Memoize filtered objects for better performance
-  const objectsBehindBody = useMemo(
-    () => placedObjects.filter(obj => (obj.zIndex || 0) < 0),
-    [placedObjects]
-  );
-
-  const objectsInFrontOfBody = useMemo(
-    () => placedObjects.filter(obj => (obj.zIndex || 0) >= 0),
-    [placedObjects]
-  );
 
   return (
     <motion.div
@@ -908,26 +1202,6 @@ export const BuildYourOwn = ({ currentTheme }) => {
                   >
                     ⬇️ To Back
                   </button>
-                  <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
-                    style={{
-                      background: 'var(--bg-gradient-start)',
-                      color: 'var(--text-primary)',
-                    }}
-                    onClick={() => handleMoveLayer('up')}
-                  >
-                    ⏫ Move Up
-                  </button>
-                  <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
-                    style={{
-                      background: 'var(--bg-gradient-start)',
-                      color: 'var(--text-primary)',
-                    }}
-                    onClick={() => handleMoveLayer('down')}
-                  >
-                    ⏬ Move Down
-                  </button>
                 </div>
               </div>
             </div>
@@ -1063,16 +1337,29 @@ export const BuildYourOwn = ({ currentTheme }) => {
                   </button>
                 </div>
                 <div>
-                  <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                    {eraserMode ? 'Eraser' : 'Brush'} Size: {brushSize}px
-                  </label>
+                  <div className="flex items-center gap-2 mb-1">
+                    <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+                      {eraserMode ? 'Eraser' : 'Brush'} Size: {brushSize}px
+                    </label>
+                    <div
+                      className="rounded-full border-2"
+                      style={{
+                        width: `${brushSize}px`,
+                        height: `${brushSize}px`,
+                        borderColor: 'var(--text-secondary)',
+                        backgroundColor: eraserMode ? 'transparent' : 'var(--text-secondary)',
+                        minWidth: '2px',
+                        minHeight: '2px',
+                      }}
+                    />
+                  </div>
                   <input
                     type="range"
                     min="1"
                     max="20"
                     value={brushSize}
                     onChange={(e) => setBrushSize(parseInt(e.target.value))}
-                    className="w-full mt-1 brush-slider"
+                    className="w-full brush-slider"
                     style={{
                       '--slider-color': 'var(--accent-primary)',
                     }}
@@ -1123,18 +1410,27 @@ export const BuildYourOwn = ({ currentTheme }) => {
               ref={stageRef}
               width={stageSize.width}
               height={stageSize.height}
-              onMouseDown={handleMouseDown}
-              onMousemove={handleMouseMove}
-              onMouseup={handleMouseUp}
+              scaleX={stageScale}
+              scaleY={stageScale}
+              x={stagePosition.x}
+              y={stagePosition.y}
+              onWheel={handleWheel}
+              onMouseDown={handleStageMouseDown}
+              onMousemove={handleStageMouseMove}
+              onMouseup={handleStageMouseUp}
               onTouchStart={handleMouseDown}
               onTouchMove={handleMouseMove}
               onTouchEnd={handleMouseUp}
-              style={{ background: currentTheme?.id === 'midnightVelvetMeadow' ? '#1a0a1f' : '#f0f0f0', borderRadius: '12px' }}
+              style={{
+                background: currentTheme?.id === 'midnightVelvetMeadow' ? '#1a0a1f' : '#f0f0f0',
+                borderRadius: '12px',
+                cursor: isPanning ? 'grabbing' : (spacePressed || panMode) ? 'grab' : 'default'
+              }}
             >
               {/* Layer 1: Body and Objects (content layer - will be exported) */}
               <Layer>
                 {/* Objects behind body (negative zIndex) */}
-                {objectsBehindBody.map((obj) => (
+                {placedObjects.filter(obj => (obj.zIndex || 0) < 0).map((obj) => (
                   <DraggableImage
                     key={obj.id}
                     object={obj}
@@ -1142,6 +1438,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     onSelect={() => setSelectedId(obj.id)}
                     onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
                     onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
+                    onTransformStart={handleTransformStart}
+                    onDragStart={handleDragStart}
+                    freeDrawMode={freeDrawMode}
                     stageSize={stageSize}
                     currentTheme={currentTheme}
                   />
@@ -1160,7 +1459,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                 )}
 
                 {/* Objects in front of body (zero or positive zIndex) */}
-                {objectsInFrontOfBody.map((obj) => (
+                {placedObjects.filter(obj => (obj.zIndex || 0) >= 0).map((obj) => (
                   <DraggableImage
                     key={obj.id}
                     object={obj}
@@ -1168,6 +1467,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     onSelect={() => setSelectedId(obj.id)}
                     onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
                     onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
+                    onTransformStart={handleTransformStart}
+                    onDragStart={handleDragStart}
+                    freeDrawMode={freeDrawMode}
                     stageSize={stageSize}
                     currentTheme={currentTheme}
                   />
@@ -1191,7 +1493,12 @@ export const BuildYourOwn = ({ currentTheme }) => {
               </Layer>
 
               {/* Layer 3: UI Controls (NOT exported) */}
-              <Layer>
+              <Layer
+                scaleX={1 / stageScale}
+                scaleY={1 / stageScale}
+                x={-stagePosition.x / stageScale}
+                y={-stagePosition.y / stageScale}
+              >
                 {/* Body Size Controls - positioned in top-left */}
                 {selectedBody && (
                   <Group>
@@ -1336,6 +1643,187 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     )}
                   </Group>
                 )}
+
+                {/* Zoom Controls - positioned in upper right corner */}
+                <Group>
+                  {/* Pan Mode Toggle Button */}
+                  <Rect
+                    x={stageSize.width - (stageSize.width < 600 ? 205 : 230)}
+                    y={15}
+                    width={stageSize.width < 600 ? 35 : 45}
+                    height={stageSize.width < 600 ? 28 : 35}
+                    fill={panMode ? (currentTheme?.colors?.accentPrimary || '#ff9dda') : (currentTheme?.colors?.accentSecondary || '#c5a3ff')}
+                    cornerRadius={10}
+                    onClick={() => setPanMode(!panMode)}
+                    onTap={() => setPanMode(!panMode)}
+                    onMouseEnter={(e) => {
+                      const container = e.target.getStage().container();
+                      container.style.cursor = 'pointer';
+                      e.target.to({
+                        shadowColor: panMode ? (currentTheme?.colors?.accentPrimary || '#ff9dda') : (currentTheme?.colors?.accentSecondary || '#c5a3ff'),
+                        shadowBlur: 20,
+                        shadowOpacity: 0.8,
+                        duration: 0.2
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      const container = e.target.getStage().container();
+                      container.style.cursor = 'default';
+                      e.target.to({
+                        shadowBlur: 0,
+                        shadowOpacity: 0,
+                        duration: 0.2
+                      });
+                    }}
+                  />
+                  <Text
+                    x={stageSize.width - (stageSize.width < 600 ? 205 : 230)}
+                    y={15}
+                    width={stageSize.width < 600 ? 35 : 45}
+                    height={stageSize.width < 600 ? 28 : 35}
+                    text="✋"
+                    fontSize={stageSize.width < 600 ? 16 : 20}
+                    fontFamily={currentFont}
+                    fill="white"
+                    align="center"
+                    verticalAlign="middle"
+                    listening={false}
+                  />
+
+                  {/* Zoom In Button */}
+                  <Rect
+                    x={stageSize.width - (stageSize.width < 600 ? 155 : 175)}
+                    y={15}
+                    width={stageSize.width < 600 ? 35 : 45}
+                    height={stageSize.width < 600 ? 28 : 35}
+                    fill={currentTheme?.colors?.accentSecondary || '#c5a3ff'}
+                    cornerRadius={10}
+                    onClick={() => handleZoom('in')}
+                    onTap={() => handleZoom('in')}
+                    onMouseEnter={(e) => {
+                      const container = e.target.getStage().container();
+                      container.style.cursor = 'pointer';
+                      e.target.to({
+                        shadowColor: currentTheme?.colors?.accentSecondary || '#c5a3ff',
+                        shadowBlur: 20,
+                        shadowOpacity: 0.8,
+                        duration: 0.2
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      const container = e.target.getStage().container();
+                      container.style.cursor = 'default';
+                      e.target.to({
+                        shadowBlur: 0,
+                        shadowOpacity: 0,
+                        duration: 0.2
+                      });
+                    }}
+                  />
+                  <Text
+                    x={stageSize.width - (stageSize.width < 600 ? 155 : 175)}
+                    y={15}
+                    width={stageSize.width < 600 ? 35 : 45}
+                    height={stageSize.width < 600 ? 28 : 35}
+                    text="+"
+                    fontSize={stageSize.width < 600 ? 18 : 22}
+                    fontFamily={currentFont}
+                    fontStyle="bold"
+                    fill="white"
+                    align="center"
+                    verticalAlign="middle"
+                    listening={false}
+                  />
+
+                  {/* Zoom Out Button */}
+                  <Rect
+                    x={stageSize.width - (stageSize.width < 600 ? 110 : 120)}
+                    y={15}
+                    width={stageSize.width < 600 ? 35 : 45}
+                    height={stageSize.width < 600 ? 28 : 35}
+                    fill={currentTheme?.colors?.accentSecondary || '#c5a3ff'}
+                    cornerRadius={10}
+                    onClick={() => handleZoom('out')}
+                    onTap={() => handleZoom('out')}
+                    onMouseEnter={(e) => {
+                      const container = e.target.getStage().container();
+                      container.style.cursor = 'pointer';
+                      e.target.to({
+                        shadowColor: currentTheme?.colors?.accentSecondary || '#c5a3ff',
+                        shadowBlur: 20,
+                        shadowOpacity: 0.8,
+                        duration: 0.2
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      const container = e.target.getStage().container();
+                      container.style.cursor = 'default';
+                      e.target.to({
+                        shadowBlur: 0,
+                        shadowOpacity: 0,
+                        duration: 0.2
+                      });
+                    }}
+                  />
+                  <Text
+                    x={stageSize.width - (stageSize.width < 600 ? 110 : 120)}
+                    y={15}
+                    width={stageSize.width < 600 ? 35 : 45}
+                    height={stageSize.width < 600 ? 28 : 35}
+                    text="-"
+                    fontSize={stageSize.width < 600 ? 18 : 22}
+                    fontFamily={currentFont}
+                    fontStyle="bold"
+                    fill="white"
+                    align="center"
+                    verticalAlign="middle"
+                    listening={false}
+                  />
+
+                  {/* Reset View Button */}
+                  <Rect
+                    x={stageSize.width - (stageSize.width < 600 ? 65 : 65)}
+                    y={15}
+                    width={stageSize.width < 600 ? 35 : 45}
+                    height={stageSize.width < 600 ? 28 : 35}
+                    fill={currentTheme?.colors?.accentSecondary || '#c5a3ff'}
+                    cornerRadius={10}
+                    onClick={handleResetView}
+                    onTap={handleResetView}
+                    onMouseEnter={(e) => {
+                      const container = e.target.getStage().container();
+                      container.style.cursor = 'pointer';
+                      e.target.to({
+                        shadowColor: currentTheme?.colors?.accentSecondary || '#c5a3ff',
+                        shadowBlur: 20,
+                        shadowOpacity: 0.8,
+                        duration: 0.2
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      const container = e.target.getStage().container();
+                      container.style.cursor = 'default';
+                      e.target.to({
+                        shadowBlur: 0,
+                        shadowOpacity: 0,
+                        duration: 0.2
+                      });
+                    }}
+                  />
+                  <Text
+                    x={stageSize.width - (stageSize.width < 600 ? 65 : 65)}
+                    y={15}
+                    width={stageSize.width < 600 ? 35 : 45}
+                    height={stageSize.width < 600 ? 28 : 35}
+                    text="⟲"
+                    fontSize={stageSize.width < 600 ? 16 : 20}
+                    fontFamily={currentFont}
+                    fill="white"
+                    align="center"
+                    verticalAlign="middle"
+                    listening={false}
+                  />
+                </Group>
 
                 {/* Trash Can Icon - positioned in bottom-left */}
                 {trashImage && (
