@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
-import { Stage, Layer, Image as KonvaImage, Line, Transformer, Rect, Text, Group } from 'react-konva';
+import { Stage, Layer, Image as KonvaImage, Line, Transformer, Rect, Text, Group, Circle } from 'react-konva';
 import useImage from 'use-image';
 import { Sparkle } from '../components/Sparkle';
 
@@ -458,10 +458,10 @@ export const BuildYourOwn = ({ currentTheme }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [lines, setLines] = useState([]);
   const [brushSize, setBrushSize] = useState(5);
+  const [tempSliderPos, setTempSliderPos] = useState(null);
   const [trashHovered, setTrashHovered] = useState(false);
   const [history, setHistory] = useState([]);
   const [bodySizeMultiplier, setBodySizeMultiplier] = useState(null);
-  const [showBodySizeSlider, setShowBodySizeSlider] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState({
     bodyType: false,
     facial: true,
@@ -843,6 +843,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
       const touches = e.touches;
       if (touches && touches.length === 2) {
         e.preventDefault();
+        e.stopPropagation();
 
         const p1 = { x: touches[0].clientX, y: touches[0].clientY };
         const p2 = { x: touches[1].clientX, y: touches[1].clientY };
@@ -850,6 +851,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
         lastDist = getDistance(p1, p2);
         lastCenter = getCenter(p1, p2);
       }
+      // Don't prevent default for single-finger touches - let them pass through
     };
 
     const handleTouchMove = (e) => {
@@ -857,6 +859,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
       if (touches && touches.length === 2) {
         e.preventDefault();
+        e.stopPropagation();
 
         const p1 = { x: touches[0].clientX, y: touches[0].clientY };
         const p2 = { x: touches[1].clientX, y: touches[1].clientY };
@@ -905,6 +908,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
         lastDist = newDist;
         lastCenter = newCenter;
       }
+      // Don't prevent default for single-finger touches - let them pass through
     };
 
     const handleTouchEnd = (e) => {
@@ -935,6 +939,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
       return;
     }
 
+    // Check if clicking on free draw controls (prevent drawing on the controls)
+    if (clickedNode.attrs && clickedNode.attrs.id && clickedNode.attrs.id.startsWith('freedraw-')) {
+      return;
+    }
+
     if (!freeDrawMode) {
       const clickedOnEmpty = e.target === e.target.getStage();
       if (clickedOnEmpty) {
@@ -946,7 +955,10 @@ export const BuildYourOwn = ({ currentTheme }) => {
     saveToHistory();
     setIsDrawing(true);
     const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { points: [pos.x, pos.y], color: currentColor, size: brushSize, eraser: eraserMode }]);
+    // Transform pointer position to account for zoom and pan
+    const transformedX = (pos.x - stagePosition.x) / stageScale;
+    const transformedY = (pos.y - stagePosition.y) / stageScale;
+    setLines([...lines, { points: [transformedX, transformedY], color: currentColor, size: brushSize, eraser: eraserMode }]);
   };
 
   const handleMouseMove = (e) => {
@@ -954,8 +966,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
+    // Transform pointer position to account for zoom and pan
+    const transformedX = (point.x - stagePosition.x) / stageScale;
+    const transformedY = (point.y - stagePosition.y) / stageScale;
     let lastLine = lines[lines.length - 1];
-    lastLine.points = lastLine.points.concat([point.x, point.y]);
+    lastLine.points = lastLine.points.concat([transformedX, transformedY]);
     setLines([...lines.slice(0, -1), lastLine]);
   };
 
@@ -1044,29 +1059,52 @@ export const BuildYourOwn = ({ currentTheme }) => {
               <span className={collapsedSections.bodyType ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.bodyType ? '▶' : '▼'}</span>
             </button>
             {!collapsedSections.bodyType && (
-              <div className="grid grid-cols-3 gap-2">
-                {bodyTypes.map((body) => (
-                  <button
-                    key={body.id}
-                    className={`p-1 rounded-2xl transition-all shadow-md aspect-square flex flex-col items-center justify-center ${
-                      selectedBody?.id === body.id
-                        ? 'ring-2 ring-offset-2 scale-105'
-                        : 'hover:scale-105'
-                    }`}
-                    style={{
-                      '--tw-ring-color': currentTheme?.colors?.accentPrimary || '#ff9dda',
-                      '--tw-ring-offset-color': currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 1)' : 'rgba(255, 255, 255, 1)',
-                      backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-                    }}
-                    onClick={() => handleBodySelect(body)}
-                  >
-                    <div className="text-2xl mb-0.5">{body.emoji}</div>
-                    <div className="text-[10px] font-semibold leading-tight" style={{ color: 'var(--text-primary)' }}>
-                      {body.name}
-                    </div>
-                  </button>
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {bodyTypes.map((body) => (
+                    <button
+                      key={body.id}
+                      className={`p-1 rounded-2xl transition-all shadow-md aspect-square flex flex-col items-center justify-center ${
+                        selectedBody?.id === body.id
+                          ? 'ring-2 ring-offset-2 scale-105'
+                          : 'hover:scale-105'
+                      }`}
+                      style={{
+                        '--tw-ring-color': currentTheme?.colors?.accentPrimary || '#ff9dda',
+                        '--tw-ring-offset-color': currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 1)' : 'rgba(255, 255, 255, 1)',
+                        backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                      }}
+                      onClick={() => handleBodySelect(body)}
+                    >
+                      <div className="text-2xl mb-0.5">{body.emoji}</div>
+                      <div className="text-[10px] font-semibold leading-tight" style={{ color: 'var(--text-primary)' }}>
+                        {body.name}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Body Size Slider - shown when body is selected */}
+                {selectedBody && (
+                  <div className="mt-3 space-y-2">
+                    <label className="text-xs font-medium block" style={{ color: 'var(--text-secondary)' }}>
+                      Body Size: {Math.round((bodySizeMultiplier || 0.5) * 100)}%
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="2"
+                      step="0.01"
+                      value={bodySizeMultiplier || 0.5}
+                      onChange={(e) => setBodySizeMultiplier(parseFloat(e.target.value))}
+                      className="w-full brush-slider"
+                      style={{
+                        '--slider-color': 'var(--accent-primary)',
+                      }}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -1284,91 +1322,6 @@ export const BuildYourOwn = ({ currentTheme }) => {
             )}
           </div>
 
-          {/* Draw Mode */}
-          <div className="mb-6">
-            <h3 className="font-bonbon tracking-wider text-xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Free Draw</h3>
-            <button
-              className={`w-full py-2 px-4 rounded-xl font-medium transition-all ${
-                freeDrawMode ? 'scale-105 shadow-lg' : 'opacity-70'
-              }`}
-              style={{
-                background: freeDrawMode
-                  ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
-                  : 'var(--bg-gradient-start)',
-                color: freeDrawMode ? 'white' : 'var(--text-primary)',
-              }}
-              onClick={() => {
-                setFreeDrawMode(!freeDrawMode);
-                if (!freeDrawMode) setEraserMode(false);
-              }}
-            >
-              {freeDrawMode ? '✏️ Drawing' : '✏️ Enable Draw'}
-            </button>
-            {freeDrawMode && (
-              <div className="mt-3 space-y-3">
-                <div className="flex gap-2">
-                  <button
-                    className={`flex-1 py-1 px-3 rounded-lg text-sm font-medium transition-all ${
-                      !eraserMode ? 'scale-105 shadow' : 'opacity-60'
-                    }`}
-                    style={{
-                      background: !eraserMode
-                        ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
-                        : '#e5e7eb',
-                      color: !eraserMode ? 'white' : '#6b7280',
-                    }}
-                    onClick={() => setEraserMode(false)}
-                  >
-                    ✏️ Pen
-                  </button>
-                  <button
-                    className={`flex-1 py-1 px-3 rounded-lg text-sm font-medium transition-all ${
-                      eraserMode ? 'scale-105 shadow' : 'opacity-60'
-                    }`}
-                    style={{
-                      background: eraserMode
-                        ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
-                        : '#e5e7eb',
-                      color: eraserMode ? 'white' : '#6b7280',
-                    }}
-                    onClick={() => setEraserMode(true)}
-                  >
-                    🧹 Eraser
-                  </button>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-                      {eraserMode ? 'Eraser' : 'Brush'} Size: {brushSize}px
-                    </label>
-                    <div
-                      className="rounded-full border-2"
-                      style={{
-                        width: `${brushSize}px`,
-                        height: `${brushSize}px`,
-                        borderColor: 'var(--text-secondary)',
-                        backgroundColor: eraserMode ? 'transparent' : 'var(--text-secondary)',
-                        minWidth: '2px',
-                        minHeight: '2px',
-                      }}
-                    />
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="20"
-                    value={brushSize}
-                    onChange={(e) => setBrushSize(parseInt(e.target.value))}
-                    className="w-full brush-slider"
-                    style={{
-                      '--slider-color': 'var(--accent-primary)',
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Actions */}
           <div className="space-y-2">
             <button
@@ -1499,150 +1452,6 @@ export const BuildYourOwn = ({ currentTheme }) => {
                 x={-stagePosition.x / stageScale}
                 y={-stagePosition.y / stageScale}
               >
-                {/* Body Size Controls - positioned in top-left */}
-                {selectedBody && (
-                  <Group>
-                    {/* Button - responsive sizing */}
-                    <Rect
-                      x={15}
-                      y={15}
-                      width={stageSize.width < 600 ? 80 : 100}
-                      height={stageSize.width < 600 ? 28 : 35}
-                      fill={currentTheme?.colors?.accentPrimary || '#ff9dda'}
-                      cornerRadius={10}
-                      onClick={() => setShowBodySizeSlider(!showBodySizeSlider)}
-                      onTap={() => setShowBodySizeSlider(!showBodySizeSlider)}
-                      onMouseEnter={(e) => {
-                        const container = e.target.getStage().container();
-                        container.style.cursor = 'pointer';
-                        e.target.to({
-                          shadowColor: currentTheme?.colors?.accentPrimary || '#ff9dda',
-                          shadowBlur: 20,
-                          shadowOpacity: 0.8,
-                          duration: 0.2
-                        });
-                      }}
-                      onMouseLeave={(e) => {
-                        const container = e.target.getStage().container();
-                        container.style.cursor = 'default';
-                        e.target.to({
-                          shadowBlur: 0,
-                          shadowOpacity: 0,
-                          duration: 0.2
-                        });
-                      }}
-                    />
-                    <Text
-                      x={15}
-                      y={15}
-                      width={stageSize.width < 600 ? 80 : 100}
-                      height={stageSize.width < 600 ? 28 : 35}
-                      text="Body Size"
-                      fontSize={stageSize.width < 600 ? 11 : 14}
-                      fontFamily={currentFont}
-                      fill="white"
-                      align="center"
-                      verticalAlign="middle"
-                      listening={false}
-                    />
-
-                    {/* Slider Panel - appears below button when open */}
-                    {showBodySizeSlider && (
-                      <Group>
-                        <Rect
-                          x={15}
-                          y={stageSize.width < 600 ? 50 : 60}
-                          width={stageSize.width < 600 ? 150 : 180}
-                          height={stageSize.width < 600 ? 70 : 80}
-                          fill={currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.95)' : 'rgba(255, 255, 255, 0.95)'}
-                          cornerRadius={12}
-                          shadowColor="black"
-                          shadowBlur={10}
-                          shadowOpacity={0.3}
-                          shadowOffset={{ x: 0, y: 2 }}
-                        />
-                        <Text
-                          x={stageSize.width < 600 ? 25 : 30}
-                          y={stageSize.width < 600 ? 60 : 70}
-                          text={`Size: ${Math.round((bodySizeMultiplier || (stageSize.width < 600 ? 0.92 : 0.5)) * 100)}%`}
-                          fontSize={stageSize.width < 600 ? 10 : 12}
-                          fontFamily={currentFont}
-                          fill={currentTheme?.colors?.textPrimary || '#8b4f8a'}
-                        />
-                        {/* Slider track */}
-                        <Rect
-                          x={stageSize.width < 600 ? 25 : 30}
-                          y={stageSize.width < 600 ? 85 : 95}
-                          width={stageSize.width < 600 ? 115 : 140}
-                          height={6}
-                          fill="rgba(0, 0, 0, 0.1)"
-                          cornerRadius={3}
-                        />
-                        {/* Slider filled portion */}
-                        <Rect
-                          x={stageSize.width < 600 ? 25 : 30}
-                          y={stageSize.width < 600 ? 85 : 95}
-                          width={(stageSize.width < 600 ? 115 : 140) * ((bodySizeMultiplier || (stageSize.width < 600 ? 0.92 : 0.5)) / 2)}
-                          height={6}
-                          fill={currentTheme?.colors?.accentPrimary || '#ff9dda'}
-                          cornerRadius={3}
-                        />
-                        {/* Slider thumb */}
-                        <Rect
-                          x={(stageSize.width < 600 ? 25 : 30) + (stageSize.width < 600 ? 115 : 140) * ((bodySizeMultiplier || (stageSize.width < 600 ? 0.92 : 0.5)) / 2) - 9}
-                          y={stageSize.width < 600 ? 79 : 89}
-                          width={18}
-                          height={18}
-                          fill={currentTheme?.colors?.accentPrimary || '#ff9dda'}
-                          cornerRadius={9}
-                          draggable
-                          dragBoundFunc={(pos) => {
-                            const minX = (stageSize.width < 600 ? 25 : 30) - 9;
-                            const maxX = (stageSize.width < 600 ? 25 : 30) + (stageSize.width < 600 ? 115 : 140) - 9;
-                            const newX = Math.max(minX, Math.min(maxX, pos.x));
-                            return { x: newX, y: stageSize.width < 600 ? 79 : 89 };
-                          }}
-                          onDragMove={(e) => {
-                            const x = e.target.x();
-                            const baseX = stageSize.width < 600 ? 25 : 30;
-                            const sliderWidth = stageSize.width < 600 ? 115 : 140;
-                            const percent = (x + 9 - baseX) / sliderWidth;
-                            const newValue = percent * 2;
-                            setBodySizeMultiplier(Math.max(0, Math.min(2.0, newValue)));
-                          }}
-                          onMouseEnter={(e) => {
-                            const container = e.target.getStage().container();
-                            container.style.cursor = 'pointer';
-                            e.target.to({ scaleX: 1.2, scaleY: 1.2, duration: 0.1 });
-                          }}
-                          onMouseLeave={(e) => {
-                            const container = e.target.getStage().container();
-                            container.style.cursor = 'default';
-                            e.target.to({ scaleX: 1, scaleY: 1, duration: 0.1 });
-                          }}
-                        />
-                        {/* Close button */}
-                        <Text
-                          x={stageSize.width < 600 ? 150 : 175}
-                          y={stageSize.width < 600 ? 55 : 65}
-                          text="✕"
-                          fontSize={stageSize.width < 600 ? 14 : 16}
-                          fill={currentTheme?.colors?.textSecondary || '#9d6b9e'}
-                          onClick={() => setShowBodySizeSlider(false)}
-                          onTap={() => setShowBodySizeSlider(false)}
-                          onMouseEnter={(e) => {
-                            const container = e.target.getStage().container();
-                            container.style.cursor = 'pointer';
-                          }}
-                          onMouseLeave={(e) => {
-                            const container = e.target.getStage().container();
-                            container.style.cursor = 'default';
-                          }}
-                        />
-                      </Group>
-                    )}
-                  </Group>
-                )}
 
                 {/* Zoom Controls - positioned in upper right corner */}
                 <Group>
@@ -1884,6 +1693,285 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     }}
                   />
                 )}
+
+                {/* Free Draw Controls - positioned in top-left corner */}
+                <Group x={15} y={15} id="freedraw-group">
+                  {/* Main toggle button */}
+                  <Group>
+                    <Rect
+                      id="freedraw-toggle"
+                      width={stageSize.width < 600 ? 110 : 125}
+                      height={stageSize.width < 600 ? 28 : 35}
+                      fill={freeDrawMode
+                        ? currentTheme?.colors?.accentPrimary || '#ff9dda'
+                        : currentTheme?.colors?.accentSecondary || '#c5a3ff'}
+                      cornerRadius={10}
+                      onClick={() => {
+                        setFreeDrawMode(!freeDrawMode);
+                        if (!freeDrawMode) setEraserMode(false);
+                      }}
+                      onTap={() => {
+                        setFreeDrawMode(!freeDrawMode);
+                        if (!freeDrawMode) setEraserMode(false);
+                      }}
+                      onMouseEnter={(e) => {
+                        const container = e.target.getStage().container();
+                        container.style.cursor = 'pointer';
+                        e.target.to({
+                          shadowColor: freeDrawMode ? (currentTheme?.colors?.accentPrimary || '#ff9dda') : (currentTheme?.colors?.accentSecondary || '#c5a3ff'),
+                          shadowBlur: 20,
+                          shadowOpacity: 0.8,
+                          duration: 0.2
+                        });
+                      }}
+                      onMouseLeave={(e) => {
+                        const container = e.target.getStage().container();
+                        container.style.cursor = 'default';
+                        e.target.to({
+                          shadowBlur: 0,
+                          shadowOpacity: 0,
+                          duration: 0.2
+                        });
+                      }}
+                    />
+                    <Text
+                      text={freeDrawMode ? '✏️ Drawing' : '✏️ Enable Draw'}
+                      fontSize={stageSize.width < 600 ? 11 : 13}
+                      fontFamily={currentFont}
+                      fontStyle="500"
+                      fill="white"
+                      width={stageSize.width < 600 ? 110 : 125}
+                      height={stageSize.width < 600 ? 28 : 35}
+                      align="center"
+                      verticalAlign="middle"
+                      listening={false}
+                    />
+                  </Group>
+
+                  {/* Expanded controls when free draw is enabled */}
+                  {freeDrawMode && (
+                    <Group y={stageSize.width < 600 ? 36 : 43}>
+                      {/* Pen/Eraser toggle buttons */}
+                      <Group>
+                        {/* Pen button */}
+                        <Group>
+                          <Rect
+                            id="freedraw-pen"
+                            width={stageSize.width < 600 ? 50 : 58}
+                            height={stageSize.width < 600 ? 26 : 30}
+                            fill={!eraserMode
+                              ? currentTheme?.colors?.accentPrimary || '#ff9dda'
+                              : '#e5e7eb'}
+                            cornerRadius={8}
+                            onClick={() => setEraserMode(false)}
+                            onTap={() => setEraserMode(false)}
+                            onMouseEnter={(e) => {
+                              const container = e.target.getStage().container();
+                              container.style.cursor = 'pointer';
+                              e.target.to({
+                                shadowColor: !eraserMode ? (currentTheme?.colors?.accentPrimary || '#ff9dda') : '#9ca3af',
+                                shadowBlur: 15,
+                                shadowOpacity: 0.6,
+                                duration: 0.2
+                              });
+                            }}
+                            onMouseLeave={(e) => {
+                              const container = e.target.getStage().container();
+                              container.style.cursor = 'default';
+                              e.target.to({
+                                shadowBlur: 0,
+                                shadowOpacity: 0,
+                                duration: 0.2
+                              });
+                            }}
+                          />
+                          <Text
+                            text="Pen"
+                            fontSize={stageSize.width < 600 ? 10 : 11}
+                            fontFamily={currentFont}
+                            fontStyle="500"
+                            fill={!eraserMode ? 'white' : '#6b7280'}
+                            width={stageSize.width < 600 ? 50 : 58}
+                            height={stageSize.width < 600 ? 26 : 30}
+                            align="center"
+                            verticalAlign="middle"
+                            listening={false}
+                          />
+                        </Group>
+
+                        {/* Eraser button */}
+                        <Group x={stageSize.width < 600 ? 58 : 66}>
+                          <Rect
+                            id="freedraw-eraser"
+                            width={stageSize.width < 600 ? 50 : 58}
+                            height={stageSize.width < 600 ? 26 : 30}
+                            fill={eraserMode
+                              ? currentTheme?.colors?.accentPrimary || '#ff9dda'
+                              : '#e5e7eb'}
+                            cornerRadius={8}
+                            onClick={() => setEraserMode(true)}
+                            onTap={() => setEraserMode(true)}
+                            onMouseEnter={(e) => {
+                              const container = e.target.getStage().container();
+                              container.style.cursor = 'pointer';
+                              e.target.to({
+                                shadowColor: eraserMode ? (currentTheme?.colors?.accentPrimary || '#ff9dda') : '#9ca3af',
+                                shadowBlur: 15,
+                                shadowOpacity: 0.6,
+                                duration: 0.2
+                              });
+                            }}
+                            onMouseLeave={(e) => {
+                              const container = e.target.getStage().container();
+                              container.style.cursor = 'default';
+                              e.target.to({
+                                shadowBlur: 0,
+                                shadowOpacity: 0,
+                                duration: 0.2
+                              });
+                            }}
+                          />
+                          <Text
+                            text="Eraser"
+                            fontSize={stageSize.width < 600 ? 9 : 10}
+                            fontFamily={currentFont}
+                            fontStyle="500"
+                            fill={eraserMode ? 'white' : '#6b7280'}
+                            width={stageSize.width < 600 ? 50 : 58}
+                            height={stageSize.width < 600 ? 26 : 30}
+                            align="center"
+                            verticalAlign="middle"
+                            listening={false}
+                          />
+                        </Group>
+                      </Group>
+
+                      {/* Brush size label and preview */}
+                      <Group y={stageSize.width < 600 ? 34 : 38}>
+                        <Text
+                          text={`${eraserMode ? 'Eraser' : 'Brush'} Size: ${brushSize}px`}
+                          fontSize={stageSize.width < 600 ? 9 : 10}
+                          fontFamily={currentFont}
+                          fontStyle="500"
+                          fill={currentTheme?.colors?.textSecondary || '#9d6b9e'}
+                          listening={false}
+                        />
+
+                        {/* Brush size preview circle - positioned with more spacing */}
+                        <Circle
+                          x={stageSize.width < 600 ? 102 : 112}
+                          y={stageSize.width < 600 ? 5 : 6}
+                          radius={Math.max(brushSize / 2, 2)}
+                          stroke={currentTheme?.colors?.textSecondary || '#9d6b9e'}
+                          strokeWidth={2}
+                          fill={eraserMode ? 'transparent' : (currentTheme?.colors?.textSecondary || '#9d6b9e')}
+                          listening={false}
+                        />
+
+                        {/* Slider background track */}
+                        <Rect
+                          id="freedraw-slider-bg"
+                          y={stageSize.width < 600 ? 16 : 18}
+                          width={stageSize.width < 600 ? 110 : 125}
+                          height={4}
+                          fill="#e5e7eb"
+                          cornerRadius={2}
+                          listening={false}
+                        />
+
+                        {/* Slider filled track */}
+                        <Rect
+                          y={stageSize.width < 600 ? 16 : 18}
+                          width={((brushSize - 1) / 19) * (stageSize.width < 600 ? 110 : 125)}
+                          height={4}
+                          fill={currentTheme?.colors?.accentPrimary || '#ff9dda'}
+                          cornerRadius={2}
+                          listening={false}
+                        />
+
+                        {/* Slider thumb */}
+                        <Circle
+                          id="freedraw-slider-thumb"
+                          x={tempSliderPos !== null ? tempSliderPos : ((brushSize - 1) / 19) * (stageSize.width < 600 ? 110 : 125)}
+                          y={stageSize.width < 600 ? 18 : 20}
+                          radius={8}
+                          fill="white"
+                          stroke={currentTheme?.colors?.accentPrimary || '#ff9dda'}
+                          strokeWidth={2}
+                          shadowColor="black"
+                          shadowBlur={4}
+                          shadowOpacity={0.2}
+                          draggable={true}
+                          dragBoundFunc={(pos) => {
+                            const minX = 0;
+                            const maxX = stageSize.width < 600 ? 110 : 125;
+                            const newX = Math.max(minX, Math.min(pos.x, maxX));
+                            return {
+                              x: newX,
+                              y: stageSize.width < 600 ? 18 : 20
+                            };
+                          }}
+                          onDragStart={() => {
+                            setTempSliderPos(((brushSize - 1) / 19) * (stageSize.width < 600 ? 110 : 125));
+                          }}
+                          onDragMove={(e) => {
+                            const x = e.target.x();
+                            setTempSliderPos(x);
+                            const maxX = stageSize.width < 600 ? 110 : 125;
+                            const newBrushSize = Math.round((x / maxX) * 19) + 1;
+                            setBrushSize(Math.max(1, Math.min(20, newBrushSize)));
+                          }}
+                          onDragEnd={() => {
+                            setTempSliderPos(null);
+                          }}
+                          onMouseEnter={(e) => {
+                            const container = e.target.getStage().container();
+                            container.style.cursor = 'pointer';
+                          }}
+                          onMouseLeave={(e) => {
+                            const container = e.target.getStage().container();
+                            container.style.cursor = 'default';
+                          }}
+                        />
+
+                        {/* Clickable track to jump to position */}
+                        <Rect
+                          id="freedraw-slider-track"
+                          y={stageSize.width < 600 ? 10 : 12}
+                          width={stageSize.width < 600 ? 110 : 125}
+                          height={16}
+                          fill="transparent"
+                          onClick={(e) => {
+                            const stage = e.target.getStage();
+                            const pointerPos = stage.getPointerPosition();
+                            const groupPos = e.target.getAbsolutePosition();
+                            const clickX = pointerPos.x - groupPos.x;
+                            const maxX = stageSize.width < 600 ? 110 : 125;
+                            const newBrushSize = Math.round((clickX / maxX) * 19) + 1;
+                            setBrushSize(Math.max(1, Math.min(20, newBrushSize)));
+                          }}
+                          onTap={(e) => {
+                            const stage = e.target.getStage();
+                            const pointerPos = stage.getPointerPosition();
+                            const groupPos = e.target.getAbsolutePosition();
+                            const clickX = pointerPos.x - groupPos.x;
+                            const maxX = stageSize.width < 600 ? 110 : 125;
+                            const newBrushSize = Math.round((clickX / maxX) * 19) + 1;
+                            setBrushSize(Math.max(1, Math.min(20, newBrushSize)));
+                          }}
+                          onMouseEnter={(e) => {
+                            const container = e.target.getStage().container();
+                            container.style.cursor = 'pointer';
+                          }}
+                          onMouseLeave={(e) => {
+                            const container = e.target.getStage().container();
+                            container.style.cursor = 'default';
+                          }}
+                        />
+                      </Group>
+                    </Group>
+                  )}
+                </Group>
               </Layer>
             </Stage>
           </div>
