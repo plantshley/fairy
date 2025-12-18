@@ -10,6 +10,11 @@ const bodyTypes = [
   { id: 'frootie', name: 'Toodie Frootie', emoji: '🍋', svgPath: '/build-svgs/body-frootie.svg' },
   { id: 'sylph', name: 'Sylph', emoji: '🦢', svgPath: '/build-svgs/body-sylph.svg' },
   { id: 'griffon', name: 'Griffon', emoji: '🦉', svgPath: '/build-svgs/body-griffon.svg' },
+  { id: 'harpy', name: 'Harpy', emoji: '🦇', svgPath: '/build-svgs/body-harpy.svg' },
+  { id: 'lovely', name: 'Lovely', emoji: '💖', svgPath: '/build-svgs/body-lovely.svg' },
+  { id: 'imp', name: 'Imp', emoji: '🐾', svgPath: '/build-svgs/body-imp.svg' },
+  { id: 'tenshi-point', name: 'Tenshi (pointy)', emoji: '🪽', svgPath: '/build-svgs/body-tenshi-point.svg' },
+  { id: 'tenshi-round', name: 'Tenshi (round)', emoji: '😇', svgPath: '/build-svgs/body-tenshi-round.svg' },
 ];
 
 // Parts to add (preview uses v1, canvas uses white2)
@@ -24,10 +29,40 @@ const parts = {
   ],
   limbs: [
     {
-      id: 'limb-long',
-      name: 'Long Limb',
-      previewPath: '/build-svgs/limb-long.svg',
-      canvasPath: '/build-svgs/limb-long.svg'
+      id: 'limbs-long',
+      name: 'Long',
+      previewPath: '/build-svgs/limbs-long.svg',
+      canvasPath: '/build-svgs/limbs-long.svg'
+    },
+    {
+      id: 'limbs-long2',
+      name: 'Long 2',
+      previewPath: '/build-svgs/limbs-long2.svg',
+      canvasPath: '/build-svgs/limbs-long2.svg'
+    },
+    {
+      id: 'limbs-med',
+      name: 'Medium',
+      previewPath: '/build-svgs/limbs-med.svg',
+      canvasPath: '/build-svgs/limbs-med.svg'
+    },
+    {
+      id: 'limbs-short',
+      name: 'Short',
+      previewPath: '/build-svgs/limbs-short.svg',
+      canvasPath: '/build-svgs/limbs-short.svg'
+    },
+    {
+      id: 'limbs-long-toes',
+      name: 'Long Toes',
+      previewPath: '/build-svgs/limbs-long-toes.svg',
+      canvasPath: '/build-svgs/limbs-long-toes.svg'
+    },
+    {
+      id: 'limbs-short-toes',
+      name: 'Short Toes',
+      previewPath: '/build-svgs/limbs-short-toes.svg',
+      canvasPath: '/build-svgs/limbs-short-toes.svg'
     },
   ],
   accessories: [
@@ -36,6 +71,74 @@ const parts = {
       name: 'Faceplate',
       previewPath: '/build-svgs/acc-faceplate.svg',
       canvasPath: '/build-svgs/acc-faceplate.svg'
+    },
+    {
+      id: 'acc-faceplate2',
+      name: 'Faceplate 2',
+      previewPath: '/build-svgs/acc-faceplate2.svg',
+      canvasPath: '/build-svgs/acc-faceplate2.svg'
+    },
+    {
+      id: 'acc-faceplate3',
+      name: 'Faceplate 3',
+      previewPath: '/build-svgs/acc-faceplate3.svg',
+      canvasPath: '/build-svgs/acc-faceplate3.svg'
+    },
+    {
+      id: 'acc-sparkle',
+      name: 'Sparkle',
+      previewPath: '/build-svgs/acc-sparkle.svg',
+      canvasPath: '/build-svgs/acc-sparkle.svg'
+    },
+    {
+      id: 'acc-boot1',
+      name: 'Boot 1',
+      previewPath: '/build-svgs/acc-boot1.svg',
+      canvasPath: '/build-svgs/acc-boot1.svg'
+    },
+    {
+      id: 'acc-boot2',
+      name: 'Boot 2',
+      previewPath: '/build-svgs/acc-boot2.svg',
+      canvasPath: '/build-svgs/acc-boot2.svg'
+    },
+    {
+      id: 'acc-boot3',
+      name: 'Boot 3',
+      previewPath: '/build-svgs/acc-boot3.svg',
+      canvasPath: '/build-svgs/acc-boot3.svg'
+    },
+    {
+      id: 'acc-frill',
+      name: 'Frill',
+      previewPath: '/build-svgs/acc-frill.svg',
+      canvasPath: '/build-svgs/acc-frill.svg'
+    },
+    {
+      id: 'acc-frill2',
+      name: 'Frill 2',
+      previewPath: '/build-svgs/acc-frill2.svg',
+      canvasPath: '/build-svgs/acc-frill2.svg'
+    },
+  ],
+  earsWingsTails: [
+    {
+      id: 'ear1',
+      name: 'Ear 1',
+      previewPath: '/build-svgs/ear1.svg',
+      canvasPath: '/build-svgs/ear1.svg'
+    },
+    {
+      id: 'ear2',
+      name: 'Ear 2',
+      previewPath: '/build-svgs/ear2.svg',
+      canvasPath: '/build-svgs/ear2.svg'
+    },
+    {
+      id: 'ear3',
+      name: 'Ear 3',
+      previewPath: '/build-svgs/ear3.svg',
+      canvasPath: '/build-svgs/ear3.svg'
     },
     {
       id: 'acc-horn1',
@@ -61,6 +164,30 @@ const parts = {
       previewPath: '/build-svgs/acc-horn4.svg',
       canvasPath: '/build-svgs/acc-horn4.svg'
     },
+    {
+      id: 'tail1',
+      name: 'Tail 1',
+      previewPath: '/build-svgs/tail1.svg',
+      canvasPath: '/build-svgs/tail1.svg'
+    },
+    {
+      id: 'tail2',
+      name: 'Tail 2',
+      previewPath: '/build-svgs/tail2.svg',
+      canvasPath: '/build-svgs/tail2.svg'
+    },
+    {
+      id: 'tail3',
+      name: 'Tail 3',
+      previewPath: '/build-svgs/tail3.svg',
+      canvasPath: '/build-svgs/tail3.svg'
+    },
+    {
+      id: 'tail4',
+      name: 'Tail 4',
+      previewPath: '/build-svgs/tail4.svg',
+      canvasPath: '/build-svgs/tail4.svg'
+    },
   ],
 };
 
@@ -74,7 +201,13 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
   const baseSizeMultiplier = screenSize < 600 ? 0.92 : 0.5;
   const sizeMultiplier = bodySizeMultiplier || baseSizeMultiplier;
   const bodySize = screenSize * sizeMultiplier;
-  const bodyOffset = bodySize / 2;
+
+  // Calculate width and height based on image aspect ratio
+  const aspectRatio = image ? image.width / image.height : 1;
+  const bodyWidth = aspectRatio >= 1 ? bodySize : bodySize * aspectRatio;
+  const bodyHeight = aspectRatio >= 1 ? bodySize / aspectRatio : bodySize;
+  const bodyOffsetX = bodyWidth / 2;
+  const bodyOffsetY = bodyHeight / 2;
 
   useEffect(() => {
     if (image && body.color) {
@@ -149,10 +282,10 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
       image={filterImage || image}
       x={x}
       y={bodyY}
-      width={bodySize}
-      height={bodySize}
-      offsetX={bodyOffset}
-      offsetY={bodyOffset}
+      width={bodyWidth}
+      height={bodyHeight}
+      offsetX={bodyOffsetX}
+      offsetY={bodyOffsetY}
       onClick={onClick}
       hitFunc={(context, shape) => {
         // Custom hit detection - only register hits on non-transparent pixels
@@ -169,6 +302,7 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
 
         // Let Konva check if the point is in bounds, then we'll check alpha
         const pos = shape.getStage().getPointerPosition();
+        if (!pos) return; // Pointer is outside the stage
         const transform = shape.getAbsoluteTransform().copy();
         transform.invert();
         const localPos = transform.point(pos);
@@ -265,11 +399,10 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
 
           // Only process pixels with opacity
           if (alpha > 0) {
-            // Outline is ~30-40 RGB with full alpha, threshold at 50
-            const isLightEnough = r > 50 || g > 50 || b > 50;
-            const isSemiTransparent = alpha > 0 && alpha < 200;
+            // Outline is ~30-40 RGB with full alpha, threshold at 100 (same as body)
+            const isLightEnough = r > 100 || g > 100 || b > 100;
 
-            if (isLightEnough || isSemiTransparent) {
+            if (isLightEnough) {
               // Light pixels = object fill color
               data[i] = newColor.r;
               data[i + 1] = newColor.g;
@@ -467,6 +600,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
     facial: true,
     limbs: true,
     accessories: true,
+    earsWingsTails: true,
   });
   const [stageScale, setStageScale] = useState(1);
   const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
@@ -1176,6 +1310,34 @@ export const BuildYourOwn = ({ currentTheme }) => {
             {!collapsedSections.accessories && (
               <div className="grid grid-cols-5 gap-2">
                 {parts.accessories.map((part) => (
+                  <button
+                    key={part.id}
+                    className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
+                    style={{
+                      backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                    }}
+                    onClick={() => handleAddObject(part)}
+                    title={`Add ${part.name}`}
+                  >
+                    <img src={part.previewPath} alt={part.name} className="w-full h-full object-contain" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Parts - Ears, Wings, Horns, & Tails */}
+          <div className="mb-6">
+            <button
+              className="w-full flex items-center justify-between mb-3 hover:opacity-70 transition-opacity"
+              onClick={() => setCollapsedSections({ ...collapsedSections, earsWingsTails: !collapsedSections.earsWingsTails })}
+            >
+              <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Other Body Parts</h3>
+              <span className={collapsedSections.earsWingsTails ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.earsWingsTails ? '▶' : '▼'}</span>
+            </button>
+            {!collapsedSections.earsWingsTails && (
+              <div className="grid grid-cols-5 gap-2">
+                {parts.earsWingsTails.map((part) => (
                   <button
                     key={part.id}
                     className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
