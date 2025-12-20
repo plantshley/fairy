@@ -26,6 +26,24 @@ const parts = {
       previewPath: '/build-svgs/eyes-sad v1.svg',
       canvasPath: '/build-svgs/eyes-sad v1.svg'
     },
+    {
+      id: 'acc-faceplate',
+      name: 'Faceplate',
+      previewPath: '/build-svgs/acc-faceplate.svg',
+      canvasPath: '/build-svgs/acc-faceplate.svg'
+    },
+    {
+      id: 'acc-faceplate2',
+      name: 'Faceplate 2',
+      previewPath: '/build-svgs/acc-faceplate2.svg',
+      canvasPath: '/build-svgs/acc-faceplate2.svg'
+    },
+    {
+      id: 'acc-faceplate3',
+      name: 'Faceplate 3',
+      previewPath: '/build-svgs/acc-faceplate3.svg',
+      canvasPath: '/build-svgs/acc-faceplate3.svg'
+    },
   ],
   limbs: [
     {
@@ -66,24 +84,6 @@ const parts = {
     },
   ],
   accessories: [
-    {
-      id: 'acc-faceplate',
-      name: 'Faceplate',
-      previewPath: '/build-svgs/acc-faceplate.svg',
-      canvasPath: '/build-svgs/acc-faceplate.svg'
-    },
-    {
-      id: 'acc-faceplate2',
-      name: 'Faceplate 2',
-      previewPath: '/build-svgs/acc-faceplate2.svg',
-      canvasPath: '/build-svgs/acc-faceplate2.svg'
-    },
-    {
-      id: 'acc-faceplate3',
-      name: 'Faceplate 3',
-      previewPath: '/build-svgs/acc-faceplate3.svg',
-      canvasPath: '/build-svgs/acc-faceplate3.svg'
-    },
     {
       id: 'acc-sparkle',
       name: 'Sparkle',
@@ -689,9 +689,16 @@ export const BuildYourOwn = ({ currentTheme }) => {
       selectedBody: selectedBody ? { ...selectedBody } : null,
     }]);
 
-    // Calculate responsive initial size - much smaller for added parts
+    // Calculate responsive initial size
     const screenSize = Math.min(stageSize.width, stageSize.height);
-    const initialSize = screenSize < 600 ? screenSize * 0.12 : screenSize * 0.06;
+    // Accessories, limbs, ears, tails, and horns are bigger; only eyes/facial are smaller
+    const isAccessory = part.id.startsWith('acc-');
+    const isLimb = part.id.startsWith('limbs-');
+    const isEarWingTail = part.id.startsWith('ear') || part.id.startsWith('tail');
+    const isBiggerPart = isAccessory || isLimb || isEarWingTail;
+    const initialSize = screenSize < 600
+      ? (isBiggerPart ? screenSize * 0.18 : screenSize * 0.12)
+      : (isBiggerPart ? screenSize * 0.10 : screenSize * 0.06);
 
     const newObject = {
       id: `${part.id}-${Date.now()}`,
@@ -1189,7 +1196,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
               className="w-full flex items-center justify-between mb-3 hover:opacity-70 transition-opacity"
               onClick={() => setCollapsedSections({ ...collapsedSections, bodyType: !collapsedSections.bodyType })}
             >
-              <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Body Type</h3>
+              <h3 className="font-bonbon tracking-wider text-xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Body Type</h3>
               <span className={collapsedSections.bodyType ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.bodyType ? '▶' : '▼'}</span>
             </button>
             {!collapsedSections.bodyType && (
@@ -1248,11 +1255,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
               className="w-full flex items-center justify-between mb-3 hover:opacity-70 transition-opacity"
               onClick={() => setCollapsedSections({ ...collapsedSections, facial: !collapsedSections.facial })}
             >
-              <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Facial</h3>
+              <h3 className="font-bonbon tracking-wider text-xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Facial</h3>
               <span className={collapsedSections.facial ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.facial ? '▶' : '▼'}</span>
             </button>
             {!collapsedSections.facial && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 {parts.eyes.map((part) => (
                   <button
                     key={part.id}
@@ -1276,7 +1283,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
               className="w-full flex items-center justify-between mb-3 hover:opacity-70 transition-opacity"
               onClick={() => setCollapsedSections({ ...collapsedSections, limbs: !collapsedSections.limbs })}
             >
-              <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Limbs</h3>
+              <h3 className="font-bonbon tracking-wider text-xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Limbs</h3>
               <span className={collapsedSections.limbs ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.limbs ? '▶' : '▼'}</span>
             </button>
             {!collapsedSections.limbs && (
@@ -1304,11 +1311,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
               className="w-full flex items-center justify-between mb-3 hover:opacity-70 transition-opacity"
               onClick={() => setCollapsedSections({ ...collapsedSections, accessories: !collapsedSections.accessories })}
             >
-              <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Accessories</h3>
+              <h3 className="font-bonbon tracking-wider text-xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Accessories</h3>
               <span className={collapsedSections.accessories ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.accessories ? '▶' : '▼'}</span>
             </button>
             {!collapsedSections.accessories && (
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 {parts.accessories.map((part) => (
                   <button
                     key={part.id}
@@ -1332,11 +1339,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
               className="w-full flex items-center justify-between mb-3 hover:opacity-70 transition-opacity"
               onClick={() => setCollapsedSections({ ...collapsedSections, earsWingsTails: !collapsedSections.earsWingsTails })}
             >
-              <h3 className="font-bonbon tracking-wider text-2xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Other Body Parts</h3>
+              <h3 className="font-bonbon tracking-wider text-xl font-bold text-center flex-1" style={{ color: 'var(--text-primary)' }}>Other Body Parts</h3>
               <span className={collapsedSections.earsWingsTails ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.earsWingsTails ? '▶' : '▼'}</span>
             </button>
             {!collapsedSections.earsWingsTails && (
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 {parts.earsWingsTails.map((part) => (
                   <button
                     key={part.id}
