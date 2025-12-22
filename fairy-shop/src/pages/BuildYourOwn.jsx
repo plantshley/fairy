@@ -21,12 +21,6 @@ const bodyTypes = [
 const parts = {
   eyes: [
     {
-      id: 'eyes-sad',
-      name: 'Sad Eyes',
-      previewPath: '/build-svgs/eyes-sad v1.svg',
-      canvasPath: '/build-svgs/eyes-sad v1.svg'
-    },
-    {
       id: 'acc-faceplate',
       name: 'Faceplate',
       previewPath: '/build-svgs/acc-faceplate.svg',
@@ -44,6 +38,47 @@ const parts = {
       previewPath: '/build-svgs/acc-faceplate3.svg',
       canvasPath: '/build-svgs/acc-faceplate3.svg'
     },
+    { id: 'facial_0', name: 'Face 1', previewPath: '/build-svgs/facial_0.svg', canvasPath: '/build-svgs/facial_0.svg' },
+    { id: 'facial_1', name: 'Face 2', previewPath: '/build-svgs/facial_1.svg', canvasPath: '/build-svgs/facial_1.svg' },
+    { id: 'facial_2', name: 'Face 3', previewPath: '/build-svgs/facial_2.svg', canvasPath: '/build-svgs/facial_2.svg' },
+    { id: 'facial_3', name: 'Face 4', previewPath: '/build-svgs/facial_3.svg', canvasPath: '/build-svgs/facial_3.svg' },
+    { id: 'facial_4', name: 'Face 5', previewPath: '/build-svgs/facial_4.svg', canvasPath: '/build-svgs/facial_4.svg' },
+    { id: 'facial_5', name: 'Face 6', previewPath: '/build-svgs/facial_5.svg', canvasPath: '/build-svgs/facial_5.svg' },
+    { id: 'facial_6', name: 'Face 7', previewPath: '/build-svgs/facial_6.svg', canvasPath: '/build-svgs/facial_6.svg' },
+    { id: 'facial_7', name: 'Face 8', previewPath: '/build-svgs/facial_7.svg', canvasPath: '/build-svgs/facial_7.svg' },
+    { id: 'facial_8', name: 'Face 9', previewPath: '/build-svgs/facial_8.svg', canvasPath: '/build-svgs/facial_8.svg' },
+    { id: 'facial_9', name: 'Face 10', previewPath: '/build-svgs/facial_9.svg', canvasPath: '/build-svgs/facial_9.svg' },
+    { id: 'facial_10', name: 'Face 11', previewPath: '/build-svgs/facial_10.svg', canvasPath: '/build-svgs/facial_10.svg' },
+    { id: 'facial_11', name: 'Face 12', previewPath: '/build-svgs/facial_11.svg', canvasPath: '/build-svgs/facial_11.svg' },
+    { id: 'facial_12', name: 'Face 13', previewPath: '/build-svgs/facial_12.svg', canvasPath: '/build-svgs/facial_12.svg' },
+    { id: 'facial_13', name: 'Face 14', previewPath: '/build-svgs/facial_13.svg', canvasPath: '/build-svgs/facial_13.svg' },
+    { id: 'facial_14', name: 'Face 15', previewPath: '/build-svgs/facial_14.svg', canvasPath: '/build-svgs/facial_14.svg' },
+    { id: 'facial_15', name: 'Face 16', previewPath: '/build-svgs/facial_15.svg', canvasPath: '/build-svgs/facial_15.svg' },
+    { id: 'facial_16', name: 'Face 17', previewPath: '/build-svgs/facial_16.svg', canvasPath: '/build-svgs/facial_16.svg' },
+    { id: 'facial_17', name: 'Face 18', previewPath: '/build-svgs/facial_17.svg', canvasPath: '/build-svgs/facial_17.svg' },
+    { id: 'facial_18', name: 'Face 19', previewPath: '/build-svgs/facial_18.svg', canvasPath: '/build-svgs/facial_18.svg' },
+    { id: 'facial_20', name: 'Face 20', previewPath: '/build-svgs/facial_20.svg', canvasPath: '/build-svgs/facial_20.svg' },
+    { id: 'facial_21', name: 'Face 21', previewPath: '/build-svgs/facial_21.svg', canvasPath: '/build-svgs/facial_21.svg' },
+    { id: 'facial_25', name: 'Face 22', previewPath: '/build-svgs/facial_25.svg', canvasPath: '/build-svgs/facial_25.svg' },
+    { id: 'facial_26', name: 'Face 23', previewPath: '/build-svgs/facial_26.svg', canvasPath: '/build-svgs/facial_26.svg' },
+    { id: 'facial_27', name: 'Face 24', previewPath: '/build-svgs/facial_27.svg', canvasPath: '/build-svgs/facial_27.svg' },
+    { id: 'facial_28', name: 'Face 25', previewPath: '/build-svgs/facial_28.svg', canvasPath: '/build-svgs/facial_28.svg' },
+    { id: 'facial_29', name: 'Face 26', previewPath: '/build-svgs/facial_29.svg', canvasPath: '/build-svgs/facial_29.svg' },
+    { id: 'facial_30', name: 'Face 27', previewPath: '/build-svgs/facial_30.svg', canvasPath: '/build-svgs/facial_30.svg' },
+    { id: 'facial_31', name: 'Face 28', previewPath: '/build-svgs/facial_31.svg', canvasPath: '/build-svgs/facial_31.svg' },
+    { id: 'facial_32', name: 'Face 29', previewPath: '/build-svgs/facial_32.svg', canvasPath: '/build-svgs/facial_32.svg' },
+    { id: 'facial_33', name: 'Face 30', previewPath: '/build-svgs/facial_33.svg', canvasPath: '/build-svgs/facial_33.svg' },
+    { id: 'facial_34', name: 'Face 31', previewPath: '/build-svgs/facial_34.svg', canvasPath: '/build-svgs/facial_34.svg' },
+    { id: 'facial_35', name: 'Face 32', previewPath: '/build-svgs/facial_35.svg', canvasPath: '/build-svgs/facial_35.svg' },
+    { id: 'facial_36', name: 'Face 33', previewPath: '/build-svgs/facial_36.svg', canvasPath: '/build-svgs/facial_36.svg' },
+    { id: 'facial_37', name: 'Face 34', previewPath: '/build-svgs/facial_37.svg', canvasPath: '/build-svgs/facial_37.svg' },
+    { id: 'facial_38', name: 'Face 35', previewPath: '/build-svgs/facial_38.svg', canvasPath: '/build-svgs/facial_38.svg' },
+    { id: 'facial_39', name: 'Face 36', previewPath: '/build-svgs/facial_39.svg', canvasPath: '/build-svgs/facial_39.svg' },
+    { id: 'facial_40', name: 'Face 37', previewPath: '/build-svgs/facial_40.svg', canvasPath: '/build-svgs/facial_40.svg' },
+    { id: 'facial_41', name: 'Face 38', previewPath: '/build-svgs/facial_41.svg', canvasPath: '/build-svgs/facial_41.svg' },
+    { id: 'facial_52', name: 'Face 39', previewPath: '/build-svgs/facial_52.svg', canvasPath: '/build-svgs/facial_52.svg' },
+    { id: 'eyes-sad-left', name: 'Sad Eye (L)', previewPath: '/build-svgs/eyes-sad-left.svg', canvasPath: '/build-svgs/eyes-sad-left.svg' },
+    { id: 'eyes-sad-right', name: 'Sad Eye (R)', previewPath: '/build-svgs/eyes-sad-right.svg', canvasPath: '/build-svgs/eyes-sad-right.svg' },
   ],
   limbs: [
     {
@@ -84,110 +119,50 @@ const parts = {
     },
   ],
   accessories: [
-    {
-      id: 'acc-sparkle',
-      name: 'Sparkle',
-      previewPath: '/build-svgs/acc-sparkle.svg',
-      canvasPath: '/build-svgs/acc-sparkle.svg'
-    },
-    {
-      id: 'acc-boot1',
-      name: 'Boot 1',
-      previewPath: '/build-svgs/acc-boot1.svg',
-      canvasPath: '/build-svgs/acc-boot1.svg'
-    },
-    {
-      id: 'acc-boot2',
-      name: 'Boot 2',
-      previewPath: '/build-svgs/acc-boot2.svg',
-      canvasPath: '/build-svgs/acc-boot2.svg'
-    },
-    {
-      id: 'acc-boot3',
-      name: 'Boot 3',
-      previewPath: '/build-svgs/acc-boot3.svg',
-      canvasPath: '/build-svgs/acc-boot3.svg'
-    },
-    {
-      id: 'acc-frill',
-      name: 'Frill',
-      previewPath: '/build-svgs/acc-frill.svg',
-      canvasPath: '/build-svgs/acc-frill.svg'
-    },
-    {
-      id: 'acc-frill2',
-      name: 'Frill 2',
-      previewPath: '/build-svgs/acc-frill2.svg',
-      canvasPath: '/build-svgs/acc-frill2.svg'
-    },
+    { id: 'acc-sparkle', name: 'Sparkle', previewPath: '/build-svgs/acc-sparkle.svg', canvasPath: '/build-svgs/acc-sparkle.svg' },
+    { id: 'acc-heart', name: 'Heart', previewPath: '/build-svgs/acc-heart.svg', canvasPath: '/build-svgs/acc-heart.svg' },
+    { id: 'acc-star', name: 'Star', previewPath: '/build-svgs/acc-star.svg', canvasPath: '/build-svgs/acc-star.svg' },
+    { id: 'acc-crown', name: 'Crown', previewPath: '/build-svgs/acc-crown.svg', canvasPath: '/build-svgs/acc-crown.svg' },
+    { id: 'acc-halo', name: 'Halo', previewPath: '/build-svgs/acc-halo.svg', canvasPath: '/build-svgs/acc-halo.svg' },
+    { id: 'acc-boot1', name: 'Boot 1', previewPath: '/build-svgs/acc-boot1.svg', canvasPath: '/build-svgs/acc-boot1.svg' },
+    { id: 'acc-boot2', name: 'Boot 2', previewPath: '/build-svgs/acc-boot2.svg', canvasPath: '/build-svgs/acc-boot2.svg' },
+    { id: 'acc-boot3', name: 'Boot 3', previewPath: '/build-svgs/acc-boot3.svg', canvasPath: '/build-svgs/acc-boot3.svg' },
+    { id: 'acc-frill', name: 'Frill', previewPath: '/build-svgs/acc-frill.svg', canvasPath: '/build-svgs/acc-frill.svg' },
+    { id: 'acc-frill2', name: 'Frill 2', previewPath: '/build-svgs/acc-frill2.svg', canvasPath: '/build-svgs/acc-frill2.svg' },
+    { id: 'acc_0', name: 'Acc 1', previewPath: '/build-svgs/acc_0.svg', canvasPath: '/build-svgs/acc_0.svg' },
+    { id: 'acc_1', name: 'Acc 2', previewPath: '/build-svgs/acc_1.svg', canvasPath: '/build-svgs/acc_1.svg' },
+    { id: 'acc_2', name: 'Acc 3', previewPath: '/build-svgs/acc_2.svg', canvasPath: '/build-svgs/acc_2.svg' },
+    { id: 'acc_3', name: 'Acc 4', previewPath: '/build-svgs/acc_3.svg', canvasPath: '/build-svgs/acc_3.svg' },
+    { id: 'acc_4', name: 'Acc 5', previewPath: '/build-svgs/acc_4.svg', canvasPath: '/build-svgs/acc_4.svg' },
+    { id: 'acc_5', name: 'Acc 6', previewPath: '/build-svgs/acc_5.svg', canvasPath: '/build-svgs/acc_5.svg' },
+    { id: 'acc_6', name: 'Acc 7', previewPath: '/build-svgs/acc_6.svg', canvasPath: '/build-svgs/acc_6.svg' },
+    { id: 'acc_7', name: 'Acc 8', previewPath: '/build-svgs/acc_7.svg', canvasPath: '/build-svgs/acc_7.svg' },
+    { id: 'acc_8', name: 'Acc 9', previewPath: '/build-svgs/acc_8.svg', canvasPath: '/build-svgs/acc_8.svg' },
+    { id: 'acc_9', name: 'Acc 10', previewPath: '/build-svgs/acc_9.svg', canvasPath: '/build-svgs/acc_9.svg' },
+    { id: 'acc_10', name: 'Acc 11', previewPath: '/build-svgs/acc_10.svg', canvasPath: '/build-svgs/acc_10.svg' },
+    { id: 'acc_11', name: 'Acc 12', previewPath: '/build-svgs/acc_11.svg', canvasPath: '/build-svgs/acc_11.svg' },
+    { id: 'acc_12', name: 'Acc 13', previewPath: '/build-svgs/acc_12.svg', canvasPath: '/build-svgs/acc_12.svg' },
+    { id: 'acc_13', name: 'Acc 14', previewPath: '/build-svgs/acc_13.svg', canvasPath: '/build-svgs/acc_13.svg' },
+    { id: 'acc_14', name: 'Acc 15', previewPath: '/build-svgs/acc_14.svg', canvasPath: '/build-svgs/acc_14.svg' },
+    { id: 'acc_15', name: 'Acc 16', previewPath: '/build-svgs/acc_15.svg', canvasPath: '/build-svgs/acc_15.svg' },
+    { id: 'acc_16', name: 'Acc 17', previewPath: '/build-svgs/acc_16.svg', canvasPath: '/build-svgs/acc_16.svg' },
   ],
   earsWingsTails: [
-    {
-      id: 'ear1',
-      name: 'Ear 1',
-      previewPath: '/build-svgs/ear1.svg',
-      canvasPath: '/build-svgs/ear1.svg'
-    },
-    {
-      id: 'ear2',
-      name: 'Ear 2',
-      previewPath: '/build-svgs/ear2.svg',
-      canvasPath: '/build-svgs/ear2.svg'
-    },
-    {
-      id: 'ear3',
-      name: 'Ear 3',
-      previewPath: '/build-svgs/ear3.svg',
-      canvasPath: '/build-svgs/ear3.svg'
-    },
-    {
-      id: 'acc-horn1',
-      name: 'Horn 1',
-      previewPath: '/build-svgs/acc-horn1.svg',
-      canvasPath: '/build-svgs/acc-horn1.svg'
-    },
-    {
-      id: 'acc-horn2',
-      name: 'Horn 2',
-      previewPath: '/build-svgs/acc-horn2.svg',
-      canvasPath: '/build-svgs/acc-horn2.svg'
-    },
-    {
-      id: 'acc-horn3',
-      name: 'Horn 3',
-      previewPath: '/build-svgs/acc-horn3.svg',
-      canvasPath: '/build-svgs/acc-horn3.svg'
-    },
-    {
-      id: 'acc-horn4',
-      name: 'Horn 4',
-      previewPath: '/build-svgs/acc-horn4.svg',
-      canvasPath: '/build-svgs/acc-horn4.svg'
-    },
-    {
-      id: 'tail1',
-      name: 'Tail 1',
-      previewPath: '/build-svgs/tail1.svg',
-      canvasPath: '/build-svgs/tail1.svg'
-    },
-    {
-      id: 'tail2',
-      name: 'Tail 2',
-      previewPath: '/build-svgs/tail2.svg',
-      canvasPath: '/build-svgs/tail2.svg'
-    },
-    {
-      id: 'tail3',
-      name: 'Tail 3',
-      previewPath: '/build-svgs/tail3.svg',
-      canvasPath: '/build-svgs/tail3.svg'
-    },
-    {
-      id: 'tail4',
-      name: 'Tail 4',
-      previewPath: '/build-svgs/tail4.svg',
-      canvasPath: '/build-svgs/tail4.svg'
-    },
+    { id: 'ear1', name: 'Ear 1', previewPath: '/build-svgs/ear1.svg', canvasPath: '/build-svgs/ear1.svg' },
+    { id: 'ear2', name: 'Ear 2', previewPath: '/build-svgs/ear2.svg', canvasPath: '/build-svgs/ear2.svg' },
+    { id: 'ear3', name: 'Ear 3', previewPath: '/build-svgs/ear3.svg', canvasPath: '/build-svgs/ear3.svg' },
+    { id: 'ear4', name: 'Ear 4', previewPath: '/build-svgs/ear4.svg', canvasPath: '/build-svgs/ear4.svg' },
+    { id: 'ear5', name: 'Ear 5', previewPath: '/build-svgs/ear5.svg', canvasPath: '/build-svgs/ear5.svg' },
+    { id: 'wings-angel', name: 'Angel Wings', previewPath: '/build-svgs/wings-angel.svg', canvasPath: '/build-svgs/wings-angel.svg' },
+    { id: 'wings-bat', name: 'Bat Wings', previewPath: '/build-svgs/wings-bat.svg', canvasPath: '/build-svgs/wings-bat.svg' },
+    { id: 'acc-horn1', name: 'Horn 1', previewPath: '/build-svgs/acc-horn1.svg', canvasPath: '/build-svgs/acc-horn1.svg' },
+    { id: 'acc-horn2', name: 'Horn 2', previewPath: '/build-svgs/acc-horn2.svg', canvasPath: '/build-svgs/acc-horn2.svg' },
+    { id: 'acc-horn3', name: 'Horn 3', previewPath: '/build-svgs/acc-horn3.svg', canvasPath: '/build-svgs/acc-horn3.svg' },
+    { id: 'acc-horn4', name: 'Horn 4', previewPath: '/build-svgs/acc-horn4.svg', canvasPath: '/build-svgs/acc-horn4.svg' },
+    { id: 'tail1', name: 'Tail 1', previewPath: '/build-svgs/tail1.svg', canvasPath: '/build-svgs/tail1.svg' },
+    { id: 'tail2', name: 'Tail 2', previewPath: '/build-svgs/tail2.svg', canvasPath: '/build-svgs/tail2.svg' },
+    { id: 'tail3', name: 'Tail 3', previewPath: '/build-svgs/tail3.svg', canvasPath: '/build-svgs/tail3.svg' },
+    { id: 'tail4', name: 'Tail 4', previewPath: '/build-svgs/tail4.svg', canvasPath: '/build-svgs/tail4.svg' },
   ],
 };
 
@@ -336,7 +311,7 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
 };
 
 // Individual draggable SVG image component with color filter
-const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stageSize, currentTheme, onTransformStart, onDragStart, freeDrawMode }) => {
+const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stageSize, stageScale, stagePosition, currentTheme, onTransformStart, onDragStart, freeDrawMode }) => {
   const shapeRef = useRef();
   const trRef = useRef();
   const [image] = useImage(object.svgPath);
@@ -501,9 +476,16 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
   }, [image, object.color, object.outlineColor]);
 
   const checkIfInTrash = (x, y, scale = 1) => {
+    // Convert object position from world space (content layer) to screen space (UI layer)
+    // The content layer has stage transforms applied, UI layer has inverse transforms
+    const screenX = (x * stageScale) + stagePosition.x;
+    const screenY = (y * stageScale) + stagePosition.y;
+
+    // Trash is in UI layer at these screen space coordinates
     const trashX = 60;
     const trashY = stageSize.height - 60;
-    const distance = Math.sqrt(Math.pow(x - trashX, 2) + Math.pow(y - trashY, 2));
+
+    const distance = Math.sqrt(Math.pow(screenX - trashX, 2) + Math.pow(screenY - trashY, 2));
     // Increase detection radius based on object scale, with a reasonable upper limit
     const detectionRadius = Math.min(60 + (Math.max(scale - 1, 0) * 100), 200);
     return distance < detectionRadius;
@@ -1564,6 +1546,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     onDragStart={handleDragStart}
                     freeDrawMode={freeDrawMode}
                     stageSize={stageSize}
+                    stageScale={stageScale}
+                    stagePosition={stagePosition}
                     currentTheme={currentTheme}
                   />
                 ))}
@@ -1593,6 +1577,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     onDragStart={handleDragStart}
                     freeDrawMode={freeDrawMode}
                     stageSize={stageSize}
+                    stageScale={stageScale}
+                    stagePosition={stagePosition}
                     currentTheme={currentTheme}
                   />
                 ))}
