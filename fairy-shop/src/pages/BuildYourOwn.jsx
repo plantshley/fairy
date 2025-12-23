@@ -175,7 +175,8 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
 
   // Calculate responsive body size - use bodySizeMultiplier prop
   const screenSize = Math.min(stageSize.width, stageSize.height);
-  const baseSizeMultiplier = screenSize < 600 ? 0.92 : 0.5;
+  const isDesktop = window.innerWidth >= 1024; // lg breakpoint
+  const baseSizeMultiplier = isDesktop ? 0.75 : 0.92;
   const sizeMultiplier = bodySizeMultiplier || baseSizeMultiplier;
   const bodySize = screenSize * sizeMultiplier;
 
@@ -698,14 +699,22 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
     // Calculate responsive initial size
     const screenSize = Math.min(stageSize.width, stageSize.height);
+    const isDesktop = window.innerWidth >= 1024; // lg breakpoint
     // Accessories, limbs, ears, tails, and horns are bigger; only eyes/facial are smaller
     const isAccessory = part.id.startsWith('acc-');
     const isLimb = part.id.startsWith('limbs-');
     const isEarWingTail = part.id.startsWith('ear') || part.id.startsWith('tail');
     const isBiggerPart = isAccessory || isLimb || isEarWingTail;
-    const initialSize = screenSize < 600
-      ? (isBiggerPart ? screenSize * 0.18 : screenSize * 0.12)
-      : (isBiggerPart ? screenSize * 0.10 : screenSize * 0.06);
+
+    // Make limbs much smaller for all screen sizes
+    let initialSize;
+    if (isLimb) {
+      initialSize = isDesktop ? screenSize * 0.1 : screenSize * 0.15;
+    } else {
+      initialSize = isDesktop
+        ? (isBiggerPart ? screenSize * 0.12 : screenSize * 0.18)
+        : (isBiggerPart ? screenSize * 0.1 : screenSize * 0.18);
+    }
 
     const newObject = {
       id: `${part.id}-${Date.now()}`,
