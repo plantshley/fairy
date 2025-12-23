@@ -206,7 +206,7 @@ export const Links = ({ currentTheme }) => {
         ⋆｡‧˚ʚ♡ɞ˚‧｡⋆ links ⋆｡‧˚ʚ♡ɞ˚‧｡⋆
       </motion.h1>
 
-      <p className="text-center mb-8 text-base sm:text-lg md:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
+      <p className="text-center mb-8 text-sm sm:text-base md:text-lg lg:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
         ʚ♡ɞ connect with me across the web ʚ♡ɞ
       </p>
 

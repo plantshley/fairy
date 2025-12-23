@@ -41,11 +41,11 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
   return (
     <>
       {/* Corner creature button with speech bubble */}
-      <div className="fixed bottom-20 right-2 sm:bottom-6 sm:right-6 z-50">
+      <div className="fixed bottom-20 right-2 landscape:bottom-2 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-50">
         {/* Speech bubble - only show on home page */}
         {activeTab === 'home' && (
           <div
-            className="absolute top-6 sm:top-8 -left-4 sm:-left-5 w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-sm text-[8px] sm:text-[9px] text-center flex flex-col items-center relative overflow-visible"
+            className="absolute -left-4 top-2 sm:-left-6 sm:top-4 lg:-left-4 lg:top-8 w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-full backdrop-blur-sm text-[7px] sm:text-[8px] lg:text-xs text-center flex flex-col items-center relative overflow-visible"
             style={{
               background: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
               color: 'var(--text-primary)',
@@ -82,7 +82,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
           <motion.img
             src={getModalCreature()}
             alt="Change theme"
-            className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 object-contain"
+            className="w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 object-contain"
             animate={{
               y: [0, -8, 0],
               rotate: [0, 5, -5, 0],

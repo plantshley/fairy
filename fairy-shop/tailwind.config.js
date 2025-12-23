@@ -29,6 +29,10 @@ export default {
           '50%': { backgroundPosition: '100% 50%' },
         },
       },
+      screens: {
+        // Treat landscape orientation on mobile as a larger screen
+        'landscape': { 'raw': '(orientation: landscape) and (max-height: 768px)' },
+      },
     },
   },
   plugins: [],

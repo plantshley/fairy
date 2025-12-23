@@ -21,7 +21,7 @@ export const Shop = ({ currentTheme }) => {
         ✧･ﾟ: *✧･ﾟ:* shop *:･ﾟ✧*:･ﾟ✧
       </motion.h1>
 
-      <p className="text-center mb-8 text-base sm:text-lg md:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
+      <p className="text-center mb-8 text-sm sm:text-base md:text-lg lg:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
         ･ﾟ✧ browse my crochet creatures ✧ﾟ･
       </p>
 

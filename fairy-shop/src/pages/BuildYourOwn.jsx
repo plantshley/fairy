@@ -594,12 +594,29 @@ export const BuildYourOwn = ({ currentTheme }) => {
   // Refs to track current zoom/pan state for smooth touch gestures
   const stageScaleRef = useRef(1);
   const stagePositionRef = useRef({ x: 0, y: 0 });
+  // Ref to throttle brush size updates with requestAnimationFrame
+  const brushSizeUpdateRef = useRef(null);
   const [trashImage] = useImage('/trash.png');
   const [visualisImage] = useImage('/visualis.png');
   const [undoImage] = useImage('/icons/refresh-data.png');
 
   // Get current font from CSS variable - recompute when body class changes
   const [currentFont, setCurrentFont] = useState('JetBrains Mono, monospace');
+
+  // Preload all part images on mount for faster loading
+  useEffect(() => {
+    const allParts = [
+      ...parts.eyes,
+      ...parts.limbs,
+      ...parts.accessories,
+      ...parts.earsWingsTails,
+    ];
+
+    allParts.forEach((part) => {
+      const img = new Image();
+      img.src = part.previewPath;
+    });
+  }, []);
 
   useEffect(() => {
     const updateFont = () => {
@@ -662,6 +679,12 @@ export const BuildYourOwn = ({ currentTheme }) => {
       selectedBody: selectedBody ? { ...selectedBody } : null,
     }]);
     setSelectedBody({ ...body, color: body.color || '#ffffff' });
+
+    // Set default body size based on screen width if not already set
+    if (bodySizeMultiplier === null) {
+      const isMobile = window.innerWidth < 1024; // lg breakpoint
+      setBodySizeMultiplier(isMobile ? 0.7 : 0.5); // Larger on mobile
+    }
   };
 
   const handleAddObject = (part) => {
@@ -1153,17 +1176,17 @@ export const BuildYourOwn = ({ currentTheme }) => {
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <Sparkle count={15} />
-        ˗ˏˋ ★ ˎˊ˗ build your own ˗ˏˋ ★ ˎˊ˗
+        ˗ˏˋ ★ build your own ★ ˎˊ˗
       </motion.h1>
 
-      <p className="text-center mb-2 sm:mb-4 text-base sm:text-lg md:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
+      <p className="text-center mb-2 sm:mb-4 text-sm sm:text-base md:text-lg lg:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
         ⋆｡°✩ design your kirametki creature ✩°｡⋆
       </p>
 
-      <div className="flex flex-col lg:flex-row gap-4 w-full max-w-7xl h-full">
+      <div className="flex flex-col landscape:flex-row lg:flex-row gap-4 w-full max-w-7xl h-full">
         {/* Left Control Panel */}
         <motion.div
-          className="backdrop-blur-md rounded-3xl p-4 shadow-xl lg:w-64 flex-shrink-0 overflow-y-auto"
+          className="backdrop-blur-md rounded-3xl p-4 shadow-xl landscape:w-64 lg:w-64 flex-shrink-0 overflow-y-auto"
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
@@ -1241,11 +1264,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
               <span className={collapsedSections.facial ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.facial ? '▶' : '▼'}</span>
             </button>
             {!collapsedSections.facial && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-5 sm:grid-cols-4 lg:grid-cols-4 gap-1 sm:gap-2">
                 {parts.eyes.map((part) => (
                   <button
                     key={part.id}
-                    className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
+                    className="p-0.5 sm:p-2 rounded-lg sm:rounded-2xl transition-all hover:scale-110 shadow-sm sm:shadow-md aspect-square flex items-center justify-center"
                     style={{
                       backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                     }}
@@ -1269,11 +1292,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
               <span className={collapsedSections.limbs ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.limbs ? '▶' : '▼'}</span>
             </button>
             {!collapsedSections.limbs && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-3 lg:grid-cols-3 gap-1 sm:gap-2">
                 {parts.limbs.map((part) => (
                   <button
                     key={part.id}
-                    className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
+                    className="p-0.5 sm:p-2 rounded-lg sm:rounded-2xl transition-all hover:scale-110 shadow-sm sm:shadow-md aspect-square flex items-center justify-center"
                     style={{
                       backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                     }}
@@ -1297,11 +1320,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
               <span className={collapsedSections.accessories ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.accessories ? '▶' : '▼'}</span>
             </button>
             {!collapsedSections.accessories && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-5 sm:grid-cols-4 lg:grid-cols-4 gap-1 sm:gap-2">
                 {parts.accessories.map((part) => (
                   <button
                     key={part.id}
-                    className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
+                    className="p-0.5 sm:p-2 rounded-lg sm:rounded-2xl transition-all hover:scale-110 shadow-sm sm:shadow-md aspect-square flex items-center justify-center"
                     style={{
                       backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                     }}
@@ -1325,11 +1348,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
               <span className={collapsedSections.earsWingsTails ? 'text-sm' : 'text-xl'} style={{ color: 'var(--text-secondary)' }}>{collapsedSections.earsWingsTails ? '▶' : '▼'}</span>
             </button>
             {!collapsedSections.earsWingsTails && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-5 sm:grid-cols-4 lg:grid-cols-4 gap-1 sm:gap-2">
                 {parts.earsWingsTails.map((part) => (
                   <button
                     key={part.id}
-                    className="p-2 rounded-2xl transition-all hover:scale-110 shadow-md aspect-square flex items-center justify-center"
+                    className="p-0.5 sm:p-2 rounded-lg sm:rounded-2xl transition-all hover:scale-110 shadow-sm sm:shadow-md aspect-square flex items-center justify-center"
                     style={{
                       backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                     }}
@@ -2074,9 +2097,23 @@ export const BuildYourOwn = ({ currentTheme }) => {
                             setTempSliderPos(x);
                             const maxX = stageSize.width < 600 ? 110 : 125;
                             const newBrushSize = Math.round((x / maxX) * 19) + 1;
-                            setBrushSize(Math.max(1, Math.min(20, newBrushSize)));
+                            const clampedSize = Math.max(1, Math.min(20, newBrushSize));
+
+                            // Throttle brush size updates using requestAnimationFrame
+                            if (brushSizeUpdateRef.current) {
+                              cancelAnimationFrame(brushSizeUpdateRef.current);
+                            }
+                            brushSizeUpdateRef.current = requestAnimationFrame(() => {
+                              setBrushSize(clampedSize);
+                              brushSizeUpdateRef.current = null;
+                            });
                           }}
                           onDragEnd={() => {
+                            // Cancel any pending updates
+                            if (brushSizeUpdateRef.current) {
+                              cancelAnimationFrame(brushSizeUpdateRef.current);
+                              brushSizeUpdateRef.current = null;
+                            }
                             setTempSliderPos(null);
                           }}
                           onMouseEnter={(e) => {

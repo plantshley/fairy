@@ -29,9 +29,9 @@ export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
   return (
     <>
       {/* Desktop Navigation - hidden on mobile */}
-      <nav className="fixed left-2 top-1/2 -translate-y-1/2 z-30 hidden lg:block">
+      <nav className="fixed left-2 bottom-2 lg:bottom-auto lg:top-1/2 lg:-translate-y-1/2 z-30 hidden landscape:block lg:block">
         <div
-          className="backdrop-blur-md rounded-2xl shadow-2xl p-2 space-y-1"
+          className="backdrop-blur-md rounded-2xl shadow-2xl p-1 space-y-0.5"
           style={{
             backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
           }}
@@ -39,7 +39,7 @@ export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
           {tabs.map((tab) => (
             <motion.button
               key={tab.id}
-              className="w-full px-1 py-2 rounded-xl font-medium transition-all text-left flex items-center gap-2"
+              className="w-full px-0.5 py-1 rounded-xl font-medium transition-all text-left flex items-center gap-1"
               style={{
                 background: activeTab === tab.id
                   ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
@@ -50,11 +50,11 @@ export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
               whileHover={{ scale: 1.05, x: 5 }}
               whileTap={{ scale: 0.95 }}
             >
-              <img src={tab.icon} alt={tab.label} className="w-10 h-10 object-contain" />
-              <span className="text-base whitespace-nowrap font-bonbon tracking-wider">{tab.label}</span>
+              <img src={tab.icon} alt={tab.label} className="w-6 h-6 lg:w-8 lg:h-8 object-contain" />
+              <span className="text-xs lg:text-sm whitespace-nowrap font-bonbon tracking-wider">{tab.label}</span>
               {activeTab === tab.id && (
                 <motion.span
-                  className="ml-auto text-normal"
+                  className="ml-auto text-xs lg:text-base"
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                 >
@@ -67,7 +67,7 @@ export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
       </nav>
 
       {/* Mobile Navigation - bottom tab bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 lg:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-30 landscape:hidden lg:hidden">
         <div
           className="backdrop-blur-md shadow-2xl border-t-2"
           style={{
