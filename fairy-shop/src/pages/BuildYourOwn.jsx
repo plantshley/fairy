@@ -147,7 +147,7 @@ const parts = {
     { id: 'acc_16', name: 'Acc 17', previewPath: '/build-svgs/acc_16.svg', canvasPath: '/build-svgs/acc_16.svg' },
   ],
   earsWingsTails: [
-    { id: 'acc_0', name: 'Acc 1', previewPath: '/build-svgs/acc_0.svg', canvasPath: '/build-svgs/acc_0.svg' },
+    { id: 'ear6', name: 'Ear 6', previewPath: '/build-svgs/ear6.svg', canvasPath: '/build-svgs/ear6.svg' },
     { id: 'ear1', name: 'Ear 1', previewPath: '/build-svgs/ear1.svg', canvasPath: '/build-svgs/ear1.svg' },
     { id: 'ear2', name: 'Ear 2', previewPath: '/build-svgs/ear2.svg', canvasPath: '/build-svgs/ear2.svg' },
     { id: 'ear3', name: 'Ear 3', previewPath: '/build-svgs/ear3.svg', canvasPath: '/build-svgs/ear3.svg' },
@@ -176,7 +176,7 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
   // Calculate responsive body size - use bodySizeMultiplier prop
   const screenSize = Math.min(stageSize.width, stageSize.height);
   const isDesktop = window.innerWidth >= 1024; // lg breakpoint
-  const baseSizeMultiplier = isDesktop ? 0.75 : 0.92;
+  const baseSizeMultiplier = isDesktop ? 0.85 : 0.92;
   const sizeMultiplier = bodySizeMultiplier || baseSizeMultiplier;
   const bodySize = screenSize * sizeMultiplier;
 
@@ -686,7 +686,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
     // Set default body size based on screen width if not already set
     if (bodySizeMultiplier === null) {
       const isMobile = window.innerWidth < 1024; // lg breakpoint
-      setBodySizeMultiplier(isMobile ? 0.7 : 0.5); // Larger on mobile
+      setBodySizeMultiplier(isMobile ? 0.92 : 0.85); // Larger on both mobile and desktop
     }
   };
 
@@ -700,17 +700,27 @@ export const BuildYourOwn = ({ currentTheme }) => {
     // Calculate responsive initial size
     const screenSize = Math.min(stageSize.width, stageSize.height);
     const isDesktop = window.innerWidth >= 1024; // lg breakpoint
-    // Accessories, limbs, ears, tails, and horns are bigger; only eyes/facial are smaller
+    // Identify part types
+    const isFaceplate = part.id.startsWith('acc-faceplate');
+    const isFacial = part.id.startsWith('facial');
     const isAccessory = part.id.startsWith('acc-');
     const isLimb = part.id.startsWith('limbs-');
     const isEarWingTail = part.id.startsWith('ear') || part.id.startsWith('tail');
     const isBiggerPart = isAccessory || isLimb || isEarWingTail;
 
-    // Make limbs much smaller for all screen sizes
+    // Determine initial size based on part type
     let initialSize;
-    if (isLimb) {
+    if (isFaceplate) {
+      // Faceplates should be large
+      initialSize = isDesktop ? screenSize * 0.25 : screenSize * 0.30;
+    } else if (isLimb) {
+      // Limbs are much smaller
       initialSize = isDesktop ? screenSize * 0.1 : screenSize * 0.15;
+    } else if (isFacial) {
+      // Facial features smaller for all screen sizes
+      initialSize = isDesktop ? screenSize * 0.12 : screenSize * 0.14;
     } else {
+      // Other accessories
       initialSize = isDesktop
         ? (isBiggerPart ? screenSize * 0.12 : screenSize * 0.18)
         : (isBiggerPart ? screenSize * 0.1 : screenSize * 0.18);
