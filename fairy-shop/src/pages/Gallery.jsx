@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Particles, initParticlesEngine } from '@tsparticles/react';
 import { loadFull } from 'tsparticles';
 import galleryManifest from '../galleryManifest.json';
+import { getAssetPath } from '../utils/assetPath';
 
 const categories = [
   {
@@ -381,7 +382,7 @@ export const Gallery = ({ currentTheme }) => {
         >
           {images.map((imagePath, index) => {
             // Only encode spaces in the path, leave other special characters
-            const encodedSrc = `/${imagePath.replace(/ /g, '%20')}`;
+            const encodedSrc = getAssetPath(`/${imagePath.replace(/ /g, '%20')}`);
             return (
               <motion.div
                 key={imagePath}
@@ -491,7 +492,7 @@ export const Gallery = ({ currentTheme }) => {
               )}
 
               <motion.img
-                src={`/${selectedImage.replace(/ /g, '%20')}`}
+                src={getAssetPath(`/${selectedImage.replace(/ /g, '%20')}`)}
                 alt="Selected gallery image"
                 className="max-w-full max-h-full object-contain select-none"
                 style={{

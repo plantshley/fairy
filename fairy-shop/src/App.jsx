@@ -12,6 +12,7 @@ import { Links } from './pages/Links';
 import { Gallery } from './pages/Gallery';
 import { BuildYourOwn } from './pages/BuildYourOwn';
 import { themes, applyTheme } from './themes';
+import { getAssetPath } from './utils/assetPath';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -72,7 +73,7 @@ function App() {
       />
 
       {/* Background music control (place after theme selector so it appears above other UI) */}
-      <BackgroundMusic src="/audio/background-music.mp3" />
+      <BackgroundMusic src={getAssetPath('/audio/background-music.mp3')} />
 
       <AccessibilityToggle
         accessibleFonts={accessibleFonts}

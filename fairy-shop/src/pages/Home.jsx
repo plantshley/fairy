@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Sparkle } from '../components/Sparkle';
+import { getAssetPath } from '../utils/assetPath';
 
 export const Home = ({ currentTheme }) => {
   const getThemeEmojis = () => {
@@ -38,7 +39,7 @@ export const Home = ({ currentTheme }) => {
         {/* Animated image header */}
         <div className="flex justify-center gap-4 sm:gap-6 md:gap-8 items-center">
           <motion.img
-            src="/vday-birb-png1.png"
+            src={getAssetPath('/vday-birb-png1.png')}
             alt="Valentine's bird"
             className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 object-contain"
             style={{ willChange: 'transform' }}
@@ -52,7 +53,7 @@ export const Home = ({ currentTheme }) => {
             }}
           />
           <motion.img
-            src="/scootaloo1.png"
+            src={getAssetPath('/scootaloo1.png')}
             alt="Scootaloo"
             className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 object-contain"
             style={{ willChange: 'transform' }}
@@ -67,7 +68,7 @@ export const Home = ({ currentTheme }) => {
             }}
           />
           <motion.img
-            src="/butterflies.png"
+            src={getAssetPath('/butterflies.png')}
             alt="Butterflies"
             className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain"
             style={{ willChange: 'transform' }}

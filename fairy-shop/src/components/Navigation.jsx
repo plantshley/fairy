@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
+import { getAssetPath } from '../utils/assetPath';
 
 const tabs = [
-  { id: 'home', label: 'home', icon: '/house.png' },
-  { id: 'shop', label: 'shop', icon: '/rich.png' },
-  { id: 'links', label: 'links', icon: '/moon.png' },
-  { id: 'gallery', label: 'gallery', icon: '/rainbow.png' },
-  { id: 'build', label: 'build', icon: '/visualis.png' },
+  { id: 'home', label: 'home', icon: getAssetPath('/house.png') },
+  { id: 'shop', label: 'shop', icon: getAssetPath('/rich.png') },
+  { id: 'links', label: 'links', icon: getAssetPath('/moon.png') },
+  { id: 'gallery', label: 'gallery', icon: getAssetPath('/rainbow.png') },
+  { id: 'build', label: 'build', icon: getAssetPath('/visualis.png') },
 ];
 
 export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {

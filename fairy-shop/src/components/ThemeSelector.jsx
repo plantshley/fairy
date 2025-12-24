@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { themes } from '../themes';
+import { getAssetPath } from '../utils/assetPath';
 
 export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,11 +9,11 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
   // Preload all creature images on mount
   useEffect(() => {
     const imagesToPreload = [
-      '/heart-bright1.png',
-      '/disco-fever-griffon.png',
-      '/moon-custom1.png',
-      '/glacial-seas-dolphin1.png',
-      '/homura1.png',
+      getAssetPath('/heart-bright1.png'),
+      getAssetPath('/disco-fever-griffon.png'),
+      getAssetPath('/moon-custom1.png'),
+      getAssetPath('/glacial-seas-dolphin1.png'),
+      getAssetPath('/homura1.png'),
     ];
 
     imagesToPreload.forEach((src) => {
@@ -24,17 +25,17 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
   const getModalCreature = () => {
     switch (currentTheme?.id) {
       case 'twinkleFairyDream':
-        return '/heart-bright1.png';
+        return getAssetPath('/heart-bright1.png');
       case 'glitterGroovyRainbow':
-        return '/disco-fever-griffon.png';
+        return getAssetPath('/disco-fever-griffon.png');
       case 'celestialAngelicClouds':
-        return '/moon-custom1.png';
+        return getAssetPath('/moon-custom1.png');
       case 'crystalSeasideGarden':
-        return '/glacial-seas-dolphin1.png';
+        return getAssetPath('/glacial-seas-dolphin1.png');
       case 'midnightVelvetMeadow':
-        return '/homura1.png';
+        return getAssetPath('/homura1.png');
       default:
-        return '/heart-bright1.png';
+        return getAssetPath('/heart-bright1.png');
     }
   };
 
