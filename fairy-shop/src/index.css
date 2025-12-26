@@ -52,9 +52,9 @@
 
 /* Accessible fonts mode */
 .accessible-fonts {
-  --font-heading: 'OpenDyslexic', sans-serif;
-  --font-body: 'Comic Sans MS', cursive, sans-serif;
-  --font-decorative: 'Inclusive Sans', sans-serif;
+  --font-heading: 'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif;
+  --font-body: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', 'Arial', sans-serif;
+  --font-decorative: 'Comic Sans MS', 'Arial', sans-serif;
 }
 
 body {
@@ -233,30 +233,13 @@ body {
   top: 50%;
 }
 
-/* Color picker styling - removes all browser defaults */
+/* Color picker styling - use native browser color picker */
 .color-picker-clean {
-  padding: 0;
-  border: none;
-  outline: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background: transparent;
-}
-
-.color-picker-clean::-webkit-color-swatch-wrapper {
-  padding: 0;
-  border: none;
-}
-
-.color-picker-clean::-webkit-color-swatch {
-  border: none;
-  border-radius: 50%;
-}
-
-.color-picker-clean::-moz-color-swatch {
-  border: none;
-  border-radius: 50%;
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--accent-primary);
+  border-radius: 0.375rem;
 }
 
 /* Brush slider styling with theme colors */

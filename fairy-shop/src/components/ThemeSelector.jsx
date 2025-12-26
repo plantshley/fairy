@@ -125,11 +125,11 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
                 onClick={(e) => e.stopPropagation()}
               >
               <div className="relative">
-                <h2 className="font-kalnia text-4xl mb-2 gradient-text text-center">
+                <h2 className="font-kalnia text-2xl sm:text-3xl lg:text-4xl mb-2 gradient-text text-center">
                   ✧ Choose Your Magic ✧
                 </h2>
 
-                <p className="text-center text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-center text-xs sm:text-sm mb-4 sm:mb-6" style={{ color: 'var(--text-secondary)' }}>
                   ˚ ༘♡ Select a theme ♡⋆˚
                 </p>
 
@@ -152,10 +152,10 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="flex flex-col items-center justify-center gap-1 text-center">
-                        <div className="font-bonbon tracking-wider text-xl" style={{ color: theme.colors.textPrimary }}>
+                        <div className="font-bonbon tracking-wider text-base sm:text-lg lg:text-xl" style={{ color: theme.colors.textPrimary }}>
                           {theme.name}
                         </div>
-                        <div className="text-base">
+                        <div className="text-sm sm:text-base">
                           {theme.emojis.join(' ')}
                         </div>
                       </div>

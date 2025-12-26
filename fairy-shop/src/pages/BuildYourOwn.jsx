@@ -321,6 +321,8 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
   const [image] = useImage(object.svgPath);
   const [filterImage, setFilterImage] = useState(null);
   const [croppedDimensions, setCroppedDimensions] = useState({ width: object.width || 100, height: object.height || 100 });
+  const dragStartPos = useRef(null);
+  const isDragging = useRef(false);
 
   useEffect(() => {
     if (isSelected && trRef.current) {
@@ -491,7 +493,7 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
 
     const distance = Math.sqrt(Math.pow(screenX - trashX, 2) + Math.pow(screenY - trashY, 2));
     // Increase detection radius based on object scale, with a reasonable upper limit
-    const detectionRadius = Math.min(60 + (Math.max(scale - 1, 0) * 100), 200);
+    const detectionRadius = Math.min(40 + (Math.max(scale - 1, 0) * 60), 120);
     return distance < detectionRadius;
   };
 
@@ -512,8 +514,40 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
         draggable={!freeDrawMode}
         onClick={freeDrawMode ? undefined : onSelect}
         onTap={freeDrawMode ? undefined : onSelect}
-        onDragStart={freeDrawMode ? undefined : onDragStart}
+        onDragStart={freeDrawMode ? undefined : (e) => {
+          dragStartPos.current = { x: e.target.x(), y: e.target.y() };
+          isDragging.current = false;
+          if (onDragStart) onDragStart();
+        }}
+        onDragMove={(e) => {
+          if (freeDrawMode || !dragStartPos.current) return;
+
+          const currentX = e.target.x();
+          const currentY = e.target.y();
+          const dx = currentX - dragStartPos.current.x;
+          const dy = currentY - dragStartPos.current.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          // Only enable dragging if moved more than 10 pixels
+          if (distance > 10) {
+            isDragging.current = true;
+          }
+
+          // If not yet marked as dragging, prevent movement
+          if (!isDragging.current) {
+            e.target.position(dragStartPos.current);
+          }
+        }}
         onDragEnd={(e) => {
+          if (freeDrawMode) return;
+
+          // If drag didn't meet threshold, reset position and don't process as drag
+          if (!isDragging.current && dragStartPos.current) {
+            e.target.position(dragStartPos.current);
+            dragStartPos.current = null;
+            return;
+          }
+
           const newX = e.target.x();
           const newY = e.target.y();
           const scale = Math.max(Math.abs(object.scaleX || 1), Math.abs(object.scaleY || 1));
@@ -527,6 +561,9 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
               y: newY,
             });
           }
+
+          dragStartPos.current = null;
+          isDragging.current = false;
         }}
         onTransformStart={onTransformStart}
         onTransformEnd={(e) => {
@@ -1161,14 +1198,33 @@ export const BuildYourOwn = ({ currentTheme }) => {
     const drawingLayer = stage.children[1]; // Layer 2: Free Draw Lines
     // Layer 3 (UI controls) is NOT included
 
-    // Temporarily create a new stage with just the content layers
-    const tempStage = stage.clone();
-    tempStage.children = [contentLayer.clone(), drawingLayer.clone()];
+    // Calculate bounding box of all content with generous padding
+    const contentGroup = contentLayer.getChildren().find(child => child !== undefined);
+    if (!contentGroup) return;
 
-    // Export at higher quality: pixelRatio 2-3x for sharper images
-    const uri = tempStage.toDataURL({
+    // Get bounds of all visible content
+    const box = contentLayer.getClientRect({ skipTransform: false });
+    const drawBox = drawingLayer.getClientRect({ skipTransform: false });
+
+    // Merge the two bounding boxes
+    const x = Math.min(box.x || 0, drawBox.x || 0);
+    const y = Math.min(box.y || 0, drawBox.y || 0);
+    const x2 = Math.max((box.x || 0) + (box.width || 0), (drawBox.x || 0) + (drawBox.width || 0));
+    const y2 = Math.max((box.y || 0) + (box.height || 0), (drawBox.y || 0) + (drawBox.height || 0));
+    const width = x2 - x;
+    const height = y2 - y;
+
+    // Add 10% padding around content to ensure nothing is cropped
+    const padding = Math.max(width, height) * 0.1;
+
+    // Export with calculated bounds and padding
+    const uri = stage.toDataURL({
       pixelRatio: 3, // 3x resolution for crisp, high-quality export
       mimeType: 'image/png', // PNG for lossless quality
+      x: x - padding,
+      y: y - padding,
+      width: width + (padding * 2),
+      height: height + (padding * 2),
     });
 
     const link = document.createElement('a');
@@ -1177,9 +1233,6 @@ export const BuildYourOwn = ({ currentTheme }) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    // Clean up
-    tempStage.destroy();
   };
 
   return (
@@ -1453,7 +1506,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     type="color"
                     value={selectedBody.color || '#ff69b4'}
                     onChange={(e) => handleBodyColorChange(e.target.value)}
-                    className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
+                    className="color-picker-clean flex-shrink-0"
                   />
                   <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
                     Body Color
@@ -1466,7 +1519,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     type="color"
                     value={selectedBody.outlineColor || '#000000'}
                     onChange={(e) => handleBodyOutlineColorChange(e.target.value)}
-                    className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
+                    className="color-picker-clean flex-shrink-0"
                   />
                   <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
                     Body Outline
@@ -1483,7 +1536,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     type="color"
                     value={currentColor}
                     onChange={(e) => handleColorChange(e.target.value)}
-                    className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
+                    className="color-picker-clean flex-shrink-0"
                   />
                   <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
                     Object & Drawing Color
@@ -1496,7 +1549,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     type="color"
                     value={placedObjects.find(obj => obj.id === selectedId)?.outlineColor || '#000000'}
                     onChange={(e) => handleObjectOutlineColorChange(e.target.value)}
-                    className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
+                    className="color-picker-clean flex-shrink-0"
                   />
                   <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
                     Object Outline
@@ -1509,7 +1562,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                   type="color"
                   value={currentColor}
                   onChange={(e) => handleColorChange(e.target.value)}
-                  className="w-4 h-4 rounded-full cursor-pointer color-picker-clean flex-shrink-0"
+                  className="color-picker-clean flex-shrink-0"
                 />
                 <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
                   Object & Drawing Color
