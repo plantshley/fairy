@@ -680,9 +680,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
     const updateSize = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
-        // Use visualViewport for mobile to prevent height changes from address bar
-        const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-        const containerHeight = viewportHeight - 200;
+        // Use a fixed calculation to prevent canvas resizing during scroll
+        const containerHeight = window.innerHeight - 200;
         setStageSize({
           width: Math.min(containerWidth, 800),
           height: Math.max(containerHeight, 400),
@@ -692,16 +691,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
     updateSize();
     window.addEventListener('resize', updateSize);
-    // Listen to visualViewport resize for mobile address bar changes
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', updateSize);
-    }
 
     return () => {
       window.removeEventListener('resize', updateSize);
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', updateSize);
-      }
     };
   }, []);
 
@@ -2243,7 +2235,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
             </Stage>
           </div>
 
-          {!selectedBody && placedObjects.length === 0 && (
+          {!selectedBody && placedObjects.length === 0 && lines.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
                 {visualisImage && (

@@ -300,9 +300,15 @@ body {
   border-radius: 3px;
 }
 
-/* Pickr color picker cursor override */
+/* Pickr color picker styles */
 .pcr-button,
-.pickr .pcr-button,
+.pickr .pcr-button {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  border: 2px solid #d1d5db !important;
+  cursor: pointer !important;
+}
+
 .pcr-app .pcr-interaction .pcr-result,
 .pcr-app .pcr-selection .pcr-picker,
 .pcr-app .pcr-selection .pcr-color-preview,
