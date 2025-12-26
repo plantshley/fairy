@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Image as KonvaImage, Line, Transformer, Rect, Text, Group, Circle } from 'react-konva';
 import useImage from 'use-image';
 import { Sparkle } from '../components/Sparkle';
+import { ColorPicker } from '../components/ColorPicker';
 import { getAssetPath } from '../utils/assetPath';
 
 // Body types with SVG files (using versions with "2" in filename for canvas)
@@ -1137,6 +1138,25 @@ export const BuildYourOwn = ({ currentTheme }) => {
     };
   }, []); // No dependencies - event listeners set up once and use refs
 
+  // Prevent page scrolling when touching the canvas area
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const preventScroll = (e) => {
+      // Always prevent default touch behavior on canvas to stop page scrolling
+      e.preventDefault();
+    };
+
+    container.addEventListener('touchstart', preventScroll, { passive: false });
+    container.addEventListener('touchmove', preventScroll, { passive: false });
+
+    return () => {
+      container.removeEventListener('touchstart', preventScroll);
+      container.removeEventListener('touchmove', preventScroll);
+    };
+  }, []);
+
   const handleMouseDown = (e) => {
     // Check if clicking on the undo button (let it handle its own click)
     const clickedNode = e.target;
@@ -1501,73 +1521,41 @@ export const BuildYourOwn = ({ currentTheme }) => {
             {/* Body Color */}
             {selectedBody && (
               <>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={selectedBody.color || '#ff69b4'}
-                    onChange={(e) => handleBodyColorChange(e.target.value)}
-                    className="color-picker-clean flex-shrink-0"
-                  />
-                  <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                    Body Color
-                  </label>
-                </div>
+                <ColorPicker
+                  color={selectedBody.color || '#ff69b4'}
+                  onChange={handleBodyColorChange}
+                  label="Body Color"
+                />
 
-                {/* Body Outline Color */}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={selectedBody.outlineColor || '#000000'}
-                    onChange={(e) => handleBodyOutlineColorChange(e.target.value)}
-                    className="color-picker-clean flex-shrink-0"
-                  />
-                  <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                    Body Outline
-                  </label>
-                </div>
+                <ColorPicker
+                  color={selectedBody.outlineColor || '#000000'}
+                  onChange={handleBodyOutlineColorChange}
+                  label="Body Outline"
+                />
               </>
             )}
 
             {/* Object/Drawing Color */}
             {selectedId ? (
               <>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={currentColor}
-                    onChange={(e) => handleColorChange(e.target.value)}
-                    className="color-picker-clean flex-shrink-0"
-                  />
-                  <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                    Object & Drawing Color
-                  </label>
-                </div>
+                <ColorPicker
+                  color={currentColor}
+                  onChange={handleColorChange}
+                  label="Object & Drawing Color"
+                />
 
-                {/* Object Outline Color */}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={placedObjects.find(obj => obj.id === selectedId)?.outlineColor || '#000000'}
-                    onChange={(e) => handleObjectOutlineColorChange(e.target.value)}
-                    className="color-picker-clean flex-shrink-0"
-                  />
-                  <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                    Object Outline
-                  </label>
-                </div>
+                <ColorPicker
+                  color={placedObjects.find(obj => obj.id === selectedId)?.outlineColor || '#000000'}
+                  onChange={handleObjectOutlineColorChange}
+                  label="Object Outline"
+                />
               </>
             ) : (
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={currentColor}
-                  onChange={(e) => handleColorChange(e.target.value)}
-                  className="color-picker-clean flex-shrink-0"
-                />
-                <label className="text-xs font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                  Object & Drawing Color
-                </label>
-              </div>
+              <ColorPicker
+                color={currentColor}
+                onChange={handleColorChange}
+                label="Object & Drawing Color"
+              />
             )}
           </div>
 
@@ -2248,7 +2236,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
               <div className="text-center">
                 {visualisImage && (
                   <img
-                    src="/visualis.png"
+                    src={getAssetPath('/visualis.png')}
                     alt="Palette"
                     className="w-24 h-24 mb-4 opacity-30 mx-auto"
                   />

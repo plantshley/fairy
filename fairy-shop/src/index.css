@@ -299,3 +299,24 @@ body {
   height: 6px;
   border-radius: 3px;
 }
+
+/* Pickr color picker cursor override */
+.pcr-button,
+.pickr .pcr-button,
+.pcr-app .pcr-interaction .pcr-result,
+.pcr-app .pcr-selection .pcr-picker,
+.pcr-app .pcr-selection .pcr-color-preview,
+.pcr-app .pcr-selection .pcr-color-palette,
+.pcr-app .pcr-selection .pcr-color-chooser,
+.pcr-app .pcr-selection .pcr-color-opacity {
+  cursor: pointer !important;
+}
+
+.pcr-app * {
+  cursor: default !important;
+}
+
+.pcr-app .pcr-interaction input,
+.pcr-app .pcr-interaction button {
+  cursor: pointer !important;
+}
