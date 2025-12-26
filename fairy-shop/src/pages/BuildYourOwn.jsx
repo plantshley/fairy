@@ -677,23 +677,41 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
   // Handle responsive canvas sizing
   useEffect(() => {
+    let lastWidth = window.innerWidth;
+    let initialHeight = null;
+
     const updateSize = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
-        // Use a fixed calculation to prevent canvas resizing during scroll
-        const containerHeight = window.innerHeight - 200;
+
+        // Store initial height on first load to prevent changes from mobile address bar
+        if (initialHeight === null) {
+          initialHeight = window.innerHeight - 200;
+        }
+
         setStageSize({
           width: Math.min(containerWidth, 800),
-          height: Math.max(containerHeight, 400),
+          height: Math.max(initialHeight, 400),
         });
       }
     };
 
+    const handleResize = () => {
+      // Only update if width changed (actual rotation/resize), not height (mobile address bar)
+      const currentWidth = window.innerWidth;
+      if (currentWidth !== lastWidth) {
+        lastWidth = currentWidth;
+        // Reset initial height on orientation change
+        initialHeight = null;
+        updateSize();
+      }
+    };
+
     updateSize();
-    window.addEventListener('resize', updateSize);
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', updateSize);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -1591,9 +1609,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
         {/* Canvas Area */}
         <motion.div
           ref={containerRef}
-          className="flex-1 backdrop-blur-md rounded-3xl shadow-xl p-4 overflow-hidden"
+          className="backdrop-blur-md rounded-3xl shadow-xl p-4 overflow-hidden"
           style={{
             backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+            minHeight: '500px',
+            flex: 1,
           }}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
