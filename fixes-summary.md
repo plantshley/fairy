@@ -36,7 +36,11 @@ This document summarizes all the fixes applied to the mobile version of the depl
   - Includes color swatches for quick selection
   - Auto-hides hex/rgba inputs on mobile for simplicity
   - Shows save button on mobile (nano theme)
+  - Uses `hide` event instead of `change` to prevent picker from closing during interaction
+  - Silent color updates (`setColor(color, true)`) prevent infinite re-render loops
+  - Pickr instance persists across re-renders for stable behavior
 - Replaced all native `<input type="color">` elements in BuildYourOwn.jsx with the new ColorPicker component
+- Added CSS overrides in [src/index.css](fairy-shop/src/index.css#L303-L322) to change cursor from grab to pointer
 
 ### 4. Reduced Trash Can Detection Radius
 **Problem**: The trash detection zone was too large, making it easy to accidentally delete objects.
@@ -125,9 +129,18 @@ A comprehensive plan for improving the mobile UX has been created in [mobile-lay
 2. Preferred default sheet state: 'collapsed' or 'half-open'?
 3. Add haptic feedback on sheet state changes?
 
+### 10. Fixed Vite Development Server White Screen
+**Problem**: The app showed a white screen in development mode with module loading errors.
+
+**Solution**: Updated [vite.config.js:7](fairy-shop/vite.config.js#L7) to conditionally use base path:
+- **Before**: `base: '/fairy/'` (always)
+- **After**: `base: process.env.NODE_ENV === 'production' ? '/fairy/' : '/'`
+- Development mode now correctly loads modules from root path
+- Production builds still use `/fairy/` for GitHub Pages deployment
+
 ## Files Modified
 
-1. `fairy-shop/src/index.css` - Accessible fonts fix
+1. `fairy-shop/src/index.css` - Accessible fonts fix + Pickr cursor overrides
 2. `fairy-shop/src/components/ThemeSelector.jsx` - Responsive font sizes
 3. `fairy-shop/src/components/ColorPicker.jsx` - **NEW** Pickr wrapper component
 4. `fairy-shop/src/pages/BuildYourOwn.jsx` - Multiple fixes:
@@ -138,6 +151,7 @@ A comprehensive plan for improving the mobile UX has been created in [mobile-lay
    - Touch scroll prevention
    - Palette icon fix
 5. `fairy-shop/package.json` - Added `@simonwep/pickr` dependency
+6. `fairy-shop/vite.config.js` - **NEW** Fixed base path configuration for development
 
 ## Testing Recommendations
 

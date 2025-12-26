@@ -680,7 +680,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
     const updateSize = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
-        const containerHeight = window.innerHeight - 200;
+        // Use visualViewport for mobile to prevent height changes from address bar
+        const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        const containerHeight = viewportHeight - 200;
         setStageSize({
           width: Math.min(containerWidth, 800),
           height: Math.max(containerHeight, 400),
@@ -690,7 +692,17 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
     updateSize();
     window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    // Listen to visualViewport resize for mobile address bar changes
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateSize);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateSize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', updateSize);
+      }
+    };
   }, []);
 
   // Save current state to history
