@@ -88,7 +88,7 @@ export const BackgroundMusic = ({ src = '/audio/background-music.mp3' }) => {
         aria-label={muted ? 'Unmute background music' : 'Mute background music'}
         title={muted ? 'Unmute music' : 'Mute music'}
         onClick={toggle}
-        className="fixed z-50 top-3 right-3 lg:bottom-3 lg:top-auto w-10 h-10 flex items-center justify-center text-2xl opacity-90 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1"
+        className="absolute z-50 top-3 right-3 w-7 h-7 flex items-center justify-center text-lg opacity-90 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1"
         style={{ background: 'transparent' }}
       >
         <span aria-hidden="true" className="leading-none select-none">{muted ? '🔇' : '🎶'}</span>

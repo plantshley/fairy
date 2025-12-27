@@ -78,7 +78,16 @@ const parts = {
     { id: 'facial_39', name: 'Face 36', previewPath: getAssetPath('/build-svgs/facial_39.svg'), canvasPath: getAssetPath('/build-svgs/facial_39.svg') },
     { id: 'facial_40', name: 'Face 37', previewPath: getAssetPath('/build-svgs/facial_40.svg'), canvasPath: getAssetPath('/build-svgs/facial_40.svg') },
     { id: 'facial_41', name: 'Face 38', previewPath: getAssetPath('/build-svgs/facial_41.svg'), canvasPath: getAssetPath('/build-svgs/facial_41.svg') },
-    { id: 'facial_52', name: 'Face 39', previewPath: getAssetPath('/build-svgs/facial_52.svg'), canvasPath: getAssetPath('/build-svgs/facial_52.svg') },
+    { id: 'facial_42', name: 'Face 39', previewPath: getAssetPath('/build-svgs/facial_42.svg'), canvasPath: getAssetPath('/build-svgs/facial_42.svg') },
+    { id: 'facial_43', name: 'Face 40', previewPath: getAssetPath('/build-svgs/facial_43.svg'), canvasPath: getAssetPath('/build-svgs/facial_43.svg') },
+    { id: 'facial_44', name: 'Face 41', previewPath: getAssetPath('/build-svgs/facial_44.svg'), canvasPath: getAssetPath('/build-svgs/facial_44.svg') },
+    { id: 'facial_45', name: 'Face 42', previewPath: getAssetPath('/build-svgs/facial_45.svg'), canvasPath: getAssetPath('/build-svgs/facial_45.svg') },
+    { id: 'facial_46', name: 'Face 43', previewPath: getAssetPath('/build-svgs/facial_46.svg'), canvasPath: getAssetPath('/build-svgs/facial_46.svg') },
+    { id: 'facial_47', name: 'Face 44', previewPath: getAssetPath('/build-svgs/facial_47.svg'), canvasPath: getAssetPath('/build-svgs/facial_47.svg') },
+    { id: 'facial_48', name: 'Face 45', previewPath: getAssetPath('/build-svgs/facial_48.svg'), canvasPath: getAssetPath('/build-svgs/facial_48.svg') },
+    { id: 'facial_49', name: 'Face 46', previewPath: getAssetPath('/build-svgs/facial_49.svg'), canvasPath: getAssetPath('/build-svgs/facial_49.svg') },
+    { id: 'facial_50', name: 'Face 47', previewPath: getAssetPath('/build-svgs/facial_50.svg'), canvasPath: getAssetPath('/build-svgs/facial_50.svg') },
+    { id: 'facial_51', name: 'Face 48', previewPath: getAssetPath('/build-svgs/facial_51.svg'), canvasPath: getAssetPath('/build-svgs/facial_51.svg') },
     { id: 'eyes-sad-left', name: 'Sad Eye (L)', previewPath: getAssetPath('/build-svgs/eyes-sad-left.svg'), canvasPath: getAssetPath('/build-svgs/eyes-sad-left.svg') },
     { id: 'eyes-sad-right', name: 'Sad Eye (R)', previewPath: getAssetPath('/build-svgs/eyes-sad-right.svg'), canvasPath: getAssetPath('/build-svgs/eyes-sad-right.svg') },
   ],
@@ -488,27 +497,24 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
     const screenX = (x * stageScale) + stagePosition.x;
     const screenY = (y * stageScale) + stagePosition.y;
 
-    // Trash is in UI layer at these screen space coordinates
-    const trashX = 60;
-    const trashY = stageSize.height - 60;
+    // Trash is in UI layer at these screen space coordinates (centered on the trash icon)
+    const trashX = 30;  // x=10 + width/2 (40/2)
+    const trashY = stageSize.height - 30;  // y + height/2
 
     const distance = Math.sqrt(Math.pow(screenX - trashX, 2) + Math.pow(screenY - trashY, 2));
-    // Increase detection radius based on object scale, with a reasonable upper limit
-    const detectionRadius = Math.min(40 + (Math.max(scale - 1, 0) * 60), 120);
+    // Smaller detection radius to prevent accidental deletions
+    const detectionRadius = Math.min(25 + (Math.max(scale - 1, 0) * 30), 60);
     return distance < detectionRadius;
   };
 
+  const bufferSize = 10; // 10px buffer on each side for easier selection
+
   return (
     <>
-      <KonvaImage
+      <Group
         ref={shapeRef}
-        image={filterImage || image}
         x={object.x}
         y={object.y}
-        width={croppedDimensions.width}
-        height={croppedDimensions.height}
-        offsetX={croppedDimensions.width / 2}
-        offsetY={croppedDimensions.height / 2}
         scaleX={(object.scaleX || 1) * (object.flipped ? -1 : 1)}
         scaleY={object.scaleY || 1}
         rotation={object.rotation || 0}
@@ -583,7 +589,28 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
             height: croppedDimensions.height,
           });
         }}
-      />
+      >
+        {/* Invisible hit area for easier mobile selection */}
+        <Rect
+          x={0}
+          y={0}
+          width={croppedDimensions.width + (bufferSize * 2)}
+          height={croppedDimensions.height + (bufferSize * 2)}
+          offsetX={(croppedDimensions.width + (bufferSize * 2)) / 2}
+          offsetY={(croppedDimensions.height + (bufferSize * 2)) / 2}
+          fill="transparent"
+        />
+        <KonvaImage
+          image={filterImage || image}
+          x={0}
+          y={0}
+          width={croppedDimensions.width}
+          height={croppedDimensions.height}
+          offsetX={croppedDimensions.width / 2}
+          offsetY={croppedDimensions.height / 2}
+          listening={false}
+        />
+      </Group>
       {isSelected && !freeDrawMode && (
         <Transformer
           ref={trRef}
@@ -591,7 +618,8 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
           anchorStroke={currentTheme?.colors?.accentPrimary || '#ff9dda'}
           anchorFill={currentTheme?.colors?.accentSecondary || '#c5a3ff'}
           borderStrokeWidth={2}
-          anchorSize={8}
+          anchorSize={14}
+          anchorCornerRadius={2}
           boundBoxFunc={(oldBox, newBox) => {
             if (newBox.width < 20 || newBox.height < 20) {
               return oldBox;
@@ -796,8 +824,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
       rotation: 0,
       width: initialSize,
       height: initialSize,
-      scaleX: 1,
-      scaleY: 1,
+      scaleX: 1.3,
+      scaleY: 1.3,
       flipped: false,
       color: currentColor,
       zIndex: 1, // Start at 1 = in front of body (0), negative = behind body
@@ -1160,14 +1188,16 @@ export const BuildYourOwn = ({ currentTheme }) => {
     };
   }, []); // No dependencies - event listeners set up once and use refs
 
-  // Prevent page scrolling when touching the canvas area
+  // Prevent page scrolling only when in drawing mode
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const preventScroll = (e) => {
-      // Always prevent default touch behavior on canvas to stop page scrolling
-      e.preventDefault();
+      // Only prevent default touch behavior when in free draw mode
+      if (freeDrawMode) {
+        e.preventDefault();
+      }
     };
 
     container.addEventListener('touchstart', preventScroll, { passive: false });
@@ -1177,7 +1207,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
       container.removeEventListener('touchstart', preventScroll);
       container.removeEventListener('touchmove', preventScroll);
     };
-  }, []);
+  }, [freeDrawMode]);
 
   const handleMouseDown = (e) => {
     // Check if clicking on the undo button (let it handle its own click)
@@ -1279,7 +1309,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
   return (
     <motion.div
-      className="w-full h-full flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-4 overflow-hidden"
+      className="w-full min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-4 overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -1300,7 +1330,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
         ⋆｡°✩ design your kirametki creature ✩°｡⋆
       </p>
 
-      <div className="flex flex-col landscape:flex-row lg:flex-row gap-4 w-full max-w-7xl h-full">
+      <div className="flex flex-col landscape:flex-row lg:flex-row gap-4 w-full max-w-7xl flex-1">
         {/* Left Control Panel */}
         <motion.div
           className="backdrop-blur-md rounded-3xl p-4 shadow-xl landscape:w-64 lg:w-64 flex-shrink-0 overflow-y-auto"
@@ -1722,9 +1752,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
                 <Group>
                   {/* Pan Mode Toggle Button */}
                   <Rect
-                    x={stageSize.width - (stageSize.width < 600 ? 205 : 230)}
+                    x={stageSize.width - (stageSize.width < 400 ? 180 : stageSize.width < 600 ? 205 : 230)}
                     y={15}
-                    width={stageSize.width < 600 ? 35 : 45}
+                    width={stageSize.width < 600 ? 32 : 45}
                     height={stageSize.width < 600 ? 28 : 35}
                     fill={panMode ? (currentTheme?.colors?.accentPrimary || '#ff9dda') : (currentTheme?.colors?.accentSecondary || '#c5a3ff')}
                     cornerRadius={10}
@@ -1751,9 +1781,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     }}
                   />
                   <Text
-                    x={stageSize.width - (stageSize.width < 600 ? 205 : 230)}
+                    x={stageSize.width - (stageSize.width < 400 ? 180 : stageSize.width < 600 ? 205 : 230)}
                     y={15}
-                    width={stageSize.width < 600 ? 35 : 45}
+                    width={stageSize.width < 600 ? 32 : 45}
                     height={stageSize.width < 600 ? 28 : 35}
                     text="✋"
                     fontSize={stageSize.width < 600 ? 16 : 20}
@@ -1766,9 +1796,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
                   {/* Zoom In Button */}
                   <Rect
-                    x={stageSize.width - (stageSize.width < 600 ? 155 : 175)}
+                    x={stageSize.width - (stageSize.width < 400 ? 140 : stageSize.width < 600 ? 155 : 175)}
                     y={15}
-                    width={stageSize.width < 600 ? 35 : 45}
+                    width={stageSize.width < 600 ? 32 : 45}
                     height={stageSize.width < 600 ? 28 : 35}
                     fill={currentTheme?.colors?.accentSecondary || '#c5a3ff'}
                     cornerRadius={10}
@@ -1795,9 +1825,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     }}
                   />
                   <Text
-                    x={stageSize.width - (stageSize.width < 600 ? 155 : 175)}
+                    x={stageSize.width - (stageSize.width < 400 ? 140 : stageSize.width < 600 ? 155 : 175)}
                     y={15}
-                    width={stageSize.width < 600 ? 35 : 45}
+                    width={stageSize.width < 600 ? 32 : 45}
                     height={stageSize.width < 600 ? 28 : 35}
                     text="+"
                     fontSize={stageSize.width < 600 ? 18 : 22}
@@ -1811,9 +1841,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
                   {/* Zoom Out Button */}
                   <Rect
-                    x={stageSize.width - (stageSize.width < 600 ? 110 : 120)}
+                    x={stageSize.width - (stageSize.width < 400 ? 100 : stageSize.width < 600 ? 110 : 120)}
                     y={15}
-                    width={stageSize.width < 600 ? 35 : 45}
+                    width={stageSize.width < 600 ? 32 : 45}
                     height={stageSize.width < 600 ? 28 : 35}
                     fill={currentTheme?.colors?.accentSecondary || '#c5a3ff'}
                     cornerRadius={10}
@@ -1840,9 +1870,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     }}
                   />
                   <Text
-                    x={stageSize.width - (stageSize.width < 600 ? 110 : 120)}
+                    x={stageSize.width - (stageSize.width < 400 ? 100 : stageSize.width < 600 ? 110 : 120)}
                     y={15}
-                    width={stageSize.width < 600 ? 35 : 45}
+                    width={stageSize.width < 600 ? 32 : 45}
                     height={stageSize.width < 600 ? 28 : 35}
                     text="-"
                     fontSize={stageSize.width < 600 ? 18 : 22}
@@ -1856,9 +1886,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
                   {/* Reset View Button */}
                   <Rect
-                    x={stageSize.width - (stageSize.width < 600 ? 65 : 65)}
+                    x={stageSize.width - (stageSize.width < 400 ? 60 : stageSize.width < 600 ? 65 : 65)}
                     y={15}
-                    width={stageSize.width < 600 ? 35 : 45}
+                    width={stageSize.width < 600 ? 32 : 45}
                     height={stageSize.width < 600 ? 28 : 35}
                     fill={currentTheme?.colors?.accentSecondary || '#c5a3ff'}
                     cornerRadius={10}
@@ -1885,9 +1915,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     }}
                   />
                   <Text
-                    x={stageSize.width - (stageSize.width < 600 ? 65 : 65)}
+                    x={stageSize.width - (stageSize.width < 400 ? 60 : stageSize.width < 600 ? 65 : 65)}
                     y={15}
-                    width={stageSize.width < 600 ? 35 : 45}
+                    width={stageSize.width < 600 ? 32 : 45}
                     height={stageSize.width < 600 ? 28 : 35}
                     text="⟲"
                     fontSize={stageSize.width < 600 ? 16 : 20}
@@ -1899,28 +1929,28 @@ export const BuildYourOwn = ({ currentTheme }) => {
                   />
                 </Group>
 
-                {/* Trash Can Icon - positioned in bottom-left */}
+                {/* Trash Can Icon - positioned in bottom-left, smaller and closer to edge */}
                 {trashImage && (
                   <KonvaImage
                     image={trashImage}
-                    x={30}
-                    y={stageSize.height - 90}
-                    width={60}
-                    height={60}
+                    x={10}
+                    y={stageSize.height - 50}
+                    width={40}
+                    height={40}
                     opacity={0.7}
                     listening={false}
                   />
                 )}
 
-                {/* Undo Button - positioned in bottom-right */}
+                {/* Undo Button - positioned in bottom-right, smaller and closer to edge */}
                 {undoImage && (
                   <KonvaImage
                     id="undo-button"
                     image={undoImage}
-                    x={stageSize.width - 90}
-                    y={stageSize.height - 90}
-                    width={60}
-                    height={60}
+                    x={stageSize.width - 50}
+                    y={stageSize.height - 50}
+                    width={40}
+                    height={40}
                     opacity={history.length > 0 ? 1 : 0.3}
                     listening={true}
                     onClick={(e) => {

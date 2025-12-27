@@ -59,7 +59,15 @@ export const ColorPicker = ({ color, onChange, label }) => {
           }
         }, 50);
 
-        // Only call onChange when user finishes interaction
+        // Call onChange when save button is clicked (nano theme)
+        pickr.on('save', (color) => {
+          if (color && onChange) {
+            onChange(color.toHEXA().toString());
+          }
+          pickr.hide();
+        });
+
+        // Also call onChange when picker is hidden
         pickr.on('hide', () => {
           const currentColor = pickr.getColor();
           if (currentColor && onChange) {

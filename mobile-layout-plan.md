@@ -200,6 +200,6 @@ const [activeControlTab, setActiveControlTab] = useState('body'); // 'body' | 'p
 
 ## Questions for User
 
-1. Should the quick actions bar include any other buttons? (e.g., Free Draw toggle, Pan Mode?)
-2. Preferred default sheet state: 'collapsed' or 'half'?
-3. Should we add haptic feedback on sheet state changes (if device supports)?
+1. Should the quick actions bar include any other buttons? (e.g., Free Draw toggle, Pan Mode?) Answer: no, keep the enable draw, pan mode, zoom, and reset buttons on the canvas as is, as well as the trash icon)
+2. Preferred default sheet state: 'collapsed' or 'half'? Answer: half
+3. Should we add haptic feedback on sheet state changes (if device supports)? Answer: no
