@@ -705,6 +705,47 @@ export const BuildYourOwn = ({ currentTheme }) => {
     return () => observer.disconnect();
   }, []);
 
+  // Load saved state from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('fairyBuilderState');
+      if (saved) {
+        const state = JSON.parse(saved);
+        if (state.selectedBody) setSelectedBody(state.selectedBody);
+        if (state.placedObjects) setPlacedObjects(state.placedObjects);
+        if (state.lines) setLines(state.lines);
+        if (state.bodySizeMultiplier) setBodySizeMultiplier(state.bodySizeMultiplier);
+        if (state.currentColor) setCurrentColor(state.currentColor);
+        if (state.brushSize) setBrushSize(state.brushSize);
+        // Don't restore zoom/pan state to avoid duplication bug
+        // Always start with default zoom/pan
+      }
+    } catch (e) {
+      console.error('Failed to load saved state:', e);
+    }
+  }, []);
+
+  // Save state to localStorage
+  const handleSaveDesign = () => {
+    try {
+      const state = {
+        selectedBody,
+        placedObjects,
+        lines,
+        bodySizeMultiplier,
+        currentColor,
+        brushSize,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem('fairyBuilderState', JSON.stringify(state));
+      alert('Design saved! ✨');
+    } catch (e) {
+      console.error('Failed to save state:', e);
+      alert('Failed to save design. Please try again.');
+    }
+  };
+
+
   // Handle responsive canvas sizing
   useEffect(() => {
     let lastWidth = window.innerWidth;
@@ -1284,6 +1325,12 @@ export const BuildYourOwn = ({ currentTheme }) => {
     setLines([]);
     setSelectedBody(null);
     setSelectedId(null);
+    // Also clear saved state
+    try {
+      localStorage.removeItem('fairyBuilderState');
+    } catch (e) {
+      console.error('Failed to clear saved state:', e);
+    }
   };
 
   const handleExport = () => {
@@ -1645,6 +1692,16 @@ export const BuildYourOwn = ({ currentTheme }) => {
               onClick={handleExport}
             >
               💾 Export Image
+            </button>
+            <button
+              className="w-full py-2 px-4 rounded-xl font-medium transition-all hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))',
+                color: 'white',
+              }}
+              onClick={handleSaveDesign}
+            >
+              ✨ Save & Continue
             </button>
             <button
               className="w-full py-2 px-4 rounded-xl font-medium transition-all hover:scale-105"
