@@ -666,6 +666,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
   const stagePositionRef = useRef({ x: 0, y: 0 });
   // Ref to throttle brush size updates with requestAnimationFrame
   const brushSizeUpdateRef = useRef(null);
+  // Ref to track touch/mouse down position to distinguish tap from scroll
+  const mouseDownPos = useRef(null);
   const [trashImage] = useImage(getAssetPath('/trash.png'));
   const [visualisImage] = useImage(getAssetPath('/visualis.png'));
   const [undoImage] = useImage(getAssetPath('/icons/refresh-data.png'));
@@ -1210,6 +1212,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
   }, [freeDrawMode]);
 
   const handleMouseDown = (e) => {
+    // Track mouse/touch down position
+    const stage = e.target.getStage();
+    const pos = stage.getPointerPosition();
+    mouseDownPos.current = { x: pos.x, y: pos.y, time: Date.now() };
+
     // Check if clicking on the undo button (let it handle its own click)
     const clickedNode = e.target;
     if (clickedNode.attrs && clickedNode.attrs.id === 'undo-button') {
@@ -1222,16 +1229,12 @@ export const BuildYourOwn = ({ currentTheme }) => {
     }
 
     if (!freeDrawMode) {
-      const clickedOnEmpty = e.target === e.target.getStage();
-      if (clickedOnEmpty) {
-        setSelectedId(null);
-      }
+      // Don't deselect here - wait for mouseup to check if it was a tap
       return;
     }
 
     saveToHistory();
     setIsDrawing(true);
-    const pos = e.target.getStage().getPointerPosition();
     // Transform pointer position to account for zoom and pan
     const transformedX = (pos.x - stagePosition.x) / stageScale;
     const transformedY = (pos.y - stagePosition.y) / stageScale;
@@ -1251,8 +1254,28 @@ export const BuildYourOwn = ({ currentTheme }) => {
     setLines([...lines.slice(0, -1), lastLine]);
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e) => {
     setIsDrawing(false);
+
+    // Check if this was a tap (not a scroll/drag) to deselect
+    if (!freeDrawMode && mouseDownPos.current) {
+      const stage = e.target.getStage();
+      const pos = stage.getPointerPosition();
+      const dx = pos.x - mouseDownPos.current.x;
+      const dy = pos.y - mouseDownPos.current.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const timeDiff = Date.now() - mouseDownPos.current.time;
+
+      // Only deselect if it was a tap (< 5px movement, < 300ms duration) on empty space
+      const wasTap = distance < 5 && timeDiff < 300;
+      const clickedOnEmpty = e.target === stage;
+
+      if (wasTap && clickedOnEmpty) {
+        setSelectedId(null);
+      }
+    }
+
+    mouseDownPos.current = null;
   };
 
   const handleClear = () => {
