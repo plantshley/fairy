@@ -55,7 +55,7 @@ function App() {
   return (
     <div className="min-h-screen overflow-hidden">
       <AnimatedBackground themeEmojis={currentTheme.emojis} />
-      <CursorSparkles currentTheme={currentTheme} />
+      {activeTab !== 'build' && <CursorSparkles currentTheme={currentTheme} />}
 
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} currentTheme={currentTheme} />
 

@@ -535,8 +535,8 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
           const dy = currentY - dragStartPos.current.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          // Only enable dragging if moved more than 10 pixels
-          if (distance > 10) {
+          // Only enable dragging if moved more than 15 pixels
+          if (distance > 15) {
             isDragging.current = true;
           }
 
@@ -792,6 +792,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
       placedObjects: [...placedObjects],
       lines: [...lines],
       selectedBody: selectedBody ? { ...selectedBody } : null,
+      bodySizeMultiplier,
     }]);
   };
 
@@ -803,6 +804,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
     setPlacedObjects(lastState.placedObjects);
     setLines(lastState.lines);
     setSelectedBody(lastState.selectedBody);
+    if (lastState.bodySizeMultiplier !== undefined) {
+      setBodySizeMultiplier(lastState.bodySizeMultiplier);
+    }
     setHistory(history.slice(0, -1));
     setSelectedId(null);
   };
@@ -871,6 +875,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
       scaleY: 1.3,
       flipped: false,
       color: currentColor,
+      outlineColor: '#000000', // Default black outline
       zIndex: 1, // Start at 1 = in front of body (0), negative = behind body
     };
     setPlacedObjects(prev => [...prev, newObject]);
@@ -879,8 +884,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
   const handleFlipObject = () => {
     if (selectedId) {
       saveToHistory();
-      setPlacedObjects(
-        placedObjects.map((obj) =>
+      setPlacedObjects(prev =>
+        prev.map((obj) =>
           obj.id === selectedId ? { ...obj, flipped: !obj.flipped } : obj
         )
       );
@@ -916,8 +921,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
   };
 
   const handleObjectChange = (id, newAttrs) => {
-    setPlacedObjects(
-      placedObjects.map((obj) => (obj.id === id ? newAttrs : obj))
+    setPlacedObjects(prev =>
+      prev.map((obj) => (obj.id === id ? newAttrs : obj))
     );
   };
 
@@ -932,10 +937,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
   const handleColorChange = (newColor) => {
     setCurrentColor(newColor);
     if (selectedId) {
+      const currentSelectedId = selectedId; // Capture current value
       saveToHistory();
-      setPlacedObjects(
-        placedObjects.map((obj) =>
-          obj.id === selectedId ? { ...obj, color: newColor } : obj
+      setPlacedObjects(prev =>
+        prev.map((obj) =>
+          obj.id === currentSelectedId ? { ...obj, color: newColor } : obj
         )
       );
     }
@@ -943,10 +949,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
   const handleObjectOutlineColorChange = (newColor) => {
     if (selectedId) {
+      const currentSelectedId = selectedId; // Capture current value
       saveToHistory();
-      setPlacedObjects(
-        placedObjects.map((obj) =>
-          obj.id === selectedId ? { ...obj, outlineColor: newColor } : obj
+      setPlacedObjects(prev =>
+        prev.map((obj) =>
+          obj.id === currentSelectedId ? { ...obj, outlineColor: newColor } : obj
         )
       );
     }
@@ -991,7 +998,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
     const oldScale = stageScale;
     const newScale = direction === 'in'
-      ? Math.min(oldScale * scaleBy, 3) // Max zoom 3x
+      ? Math.min(oldScale * scaleBy, 5) // Max zoom 5x
       : Math.max(oldScale / scaleBy, 0.5); // Min zoom 0.5x
 
     // Zoom towards center
@@ -1036,7 +1043,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
     const direction = e.evt.deltaY > 0 ? -1 : 1;
     const newScale = direction > 0
-      ? Math.min(oldScale * scaleBy, 3)
+      ? Math.min(oldScale * scaleBy, 5)
       : Math.max(oldScale / scaleBy, 0.5);
 
     const newPos = {
@@ -1231,26 +1238,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
     };
   }, []); // No dependencies - event listeners set up once and use refs
 
-  // Prevent page scrolling only when in drawing mode
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const preventScroll = (e) => {
-      // Only prevent default touch behavior when in free draw mode
-      if (freeDrawMode) {
-        e.preventDefault();
-      }
-    };
-
-    container.addEventListener('touchstart', preventScroll, { passive: false });
-    container.addEventListener('touchmove', preventScroll, { passive: false });
-
-    return () => {
-      container.removeEventListener('touchstart', preventScroll);
-      container.removeEventListener('touchmove', preventScroll);
-    };
-  }, [freeDrawMode]);
+  // Note: Removed global touch scroll prevention as it was too broad and prevented
+  // scrolling on the control panel and clicking buttons on mobile.
+  // The canvas handles touch events properly through Konva's touch handlers.
 
   const handleMouseDown = (e) => {
     // Track mouse/touch down position
@@ -1274,15 +1264,50 @@ export const BuildYourOwn = ({ currentTheme }) => {
       return;
     }
 
-    saveToHistory();
-    setIsDrawing(true);
-    // Transform pointer position to account for zoom and pan
-    const transformedX = (pos.x - stagePosition.x) / stageScale;
-    const transformedY = (pos.y - stagePosition.y) / stageScale;
-    setLines([...lines, { points: [transformedX, transformedY], color: currentColor, size: brushSize, eraser: eraserMode }]);
+    // Don't start drawing if it's a multi-touch gesture (pinch-to-zoom)
+    if (e.evt && e.evt.touches && e.evt.touches.length > 1) {
+      return;
+    }
+
+    // Don't start drawing immediately - wait a tiny bit to see if a second finger comes down
+    // This prevents the initial dot when starting a pinch-to-zoom gesture
+    const touchTimeout = setTimeout(() => {
+      // Double-check we're still in single-touch mode
+      if (e.evt && e.evt.touches && e.evt.touches.length > 1) {
+        return;
+      }
+
+      saveToHistory();
+      setIsDrawing(true);
+      // Transform pointer position to account for zoom and pan
+      const transformedX = (pos.x - stagePosition.x) / stageScale;
+      const transformedY = (pos.y - stagePosition.y) / stageScale;
+      setLines([...lines, { points: [transformedX, transformedY], color: currentColor, size: brushSize, eraser: eraserMode }]);
+    }, 50); // 50ms delay to detect multi-touch
+
+    // Store timeout so we can cancel it if needed
+    if (!mouseDownPos.current.touchTimeout) {
+      mouseDownPos.current.touchTimeout = touchTimeout;
+    }
   };
 
   const handleMouseMove = (e) => {
+    // Cancel pending draw timeout if multi-touch is detected
+    if (e.evt && e.evt.touches && e.evt.touches.length > 1) {
+      if (mouseDownPos.current && mouseDownPos.current.touchTimeout) {
+        clearTimeout(mouseDownPos.current.touchTimeout);
+        mouseDownPos.current.touchTimeout = null;
+      }
+
+      // Stop drawing if already started
+      if (isDrawing) {
+        setIsDrawing(false);
+        // Remove the line that was just started
+        setLines(lines.slice(0, -1));
+      }
+      return;
+    }
+
     if (!isDrawing) return;
 
     const stage = e.target.getStage();
@@ -1296,6 +1321,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
   };
 
   const handleMouseUp = (e) => {
+    // Clear any pending draw timeout
+    if (mouseDownPos.current && mouseDownPos.current.touchTimeout) {
+      clearTimeout(mouseDownPos.current.touchTimeout);
+    }
+
     setIsDrawing(false);
 
     // Check if this was a tap (not a scroll/drag) to deselect
@@ -1320,6 +1350,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
   };
 
   const handleClear = () => {
+    if (!window.confirm('Are you sure you want to clear everything? This will delete your current design and any saved progress.')) {
+      return;
+    }
     saveToHistory();
     setPlacedObjects([]);
     setLines([]);
@@ -1338,7 +1371,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
     const stage = stageRef.current;
     const contentLayer = stage.children[0]; // Layer 1: Body and Objects
     const drawingLayer = stage.children[1]; // Layer 2: Free Draw Lines
-    // Layer 3 (UI controls) is NOT included
+    const uiLayer = stage.children[2]; // Layer 3: UI controls - will be hidden during export
 
     // Calculate bounding box of all content with generous padding
     const contentGroup = contentLayer.getChildren().find(child => child !== undefined);
@@ -1359,15 +1392,36 @@ export const BuildYourOwn = ({ currentTheme }) => {
     // Add 10% padding around content to ensure nothing is cropped
     const padding = Math.max(width, height) * 0.1;
 
-    // Export with calculated bounds and padding
+    // Use the canvas center (where the body is positioned) as the center point
+    const centerX = stageSize.width / 2;
+    const centerY = stageSize.height / 2;
+
+    // Make export square by using the larger dimension
+    const exportSize = Math.max(width, height) + (padding * 2);
+
+    // Calculate top-left corner to center the content around canvas center
+    const exportX = centerX - exportSize / 2;
+    const exportY = centerY - exportSize / 2;
+
+    // Hide UI layer before export
+    if (uiLayer) {
+      uiLayer.hide();
+    }
+
+    // Export with calculated bounds - now square and centered
     const uri = stage.toDataURL({
       pixelRatio: 3, // 3x resolution for crisp, high-quality export
       mimeType: 'image/png', // PNG for lossless quality
-      x: x - padding,
-      y: y - padding,
-      width: width + (padding * 2),
-      height: height + (padding * 2),
+      x: exportX,
+      y: exportY,
+      width: exportSize,
+      height: exportSize,
     });
+
+    // Show UI layer again after export
+    if (uiLayer) {
+      uiLayer.show();
+    }
 
     const link = document.createElement('a');
     link.download = 'my-creature.png';
@@ -1379,7 +1433,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
   return (
     <motion.div
-      className="w-full min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-4 overflow-hidden"
+      className="w-full min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-4 overflow-hidden relative z-10"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -1459,6 +1513,8 @@ export const BuildYourOwn = ({ currentTheme }) => {
                       max="2"
                       step="0.01"
                       value={bodySizeMultiplier || 0.5}
+                      onMouseDown={() => saveToHistory()}
+                      onTouchStart={() => saveToHistory()}
                       onChange={(e) => setBodySizeMultiplier(parseFloat(e.target.value))}
                       className="w-full brush-slider"
                       style={{
@@ -1583,9 +1639,9 @@ export const BuildYourOwn = ({ currentTheme }) => {
             )}
           </div>
 
-          {/* Layer and Flip Controls */}
+          {/* Selected Object Controls - Desktop/Landscape */}
           {selectedId && (
-            <div className="mb-6">
+            <div className="mb-6 hidden portrait:max-md:hidden md:block">
               <h3 className="font-bonbon tracking-wider text-xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Selected Object</h3>
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
@@ -1636,49 +1692,166 @@ export const BuildYourOwn = ({ currentTheme }) => {
             </div>
           )}
 
-          {/* Color Pickers */}
-          <div className="mb-6 space-y-2">
+          {/* Colors - Desktop/Landscape */}
+          <div className="mb-6 space-y-2 hidden portrait:max-md:hidden md:block">
             <h3 className="font-bonbon tracking-wider text-xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Colors</h3>
 
-            {/* Body Color */}
-            {selectedBody && (
+            {/* Body colors - always shown */}
+            <ColorPicker
+              color={selectedBody?.color || '#ff69b4'}
+              onChange={handleBodyColorChange}
+              label="Body Color"
+            />
+
+            <ColorPicker
+              color={selectedBody?.outlineColor || '#000000'}
+              onChange={handleBodyOutlineColorChange}
+              label="Body Outline"
+            />
+
+            {/* Object colors - only shown when object is selected */}
+            {selectedId && (
               <>
                 <ColorPicker
-                  color={selectedBody.color || '#ff69b4'}
-                  onChange={handleBodyColorChange}
-                  label="Body Color"
-                />
-
-                <ColorPicker
-                  color={selectedBody.outlineColor || '#000000'}
-                  onChange={handleBodyOutlineColorChange}
-                  label="Body Outline"
-                />
-              </>
-            )}
-
-            {/* Object/Drawing Color */}
-            {selectedId ? (
-              <>
-                <ColorPicker
-                  color={currentColor}
-                  onChange={handleColorChange}
-                  label="Object & Drawing Color"
+                  color={placedObjects.find(obj => obj.id === selectedId)?.color || currentColor}
+                  onChange={(newColor) => {
+                    const objId = selectedId;
+                    setCurrentColor(newColor);
+                    saveToHistory();
+                    setPlacedObjects(prev =>
+                      prev.map((obj) =>
+                        obj.id === objId ? { ...obj, color: newColor } : obj
+                      )
+                    );
+                  }}
+                  label="Object Color"
                 />
 
                 <ColorPicker
                   color={placedObjects.find(obj => obj.id === selectedId)?.outlineColor || '#000000'}
-                  onChange={handleObjectOutlineColorChange}
+                  onChange={(newColor) => {
+                    const objId = selectedId;
+                    saveToHistory();
+                    setPlacedObjects(prev =>
+                      prev.map((obj) =>
+                        obj.id === objId ? { ...obj, outlineColor: newColor } : obj
+                      )
+                    );
+                  }}
                   label="Object Outline"
                 />
               </>
-            ) : (
+            )}
+          </div>
+
+          {/* Colors & Object - Mobile Portrait Only */}
+          <div className="mb-6 space-y-2 portrait:max-md:block md:hidden">
+            <h3 className="font-bonbon tracking-wider text-xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Colors & Object</h3>
+
+            {/* Body Color with Duplicate button */}
+            <div className="flex items-center justify-between gap-2">
               <ColorPicker
-                color={currentColor}
-                onChange={handleColorChange}
+                color={selectedBody?.color || '#ff69b4'}
+                onChange={handleBodyColorChange}
+                label="Body Color"
+              />
+              <button
+                className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 whitespace-nowrap ml-auto"
+                style={{
+                  background: 'var(--bg-gradient-start)',
+                  color: 'var(--text-primary)',
+                  opacity: selectedId ? 1 : 0.5,
+                }}
+                onClick={handleDuplicateObject}
+                disabled={!selectedId}
+              >
+                📋 Duplicate
+              </button>
+            </div>
+
+            {/* Body Outline with To Front button */}
+            <div className="flex items-center justify-between gap-2">
+              <ColorPicker
+                color={selectedBody?.outlineColor || '#000000'}
+                onChange={handleBodyOutlineColorChange}
+                label="Body Outline"
+              />
+              <button
+                className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 whitespace-nowrap ml-auto"
+                style={{
+                  background: 'var(--bg-gradient-start)',
+                  color: 'var(--text-primary)',
+                  opacity: selectedId ? 1 : 0.5,
+                }}
+                onClick={() => handleMoveLayer('front')}
+                disabled={!selectedId}
+              >
+                ⬆️ To Front
+              </button>
+            </div>
+
+            {/* Object/Drawing Color with To Back button */}
+            <div className="flex items-center justify-between gap-2">
+              <ColorPicker
+                color={placedObjects.find(obj => obj.id === selectedId)?.color || currentColor}
+                onChange={(newColor) => {
+                  const objId = selectedId;
+                  setCurrentColor(newColor);
+                  if (objId) {
+                    saveToHistory();
+                    setPlacedObjects(prev =>
+                      prev.map((obj) =>
+                        obj.id === objId ? { ...obj, color: newColor } : obj
+                      )
+                    );
+                  }
+                }}
                 label="Object & Drawing Color"
               />
-            )}
+              <button
+                className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 whitespace-nowrap ml-auto"
+                style={{
+                  background: 'var(--bg-gradient-start)',
+                  color: 'var(--text-primary)',
+                  opacity: selectedId ? 1 : 0.5,
+                }}
+                onClick={() => handleMoveLayer('back')}
+                disabled={!selectedId}
+              >
+                ⬇️ To Back
+              </button>
+            </div>
+
+            {/* Object Outline with Flip button */}
+            <div className="flex items-center justify-between gap-2">
+              <ColorPicker
+                color={placedObjects.find(obj => obj.id === selectedId)?.outlineColor || '#000000'}
+                onChange={(newColor) => {
+                  const objId = selectedId;
+                  if (objId) {
+                    saveToHistory();
+                    setPlacedObjects(prev =>
+                      prev.map((obj) =>
+                        obj.id === objId ? { ...obj, outlineColor: newColor } : obj
+                      )
+                    );
+                  }
+                }}
+                label="Object Outline"
+              />
+              <button
+                className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 whitespace-nowrap ml-auto"
+                style={{
+                  background: 'var(--bg-gradient-start)',
+                  color: 'var(--text-primary)',
+                  opacity: selectedId ? 1 : 0.5,
+                }}
+                onClick={handleFlipObject}
+                disabled={!selectedId}
+              >
+                ↔️ Flip
+              </button>
+            </div>
           </div>
 
           {/* Actions */}
@@ -2032,30 +2205,24 @@ export const BuildYourOwn = ({ currentTheme }) => {
                     width={40}
                     height={40}
                     opacity={history.length > 0 ? 1 : 0.3}
-                    listening={true}
+                    listening={history.length > 0}
                     onClick={(e) => {
-                      if (history.length > 0) {
-                        e.cancelBubble = true;
-                        handleUndo();
-                      }
+                      e.cancelBubble = true;
+                      handleUndo();
                     }}
                     onTap={(e) => {
-                      if (history.length > 0) {
-                        e.cancelBubble = true;
-                        handleUndo();
-                      }
+                      e.cancelBubble = true;
+                      handleUndo();
                     }}
                     onMouseEnter={(e) => {
-                      if (history.length > 0) {
-                        const container = e.target.getStage().container();
-                        container.style.cursor = 'pointer';
-                        e.target.to({
-                          shadowColor: currentTheme?.colors?.accentPrimary || '#ff9dda',
-                          shadowBlur: 20,
-                          shadowOpacity: 0.8,
-                          duration: 0.2,
-                        });
-                      }
+                      const container = e.target.getStage().container();
+                      container.style.cursor = 'pointer';
+                      e.target.to({
+                        shadowColor: currentTheme?.colors?.accentPrimary || '#ff9dda',
+                        shadowBlur: 20,
+                        shadowOpacity: 0.8,
+                        duration: 0.2,
+                      });
                     }}
                     onMouseLeave={(e) => {
                       const container = e.target.getStage().container();

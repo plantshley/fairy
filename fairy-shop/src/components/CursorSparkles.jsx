@@ -230,14 +230,21 @@ export const CursorSparkles = ({ currentTheme }) => {
     if (!isInitialized) {
       isInitialized = true;
 
+      // Check if a sparkles canvas already exists and remove it
+      const existingCanvas = document.querySelector('canvas[data-sparkles-canvas]');
+      if (existingCanvas && existingCanvas.parentNode) {
+        existingCanvas.parentNode.removeChild(existingCanvas);
+      }
+
       canvas = document.createElement("canvas");
+      canvas.setAttribute('data-sparkles-canvas', 'true');
       canvas.style.position = "fixed";
       canvas.style.top = "0";
       canvas.style.left = "0";
       canvas.style.width = "100%";
       canvas.style.height = "100%";
       canvas.style.pointerEvents = "none";
-      canvas.style.zIndex = "9999";
+      canvas.style.zIndex = "100";
       document.body.appendChild(canvas);
 
       ctx = canvas.getContext("2d");

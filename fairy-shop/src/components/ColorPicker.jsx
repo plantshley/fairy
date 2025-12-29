@@ -7,6 +7,12 @@ export const ColorPicker = ({ color, onChange, label }) => {
   const pickrRef = useRef(null);
   const buttonRef = useRef(null);
   const [pickrInstance, setPickrInstance] = useState(null);
+  const onChangeRef = useRef(onChange);
+
+  // Keep onChange ref up to date
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   // Initialize Pickr only once
   useEffect(() => {
@@ -59,26 +65,33 @@ export const ColorPicker = ({ color, onChange, label }) => {
           }
         }, 50);
 
+        // Track if we already called onChange to prevent double-calling
+        let colorChanged = false;
+
         // Call onChange when save button is clicked (nano theme)
         pickr.on('save', (color) => {
-          if (color && onChange) {
-            onChange(color.toHEXA().toString());
+          if (color && onChangeRef.current) {
+            onChangeRef.current(color.toHEXA().toString());
+            colorChanged = true;
           }
           pickr.hide();
         });
 
-        // Also call onChange when picker is hidden
+        // Also call onChange when picker is hidden (only if not already called by save)
         pickr.on('hide', () => {
           const currentColor = pickr.getColor();
-          if (currentColor && onChange) {
-            onChange(currentColor.toHEXA().toString());
+          if (currentColor && onChangeRef.current && !colorChanged) {
+            onChangeRef.current(currentColor.toHEXA().toString());
           }
+          // Reset flag for next time
+          colorChanged = false;
         });
 
         // Handle swatch clicks
         pickr.on('swatchselect', (color) => {
-          if (onChange) {
-            onChange(color.toHEXA().toString());
+          if (onChangeRef.current) {
+            onChangeRef.current(color.toHEXA().toString());
+            colorChanged = true;
           }
           pickr.hide();
         });

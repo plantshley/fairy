@@ -301,6 +301,11 @@ body {
 }
 
 /* Pickr color picker styles */
+.pcr-app {
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
 .pcr-button,
 .pickr .pcr-button {
   width: 1.5rem !important;

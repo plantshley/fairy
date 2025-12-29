@@ -42,11 +42,11 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
   return (
     <>
       {/* Corner creature button with speech bubble */}
-      <div className="fixed bottom-20 right-2 landscape:bottom-2 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 z-50">
+      <div className={`fixed z-50 ${activeTab === 'build' ? 'portrait:max-md:top-2 portrait:max-md:left-2 portrait:max-md:bottom-auto portrait:max-md:right-auto' : ''} bottom-20 right-2 landscape:bottom-2 landscape:right-2 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8`}>
         {/* Speech bubble - only show on home page */}
         {activeTab === 'home' && (
           <div
-            className="absolute -left-4 top-2 sm:-left-6 sm:top-4 lg:-left-4 lg:top-8 w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-full backdrop-blur-sm text-[7px] sm:text-[8px] lg:text-xs text-center flex flex-col items-center relative overflow-visible"
+            className={`absolute ${activeTab === 'build' ? 'portrait:max-md:-right-4 portrait:max-md:top-2' : ''} -left-4 top-2 landscape:-left-4 landscape:top-4 sm:-left-6 sm:top-4 lg:-left-4 lg:top-8 w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-full backdrop-blur-sm text-[7px] sm:text-[8px] lg:text-xs text-center flex flex-col items-center relative overflow-visible`}
             style={{
               background: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
               color: 'var(--text-primary)',
@@ -60,14 +60,15 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
               <div>magic</div>
               <div>♡⋆｡°✩</div>
             </div>
-            {/* Speech bubble tail - triangular */}
+            {/* Speech bubble tail - triangular (mobile portrait on build page: points left, all others: points right) */}
             <div
-              className="absolute bottom-2.5 right-0 w-0 h-0"
+              className={`absolute ${activeTab === 'build' ? 'portrait:max-md:bottom-2.5 portrait:max-md:left-0 portrait:max-md:rotate-[-45deg]' : ''} bottom-2.5 right-0 rotate-45 landscape:bottom-2.5 landscape:right-0 landscape:rotate-45`}
               style={{
+                width: 0,
+                height: 0,
                 borderLeft: '4px solid transparent',
                 borderRight: '4px solid transparent',
                 borderTop: currentTheme?.id === 'midnightVelvetMeadow' ? '6px solid rgba(42, 16, 53, 0.9)' : '6px solid rgba(255, 255, 255, 0.9)',
-                transform: 'rotate(45deg)',
               }}
             />
           </div>
