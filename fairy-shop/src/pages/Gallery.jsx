@@ -5,6 +5,7 @@ import { Particles, initParticlesEngine } from '@tsparticles/react';
 import { loadFull } from 'tsparticles';
 import galleryManifest from '../galleryManifest.json';
 import { getAssetPath } from '../utils/assetPath';
+import { trackEvent } from '../utils/analytics';
 
 const categories = [
   {
@@ -364,6 +365,11 @@ export const Gallery = ({ currentTheme }) => {
               onClick={() => {
                 setSelectedCategory(cat);
                 setSelectedImage(null);
+                trackEvent('gallery_category_selected', {
+                  category_id: cat.id,
+                  category_name: cat.name,
+                  source: 'tab_navigation',
+                });
               }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -395,7 +401,15 @@ export const Gallery = ({ currentTheme }) => {
                 transition={{ delay: index * 0.02 }}
                 whileHover={{ scale: 1.05, zIndex: 10 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedImage(imagePath)}
+                onClick={() => {
+                  setSelectedImage(imagePath);
+                  trackEvent('gallery_image_clicked', {
+                    category_id: selectedCategory.id,
+                    category_name: selectedCategory.name,
+                    image_path: imagePath,
+                    image_index: index,
+                  });
+                }}
               >
                 <img
                   src={encodedSrc}
@@ -572,7 +586,13 @@ export const Gallery = ({ currentTheme }) => {
             currentTheme={currentTheme}
             onMouseEnter={() => setHoveredCategory(category.id)}
             onMouseLeave={() => setHoveredCategory(null)}
-            onClick={() => setSelectedCategory(category)}
+            onClick={() => {
+              setSelectedCategory(category);
+              trackEvent('gallery_category_selected', {
+                category_id: category.id,
+                category_name: category.name,
+              });
+            }}
           />
         ))}
       </div>

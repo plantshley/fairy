@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { themes } from '../themes';
 import { getAssetPath } from '../utils/assetPath';
+import { trackEvent } from '../utils/analytics';
 
 export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -148,6 +149,10 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
                       onClick={() => {
                         onThemeChange(theme);
                         setIsOpen(false);
+                        trackEvent('theme_changed', {
+                          theme_id: theme.id,
+                          theme_name: theme.name,
+                        });
                       }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}

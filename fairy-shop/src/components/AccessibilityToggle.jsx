@@ -1,6 +1,14 @@
 import { motion } from 'framer-motion';
+import { trackEvent } from '../utils/analytics';
 
 export const AccessibilityToggle = ({ accessibleFonts, onToggle }) => {
+  const handleToggle = () => {
+    onToggle();
+    trackEvent('accessible_fonts_toggled', {
+      enabled: !accessibleFonts, // Will be the NEW state after toggle
+    });
+  };
+
   return (
     <>
       {/* Desktop - aligns with left navigation */}
@@ -14,7 +22,7 @@ export const AccessibilityToggle = ({ accessibleFonts, onToggle }) => {
             ? 'white'
             : 'var(--text-primary)',
         }}
-        onClick={onToggle}
+        onClick={handleToggle}
         whileHover={{ opacity: 0.8 }}
         whileTap={{ scale: 0.95 }}
         title={accessibleFonts ? 'Disable accessible fonts' : 'Enable accessible fonts'}
@@ -35,7 +43,7 @@ export const AccessibilityToggle = ({ accessibleFonts, onToggle }) => {
             ? 'white'
             : 'var(--text-primary)',
         }}
-        onClick={onToggle}
+        onClick={handleToggle}
         whileHover={{ opacity: 0.8 }}
         whileTap={{ scale: 0.95 }}
         title={accessibleFonts ? 'Disable accessible fonts' : 'Enable accessible fonts'}

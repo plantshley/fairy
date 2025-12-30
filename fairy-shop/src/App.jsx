@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { Navigation } from './components/Navigation';
@@ -13,6 +13,7 @@ import { Gallery } from './pages/Gallery';
 import { BuildYourOwn } from './pages/BuildYourOwn';
 import { themes, applyTheme } from './themes';
 import { getAssetPath } from './utils/assetPath';
+import { trackPageView, trackTiming } from './utils/analytics';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -21,6 +22,9 @@ function App() {
     const saved = localStorage.getItem('accessibleFonts');
     return saved === 'true';
   });
+  const sessionStartRef = useRef(null);
+  const pageStartRef = useRef(null);
+  const previousTabRef = useRef(null);
 
   useEffect(() => {
     applyTheme(currentTheme);
@@ -34,6 +38,43 @@ function App() {
       document.body.classList.remove('accessible-fonts');
     }
   }, [accessibleFonts]);
+
+  // Track session start time on mount
+  useEffect(() => {
+    sessionStartRef.current = Date.now();
+    pageStartRef.current = Date.now();
+
+    // Track total session duration on unmount/page close
+    const handleBeforeUnload = () => {
+      if (sessionStartRef.current) {
+        const sessionDuration = Math.round((Date.now() - sessionStartRef.current) / 1000);
+        trackTiming('session_duration', sessionDuration, 'engagement');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      handleBeforeUnload(); // Also track on component unmount
+    };
+  }, []);
+
+  // Track page changes with time on page
+  useEffect(() => {
+    // Track time on previous page
+    if (previousTabRef.current && pageStartRef.current) {
+      const timeOnPage = Math.round((Date.now() - pageStartRef.current) / 1000);
+      trackTiming(`${previousTabRef.current}_page_time`, timeOnPage, 'page_engagement');
+    }
+
+    // Track new page view
+    trackPageView(activeTab);
+
+    // Reset page timer
+    pageStartRef.current = Date.now();
+    previousTabRef.current = activeTab;
+  }, [activeTab]);
 
   const renderPage = () => {
     switch (activeTab) {

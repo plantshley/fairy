@@ -5,6 +5,7 @@ import useImage from 'use-image';
 import { Sparkle } from '../components/Sparkle';
 import { ColorPicker } from '../components/ColorPicker';
 import { getAssetPath } from '../utils/assetPath';
+import { trackEvent } from '../utils/analytics';
 
 // Body types with SVG files (using versions with "2" in filename for canvas)
 const bodyTypes = [
@@ -738,6 +739,14 @@ export const BuildYourOwn = ({ currentTheme }) => {
         timestamp: Date.now(),
       };
       localStorage.setItem('fairyBuilderState', JSON.stringify(state));
+
+      // Track creature save
+      trackEvent('creature_saved', {
+        object_count: placedObjects.length,
+        has_body: !!selectedBody,
+        has_drawing: lines.length > 0,
+      });
+
       alert('Design saved! ✨');
     } catch (e) {
       console.error('Failed to save state:', e);
@@ -818,6 +827,12 @@ export const BuildYourOwn = ({ currentTheme }) => {
       selectedBody: selectedBody ? { ...selectedBody } : null,
     }]);
     setSelectedBody({ ...body, color: body.color || '#ffffff' });
+
+    // Track body selection
+    trackEvent('body_selected', {
+      body_type: body.id,
+      body_name: body.name,
+    });
 
     // Set default body size based on screen width if not already set
     if (bodySizeMultiplier === null) {
@@ -1367,6 +1382,13 @@ export const BuildYourOwn = ({ currentTheme }) => {
   };
 
   const handleExport = () => {
+    // Track export event
+    trackEvent('creature_exported', {
+      object_count: placedObjects.length,
+      has_drawing: lines.length > 0,
+      has_body: !!selectedBody,
+    });
+
     // Get only the content layers (first two layers), excluding UI controls layer (third layer)
     const stage = stageRef.current;
     const contentLayer = stage.children[0]; // Layer 1: Body and Objects
@@ -2249,12 +2271,22 @@ export const BuildYourOwn = ({ currentTheme }) => {
                         : currentTheme?.colors?.accentSecondary || '#c5a3ff'}
                       cornerRadius={10}
                       onClick={() => {
-                        setFreeDrawMode(!freeDrawMode);
-                        if (!freeDrawMode) setEraserMode(false);
+                        const newMode = !freeDrawMode;
+                        setFreeDrawMode(newMode);
+                        if (newMode) {
+                          trackEvent('drawing_mode_enabled');
+                          setEraserMode(false);
+                        }
+                        if (!newMode) setEraserMode(false);
                       }}
                       onTap={() => {
-                        setFreeDrawMode(!freeDrawMode);
-                        if (!freeDrawMode) setEraserMode(false);
+                        const newMode = !freeDrawMode;
+                        setFreeDrawMode(newMode);
+                        if (newMode) {
+                          trackEvent('drawing_mode_enabled');
+                          setEraserMode(false);
+                        }
+                        if (!newMode) setEraserMode(false);
                       }}
                       onMouseEnter={(e) => {
                         const container = e.target.getStage().container();

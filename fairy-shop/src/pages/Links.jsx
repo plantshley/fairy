@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { loadFull } from 'tsparticles';
 import Particles, { initParticlesEngine } from '@tsparticles/react';
 import { Sparkle } from '../components/Sparkle';
+import { trackEvent } from '../utils/analytics';
 
 const links = [
   { url: 'https://www.instagram.com/kirametki/', label: 'Instagram', labelSuffix: '(crochet)', emoji: '🪻', color: '#E4405F', subtitle: '@kirametki' },
@@ -115,6 +116,13 @@ const LinkCard = ({ link, index, currentTheme }) => {
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => {
+        trackEvent('social_link_clicked', {
+          link_label: link.label,
+          link_url: link.url,
+          link_platform: link.label.toLowerCase().replace(/ /g, '_'),
+        });
+      }}
       className={getCardClassName()}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}

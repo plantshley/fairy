@@ -1,7 +1,25 @@
 import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 import { Sparkle } from '../components/Sparkle';
+import { trackPageView, trackTiming } from '../utils/analytics';
 
 export const Shop = ({ currentTheme }) => {
+  const entryTimeRef = useRef(null);
+
+  useEffect(() => {
+    // Track page view on mount
+    trackPageView('shop');
+    entryTimeRef.current = Date.now();
+
+    // Track time on page on unmount
+    return () => {
+      if (entryTimeRef.current) {
+        const timeSpent = Math.round((Date.now() - entryTimeRef.current) / 1000);
+        trackTiming('shop_page_time', timeSpent, 'shop_engagement');
+      }
+    };
+  }, []);
+
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
