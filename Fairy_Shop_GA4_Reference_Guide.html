@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Analytics 4 Reference Guide - Fairy's Nexus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalnia+Glaze:wght@100..700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #4a4a4a;
+            background: linear-gradient(135deg, #ffd1dc 0%, #e0b0ff 50%, #ffc8dd 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #fff5f7 0%, #fef6fb 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid rgba(255, 182, 243, 0.5);
+        }
+
+        header {
+            background: linear-gradient(135deg, #ffb6f0 0%, #d4a5ff 50%, #ffccf9 100%);
+            color: #663366;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-family: 'Kalnia Glaze', serif;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        h2 {
+            color: #c084fc;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #f9a8d4;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: #d946ef;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        h4 {
+            color: #a855f7;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .event-section {
+            background: linear-gradient(135deg, #fef3f9 0%, #fdf4ff 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #f9a8d4;
+        }
+
+        .parameter-list {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            border: 1px solid rgba(249, 168, 212, 0.2);
+        }
+
+        .parameter-item {
+            display: flex;
+            align-items: baseline;
+            margin: 8px 0;
+            padding: 10px;
+            background: linear-gradient(135deg, #fef9fc 0%, #fdf6ff 100%);
+            border-radius: 8px;
+            border: 1px solid rgba(232, 121, 249, 0.15);
+        }
+
+        .parameter-name {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #e879f9 0%, #d8b4fe 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-right: 10px;
+            font-weight: bold;
+            min-width: 250px;
+        }
+
+        .parameter-desc {
+            color: #555;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .high-priority {
+            background: linear-gradient(135deg, #fda4af 0%, #fb7185 100%);
+            color: white;
+        }
+
+        .medium-priority {
+            background: linear-gradient(135deg, #ffc4df 0%, #f1a8ff 100%);
+            color: #ffffff;
+        }
+
+        .low-priority {
+            background: linear-gradient(135deg, #d8b4fe 0%, #c084fc 100%);
+            color: white;
+        }
+
+        .query-box {
+            background: linear-gradient(135deg, #fff0f9 0%, #fef3fb 100%);
+            color: #7c3668;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #f9a8d4;
+        }
+
+        .query-title {
+            color: #c084fc;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .query-details {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #fff5f0 0%, #ffe9e0 100%);
+            border-left: 5px solid #ffb89d;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .tip-box strong {
+            color: #b45309;
+        }
+
+        ol, ul {
+            margin-left: 30px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .section-nav {
+            background: linear-gradient(135deg, #ffe9f5 0%, #f8e9ff 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #f9a8d4;
+        }
+
+        .section-nav a {
+            color: #c084fc;
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .section-nav a:hover {
+            color: #d946ef;
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #ffd1f7 0%, #e8c5ff 100%);
+            color: #d946ef;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>˚⋆｡°✩♡ Google Analytics 4 Reference Guide ♡✩°｡⋆˚</h1>
+            <p>Fairy's Nexus - Custom Event Tracking & Analytics Queries</p>
+        </header>
+
+        <div class="content">
+            <div class="section-nav">
+                <strong>Quick Navigation:</strong><br><br>
+                <a href="#sample-queries">Sample Queries</a>
+                <a href="#parameters-by-event">Parameters by Event</a>
+                <a href="#all-parameters">All Parameters</a>
+                <a href="#priority-list">Priority List</a>
+                <a href="#setup">How to Register Dimensions</a>
+            </div>
+
+            <!-- SAMPLE QUERIES SECTION -->
+            <h2 id="sample-queries"><span class="emoji">🌷</span>Sample Queries You Can Run</h2>
+            <p>Once you have data in Google Analytics, try these queries in <strong>Explore</strong> mode:</p>
+
+            <div class="query-box">
+                <div class="query-title">🦁 "Which body types are most popular for creature creation?"</div>
+                <div class="query-details">
+                    <strong>Dimension:</strong> body_type, body_name<br>
+                    <strong>Metrics:</strong> Event count<br>
+                    <strong>Filter:</strong> Event name = body_selected
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">🎨 "Do users prefer drawing or placing objects?"</div>
+                <div class="query-details">
+                    <strong>Compare counts of:</strong><br>
+                    - drawing_mode_enabled (users who activate drawing)<br>
+                    - creature_exported where has_drawing = true (creatures with drawings)<br>
+                    - creature_exported where object_count > 0 (creatures with objects)
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">✨ "Which theme is most popular?"</div>
+                <div class="query-details">
+                    <strong>Dimensions:</strong> theme_id, theme_name<br>
+                    <strong>Metrics:</strong> Event count<br>
+                    <strong>Filter:</strong> Event name = theme_changed<br>
+                    <strong>Visualization:</strong> Pie chart or bar chart
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">🌺 "Which social links get the most clicks?"</div>
+                <div class="query-details">
+                    <strong>Dimensions:</strong> link_platform, link_label<br>
+                    <strong>Metrics:</strong> Event count<br>
+                    <strong>Filter:</strong> Event name = social_link_clicked<br>
+                    <strong>Result:</strong> Shows which platforms (Instagram, Venmo, etc.) get most traffic
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">📷 "Which gallery categories are most viewed?"</div>
+                <div class="query-details">
+                    <strong>Dimensions:</strong> category_id, category_name<br>
+                    <strong>Metrics:</strong> Event count<br>
+                    <strong>Filter:</strong> Event name = gallery_category_selected
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">⏱️ "How long do users spend on each page?"</div>
+                <div class="query-details">
+                    <strong>Metrics:</strong> Average value<br>
+                    <strong>Filter:</strong> Event name = timing_complete, event_category = page_engagement<br>
+                    <strong>Breakdown:</strong> Create segments for each {page}_page_time event<br>
+                    <strong>Result:</strong> See average seconds spent on home, build, shop, gallery, links pages
+                </div>
+            </div>
+
+            <div class="query-box">
+                <div class="query-title">🎯 "What's the average session duration?"</div>
+                <div class="query-details">
+                    <strong>Metric:</strong> Average value<br>
+                    <strong>Filter:</strong> Event name = timing_complete, name = session_duration<br>
+                    <strong>Result:</strong> Average time users spend on the site in seconds
+                </div>
+            </div>
+
+            <!-- PARAMETERS BY EVENT TYPE SECTION -->
+            <h2 id="parameters-by-event"><span class="emoji">💐</span>Custom Parameters by Event Type</h2>
+
+            <div class="event-section">
+                <h3><span class="emoji">🦄</span>body_selected Event</h3>
+                <p>Tracks when a user selects a body type in the creature builder</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">body_type</span>
+                        <span class="parameter-desc">The ID of the selected body (e.g., "cat", "bunny", "dragon")</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">body_name</span>
+                        <span class="parameter-desc">The display name of the body (e.g., "Cat", "Bunny", "Dragon")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">💾</span>creature_exported Event</h3>
+                <p>Tracks when a user downloads their created creature</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">object_count</span>
+                        <span class="parameter-desc">Number of objects placed on the creature</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">has_drawing</span>
+                        <span class="parameter-desc">Whether the creature includes free-draw lines (true/false)</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">has_body</span>
+                        <span class="parameter-desc">Whether a body type was selected (true/false)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">✏️</span>drawing_mode_enabled Event</h3>
+                <p>Tracks when a user activates the free draw mode</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">-</span>
+                        <span class="parameter-desc">No custom parameters (simple event trigger)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">💾</span>creature_saved Event</h3>
+                <p>Tracks when the creature is auto-saved to localStorage</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">object_count</span>
+                        <span class="parameter-desc">Number of objects in the saved creature</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">has_body</span>
+                        <span class="parameter-desc">Whether a body type is saved (true/false)</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">has_drawing</span>
+                        <span class="parameter-desc">Whether drawing lines are saved (true/false)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">📄</span>page_view Event</h3>
+                <p>Tracks when a user navigates to a different page/tab</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">page_name</span>
+                        <span class="parameter-desc">Name of the page viewed (home, build, shop, gallery, links)</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">page_location</span>
+                        <span class="parameter-desc">Full URL of the page</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">page_path</span>
+                        <span class="parameter-desc">Path portion of the URL</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">🎨</span>theme_changed Event</h3>
+                <p>Tracks when a user switches the site theme</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">theme_id</span>
+                        <span class="parameter-desc">ID of the selected theme (e.g., "twinkleFairyDream", "glitterGroovyRainbow")</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">theme_name</span>
+                        <span class="parameter-desc">Display name of the theme (e.g., "Twinkle Fairy Dream", "Glitter Groovy Rainbow")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">♿</span>accessible_fonts_toggled Event</h3>
+                <p>Tracks when a user toggles the accessible fonts feature</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">enabled</span>
+                        <span class="parameter-desc">Whether accessible fonts are now enabled (true/false)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">🔗</span>social_link_clicked Event</h3>
+                <p>Tracks when a user clicks an external social/shop link</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">link_label</span>
+                        <span class="parameter-desc">Label of the link (e.g., "Instagram", "Venmo", "Ko-fi Shop")</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">link_url</span>
+                        <span class="parameter-desc">Full URL of the destination</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">link_platform</span>
+                        <span class="parameter-desc">Platform identifier (e.g., "instagram", "venmo", "ko-fi_shop")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">📂</span>gallery_category_selected Event</h3>
+                <p>Tracks when a user clicks a gallery category</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">category_id</span>
+                        <span class="parameter-desc">ID of the selected category</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">category_name</span>
+                        <span class="parameter-desc">Display name of the category</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">source</span>
+                        <span class="parameter-desc">Where the category was clicked from (e.g., "tab_navigation")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">🖼️</span>gallery_image_clicked Event</h3>
+                <p>Tracks when a user clicks to view a gallery image</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">category_id</span>
+                        <span class="parameter-desc">ID of the category containing the image</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">category_name</span>
+                        <span class="parameter-desc">Name of the category containing the image</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">image_path</span>
+                        <span class="parameter-desc">Path to the clicked image</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">image_index</span>
+                        <span class="parameter-desc">Position of the image in the category grid (0-based)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-section">
+                <h3><span class="emoji">⏱️</span>timing_complete Event</h3>
+                <p>Tracks time-based engagement metrics</p>
+                <div class="parameter-list">
+                    <div class="parameter-item">
+                        <span class="parameter-name">name</span>
+                        <span class="parameter-desc">Name of the timing metric (e.g., "session_duration", "shop_page_time", "home_page_time")</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">value</span>
+                        <span class="parameter-desc">Time value in seconds</span>
+                    </div>
+                    <div class="parameter-item">
+                        <span class="parameter-name">event_category</span>
+                        <span class="parameter-desc">Category of the timing event (e.g., "engagement", "page_engagement", "shop_engagement")</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALL UNIQUE PARAMETERS SECTION -->
+            <h2 id="all-parameters"><span class="emoji">🌸</span>All Unique Parameters (Alphabetical)</h2>
+            <p>Every parameter you can register as a custom dimension:</p>
+
+            <div class="parameter-list">
+                <div class="parameter-item">
+                    <span class="parameter-name">body_name</span>
+                    <span class="parameter-desc">Display name of selected body</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">body_type</span>
+                    <span class="parameter-desc">ID of selected body</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">category_id</span>
+                    <span class="parameter-desc">Gallery category ID</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">category_name</span>
+                    <span class="parameter-desc">Gallery category name</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">enabled</span>
+                    <span class="parameter-desc">Accessible fonts toggle state</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">event_category</span>
+                    <span class="parameter-desc">Timing event category</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">has_body</span>
+                    <span class="parameter-desc">Boolean if body is present</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">has_drawing</span>
+                    <span class="parameter-desc">Boolean if drawing lines present</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">image_index</span>
+                    <span class="parameter-desc">Position of image in gallery grid</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">image_path</span>
+                    <span class="parameter-desc">Path to clicked gallery image</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">link_label</span>
+                    <span class="parameter-desc">Label of clicked social link</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">link_platform</span>
+                    <span class="parameter-desc">Platform identifier (lowercase)</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">link_url</span>
+                    <span class="parameter-desc">Destination URL of social link</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">name</span>
+                    <span class="parameter-desc">Name of timing metric</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">object_count</span>
+                    <span class="parameter-desc">Number of placed objects</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">page_location</span>
+                    <span class="parameter-desc">Full URL of page</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">page_name</span>
+                    <span class="parameter-desc">Name of viewed page</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">page_path</span>
+                    <span class="parameter-desc">URL path of page</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">source</span>
+                    <span class="parameter-desc">Source of gallery category click</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">theme_id</span>
+                    <span class="parameter-desc">ID of selected theme</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">theme_name</span>
+                    <span class="parameter-desc">Display name of theme</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">value</span>
+                    <span class="parameter-desc">Timing value in seconds</span>
+                </div>
+            </div>
+
+            <!-- PRIORITY LIST SECTION -->
+            <h2 id="priority-list"><span class="emoji">⭐</span>Recommended Custom Dimensions to Register</h2>
+            <p>Prioritized list based on usefulness (you can register up to 50 in GA4):</p>
+
+            <h3><span class="emoji">💖</span>High Priority (Most Useful)</h3>
+            <div class="parameter-list">
+                <div class="parameter-item">
+                    <span class="parameter-name">body_type</span>
+                    <span class="parameter-desc">See which body types users prefer</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">body_name</span>
+                    <span class="parameter-desc">Friendly name for body type analysis</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">theme_id</span>
+                    <span class="parameter-desc">Track which themes are most popular</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">theme_name</span>
+                    <span class="parameter-desc">Friendly name for theme analysis</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">link_platform</span>
+                    <span class="parameter-desc">See which social platforms drive most clicks</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">page_name</span>
+                    <span class="parameter-desc">Track which pages users visit most</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">category_name</span>
+                    <span class="parameter-desc">See which gallery categories are most popular</span>
+                    <span class="priority-badge high-priority">HIGH</span>
+                </div>
+            </div>
+
+            <h3><span class="emoji">🌟</span>Medium Priority (Good Insights)</h3>
+            <div class="parameter-list">
+                <div class="parameter-item">
+                    <span class="parameter-name">object_count</span>
+                    <span class="parameter-desc">Understand how complex users make their creatures</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">has_drawing</span>
+                    <span class="parameter-desc">See how many users utilize drawing feature</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">has_body</span>
+                    <span class="parameter-desc">See if users export with or without bodies</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">link_label</span>
+                    <span class="parameter-desc">Detailed tracking of specific links</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">enabled</span>
+                    <span class="parameter-desc">Track accessibility feature adoption</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">name</span>
+                    <span class="parameter-desc">Identify different timing metrics (for timing_complete event)</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">value</span>
+                    <span class="parameter-desc">Track time values for engagement analysis</span>
+                    <span class="priority-badge medium-priority">MEDIUM</span>
+                </div>
+            </div>
+
+            <h3><span class="emoji">🌱</span>Low Priority (Nice to Have)</h3>
+            <div class="parameter-list">
+                <div class="parameter-item">
+                    <span class="parameter-name">image_index</span>
+                    <span class="parameter-desc">See which image positions get clicked most</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">image_path</span>
+                    <span class="parameter-desc">Track specific image file clicks</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">source</span>
+                    <span class="parameter-desc">Track navigation method in gallery</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">link_url</span>
+                    <span class="parameter-desc">Full URL tracking (usually redundant with link_platform)</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">page_location</span>
+                    <span class="parameter-desc">Full URL (usually redundant with page_name for SPAs)</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">page_path</span>
+                    <span class="parameter-desc">URL path (usually redundant with page_name for SPAs)</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">event_category</span>
+                    <span class="parameter-desc">Timing event categorization</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">category_id</span>
+                    <span class="parameter-desc">Gallery category ID (usually redundant with category_name)</span>
+                    <span class="priority-badge low-priority">LOW</span>
+                </div>
+            </div>
+
+            <div class="tip-box">
+                <strong>🌷 Pro Tip:</strong> Start by registering the 7 High Priority dimensions first. These will give you the most actionable insights about user behavior, theme preferences, and social engagement. Once you have data flowing, you can add Medium Priority dimensions to dig deeper into creation patterns and feature usage!
+            </div>
+
+            <h2 id="setup"><span class="emoji">🎀</span>How to Register Custom Dimensions</h2>
+            <ol>
+                <li>Go to <strong>Admin</strong> (gear icon in bottom left of Google Analytics)</li>
+                <li>In the <strong>Property</strong> column, click <strong>Custom definitions</strong></li>
+                <li>Click <strong>Create custom dimension</strong></li>
+                <li>For each parameter:
+                    <ul>
+                        <li><strong>Dimension name:</strong> Use a friendly name (e.g., "Body Type")</li>
+                        <li><strong>Scope:</strong> Select "Event"</li>
+                        <li><strong>Description:</strong> Add a brief description</li>
+                        <li><strong>Event parameter:</strong> Enter the exact parameter name (e.g., "body_type")</li>
+                    </ul>
+                </li>
+                <li>Click <strong>Save</strong></li>
+                <li>Repeat for each parameter you want to track</li>
+            </ol>
+
+            <div class="tip-box">
+                <strong>💐 Important:</strong> Custom dimensions can take 24-48 hours to start collecting data. Events sent BEFORE you create the dimension won't be retroactively updated, but all new events will include the dimension automatically.
+            </div>
+
+            <h2><span class="emoji">🦋</span>Implementation Details</h2>
+
+            <h3>Files Modified for GA4 Tracking:</h3>
+            <ul>
+                <li><strong>fairy-shop/index.html</strong> - GA4 script with measurement ID G-S0LMXC48V5</li>
+                <li><strong>fairy-shop/src/utils/analytics.js</strong> - Analytics utility functions</li>
+                <li><strong>fairy-shop/src/pages/BuildYourOwn.jsx</strong> - Body selection, export, drawing, and save tracking</li>
+                <li><strong>fairy-shop/src/App.jsx</strong> - Page navigation and session duration tracking</li>
+                <li><strong>fairy-shop/src/pages/Shop.jsx</strong> - Shop page time tracking</li>
+                <li><strong>fairy-shop/src/pages/Gallery.jsx</strong> - Category and image click tracking</li>
+                <li><strong>fairy-shop/src/pages/Links.jsx</strong> - Social link click tracking</li>
+                <li><strong>fairy-shop/src/components/ThemeSelector.jsx</strong> - Theme change tracking</li>
+                <li><strong>fairy-shop/src/components/AccessibilityToggle.jsx</strong> - Accessibility toggle tracking</li>
+            </ul>
+
+            <h3>Privacy & Geographic Data:</h3>
+            <ul>
+                <li><strong>Full IP tracking enabled</strong> - GA4 collects complete IP addresses for geographic insights</li>
+                <li><strong>Location data available:</strong> Country, region/state, and city-level data</li>
+                <li><strong>Access location reports:</strong> Reports → User → Demographics → Locations</li>
+                <li><strong>No cookie consent banner</strong> (per implementation requirements)</li>
+                <li>Consider adding a privacy policy mentioning analytics tracking</li>
+            </ul>
+
+            <h3>Timing Events Explained:</h3>
+            <p>The <code>timing_complete</code> event tracks user engagement through time-based metrics:</p>
+            <ul>
+                <li><strong>session_duration</strong> - Total time from site entry to exit (tracked on page close/unmount)</li>
+                <li><strong>{page}_page_time</strong> - Time spent on each individual page (home, build, shop, gallery, links)</li>
+                <li>All timing values are in <strong>seconds</strong></li>
+                <li>Tracked using React useRef to avoid re-renders</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>˚⋆｡°✩♡ Fairy's Nexus - Google Analytics 4 Reference Guide ♡✩°｡⋆˚</p>
+            <p>Measurement ID: G-S0LMXC48V5 | Site: Fairy Creature Builder & Crochet Shop</p>
+        </footer>
+    </div>
+</body>
+</html>

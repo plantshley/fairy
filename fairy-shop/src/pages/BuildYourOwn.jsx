@@ -921,12 +921,12 @@ export const BuildYourOwn = ({ currentTheme }) => {
     } else if (direction === 'down' && index > 0) {
       [newObjects[index], newObjects[index - 1]] = [newObjects[index - 1], newObjects[index]];
     } else if (direction === 'front') {
-      // Move to front: set zIndex to positive (in front of body)
-      newObjects[index] = { ...newObjects[index], zIndex: 0 };
+      // Move to front: set zIndex to 10+ (in front of body AND drawings)
+      newObjects[index] = { ...newObjects[index], zIndex: 10 };
       const obj = newObjects.splice(index, 1)[0];
       newObjects.push(obj);
     } else if (direction === 'back') {
-      // Move to back: set zIndex to negative (behind body)
+      // Move to back: set zIndex to negative (behind body AND drawings)
       newObjects[index] = { ...newObjects[index], zIndex: -1 };
       const obj = newObjects.splice(index, 1)[0];
       newObjects.unshift(obj);
@@ -1389,25 +1389,35 @@ export const BuildYourOwn = ({ currentTheme }) => {
       has_body: !!selectedBody,
     });
 
-    // Get only the content layers (first two layers), excluding UI controls layer (third layer)
+    // Get only the content layers (first three layers), excluding UI controls layer (fourth layer)
     const stage = stageRef.current;
-    const contentLayer = stage.children[0]; // Layer 1: Body and Objects
+    const contentLayer1 = stage.children[0]; // Layer 1: Objects behind body and drawings
     const drawingLayer = stage.children[1]; // Layer 2: Free Draw Lines
-    const uiLayer = stage.children[2]; // Layer 3: UI controls - will be hidden during export
+    const contentLayer2 = stage.children[2]; // Layer 3: Objects in front of drawings
+    const uiLayer = stage.children[3]; // Layer 4: UI controls - will be hidden during export
 
     // Calculate bounding box of all content with generous padding
-    const contentGroup = contentLayer.getChildren().find(child => child !== undefined);
+    const contentGroup = contentLayer1.getChildren().find(child => child !== undefined);
     if (!contentGroup) return;
 
     // Get bounds of all visible content
-    const box = contentLayer.getClientRect({ skipTransform: false });
+    const box1 = contentLayer1.getClientRect({ skipTransform: false });
     const drawBox = drawingLayer.getClientRect({ skipTransform: false });
+    const box2 = contentLayer2.getClientRect({ skipTransform: false });
 
-    // Merge the two bounding boxes
-    const x = Math.min(box.x || 0, drawBox.x || 0);
-    const y = Math.min(box.y || 0, drawBox.y || 0);
-    const x2 = Math.max((box.x || 0) + (box.width || 0), (drawBox.x || 0) + (drawBox.width || 0));
-    const y2 = Math.max((box.y || 0) + (box.height || 0), (drawBox.y || 0) + (drawBox.height || 0));
+    // Merge the three bounding boxes
+    const x = Math.min(box1.x || 0, drawBox.x || 0, box2.x || 0);
+    const y = Math.min(box1.y || 0, drawBox.y || 0, box2.y || 0);
+    const x2 = Math.max(
+      (box1.x || 0) + (box1.width || 0),
+      (drawBox.x || 0) + (drawBox.width || 0),
+      (box2.x || 0) + (box2.width || 0)
+    );
+    const y2 = Math.max(
+      (box1.y || 0) + (box1.height || 0),
+      (drawBox.y || 0) + (drawBox.height || 0),
+      (box2.y || 0) + (box2.height || 0)
+    );
     const width = x2 - x;
     const height = y2 - y;
 
@@ -1946,7 +1956,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
                 cursor: isPanning ? 'grabbing' : (spacePressed || panMode) ? 'grab' : 'default'
               }}
             >
-              {/* Layer 1: Body and Objects (content layer - will be exported) */}
+              {/* Layer 1: Objects behind body and drawings (zIndex < 0) */}
               <Layer>
                 {/* Objects behind body (negative zIndex) */}
                 {placedObjects.filter(obj => (obj.zIndex || 0) < 0).map((obj) => (
@@ -1979,8 +1989,11 @@ export const BuildYourOwn = ({ currentTheme }) => {
                   />
                 )}
 
-                {/* Objects in front of body (zero or positive zIndex) */}
-                {placedObjects.filter(obj => (obj.zIndex || 0) >= 0).map((obj) => (
+                {/* Objects in front of body but behind drawings (0 <= zIndex < 10) */}
+                {placedObjects.filter(obj => {
+                  const z = obj.zIndex || 0;
+                  return z >= 0 && z < 10;
+                }).map((obj) => (
                   <DraggableImage
                     key={obj.id}
                     object={obj}
@@ -2015,7 +2028,28 @@ export const BuildYourOwn = ({ currentTheme }) => {
                 ))}
               </Layer>
 
-              {/* Layer 3: UI Controls (NOT exported) */}
+              {/* Layer 3: Objects in front of drawings (zIndex >= 10) */}
+              <Layer>
+                {placedObjects.filter(obj => (obj.zIndex || 0) >= 10).map((obj) => (
+                  <DraggableImage
+                    key={obj.id}
+                    object={obj}
+                    isSelected={obj.id === selectedId}
+                    onSelect={() => setSelectedId(obj.id)}
+                    onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
+                    onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
+                    onTransformStart={handleTransformStart}
+                    onDragStart={handleDragStart}
+                    freeDrawMode={freeDrawMode}
+                    stageSize={stageSize}
+                    stageScale={stageScale}
+                    stagePosition={stagePosition}
+                    currentTheme={currentTheme}
+                  />
+                ))}
+              </Layer>
+
+              {/* Layer 4: UI Controls (NOT exported) */}
               <Layer
                 scaleX={1 / stageScale}
                 scaleY={1 / stageScale}
