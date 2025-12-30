@@ -1405,49 +1405,52 @@ export const BuildYourOwn = ({ currentTheme }) => {
     const drawBox = drawingLayer.getClientRect({ skipTransform: false });
     const box2 = contentLayer2.getClientRect({ skipTransform: false });
 
-    // Merge the three bounding boxes
-    const x = Math.min(box1.x || 0, drawBox.x || 0, box2.x || 0);
-    const y = Math.min(box1.y || 0, drawBox.y || 0, box2.y || 0);
-    const x2 = Math.max(
-      (box1.x || 0) + (box1.width || 0),
-      (drawBox.x || 0) + (drawBox.width || 0),
-      (box2.x || 0) + (box2.width || 0)
-    );
-    const y2 = Math.max(
-      (box1.y || 0) + (box1.height || 0),
-      (drawBox.y || 0) + (drawBox.height || 0),
-      (box2.y || 0) + (box2.height || 0)
-    );
+    // Collect only non-empty boxes (ignore layers with no content)
+    const boxes = [box1, drawBox, box2].filter(box => box.width > 0 && box.height > 0);
+
+    if (boxes.length === 0) return; // Nothing to export
+
+    // Merge only the non-empty bounding boxes
+    const x = Math.min(...boxes.map(box => box.x));
+    const y = Math.min(...boxes.map(box => box.y));
+    const x2 = Math.max(...boxes.map(box => box.x + box.width));
+    const y2 = Math.max(...boxes.map(box => box.y + box.height));
     const width = x2 - x;
     const height = y2 - y;
 
-    // Add 10% padding around content to ensure nothing is cropped
-    const padding = Math.max(width, height) * 0.1;
+    // Debug: Log bounding box info
+    console.log('Bounding box:', { x, y, width, height, x2, y2 });
+    console.log('Canvas size:', stageSize);
+    console.log('Box1:', box1);
+    console.log('DrawBox:', drawBox);
+    console.log('Box2:', box2);
 
-    // Use the canvas center (where the body is positioned) as the center point
-    const centerX = stageSize.width / 2;
-    const centerY = stageSize.height / 2;
+    // Add very minimal padding - just enough to not clip edges
+    const padding = 20;
 
-    // Make export square by using the larger dimension
-    const exportSize = Math.max(width, height) + (padding * 2);
+    // Export the actual content dimensions (not forced to square)
+    const exportWidth = width + (padding * 2);
+    const exportHeight = height + (padding * 2);
 
-    // Calculate top-left corner to center the content around canvas center
-    const exportX = centerX - exportSize / 2;
-    const exportY = centerY - exportSize / 2;
+    // Position at content bounds with padding
+    const exportX = x - padding;
+    const exportY = y - padding;
+
+    console.log('Export dimensions:', { exportX, exportY, exportWidth, exportHeight });
 
     // Hide UI layer before export
     if (uiLayer) {
       uiLayer.hide();
     }
 
-    // Export with calculated bounds - now square and centered
+    // Export with tight crop around actual content
     const uri = stage.toDataURL({
       pixelRatio: 3, // 3x resolution for crisp, high-quality export
       mimeType: 'image/png', // PNG for lossless quality
       x: exportX,
       y: exportY,
-      width: exportSize,
-      height: exportSize,
+      width: exportWidth,
+      height: exportHeight,
     });
 
     // Show UI layer again after export

@@ -43,7 +43,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
   return (
     <>
       {/* Corner creature button with speech bubble */}
-      <div className={`fixed z-50 ${activeTab === 'build' ? 'portrait:max-md:top-2 portrait:max-md:left-2 portrait:max-md:bottom-auto portrait:max-md:right-auto' : ''} bottom-20 right-2 landscape:bottom-2 landscape:right-2 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8`}>
+      <div className={`fixed z-50 ${activeTab === 'build' ? 'max-md:top-2 max-md:left-2 max-md:bottom-auto max-md:right-auto md:bottom-20 md:right-2' : 'bottom-20 right-2'} landscape:bottom-2 landscape:right-2 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8`}>
         {/* Speech bubble - only show on home page */}
         {activeTab === 'home' && (
           <div
