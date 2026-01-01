@@ -125,11 +125,6 @@ export const ColorsTabContent = ({
               }}
             />
           </div>
-          {!hasSelectedObject && (
-            <p className="text-[10px] mt-1 text-center" style={{ color: 'var(--text-secondary)' }}>
-              Select an object on canvas
-            </p>
-          )}
         </div>
       </div>
     </div>

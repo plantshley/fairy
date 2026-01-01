@@ -86,16 +86,6 @@ export const MobileBottomSheet = ({
     }
   };
 
-  // Cycle through all three states on handle tap
-  const handleHandleTap = () => {
-    if (currentState === 'collapsed') {
-      onStateChange('half');
-    } else if (currentState === 'half') {
-      onStateChange('full');
-    } else {
-      onStateChange('collapsed');
-    }
-  };
 
   // Handle backdrop tap to collapse
   const handleBackdropClick = () => {
@@ -147,7 +137,6 @@ export const MobileBottomSheet = ({
         <motion.div
           className="flex justify-center pt-2 pb-3 cursor-grab active:cursor-grabbing relative"
           onPointerDown={(e) => dragControls.start(e)}
-          onTap={handleHandleTap}
         >
           {/* Expand Up Button - Left Side */}
           <button

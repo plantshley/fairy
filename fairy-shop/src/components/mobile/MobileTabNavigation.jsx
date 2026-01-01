@@ -32,17 +32,16 @@ export const MobileTabNavigation = ({
           return (
             <button
               key={tab.id}
-              className="flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-xl font-bonbon text-sm transition-colors"
+              className="flex-1 flex items-center justify-center py-2 px-1 rounded-xl font-bonbon text-sm transition-colors"
               style={{
                 background: isActive
                   ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
                   : 'transparent',
                 color: isActive ? 'white' : 'var(--text-primary)',
-                minHeight: '48px',
+                minHeight: '40px',
               }}
               onClick={() => onTabChange(tab.id)}
             >
-              <span className="text-xl mb-0.5">{tab.icon}</span>
               <span className="truncate w-full text-center">{tab.label}</span>
             </button>
           );

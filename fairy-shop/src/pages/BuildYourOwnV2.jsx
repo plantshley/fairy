@@ -6,6 +6,7 @@ import { Sparkle } from '../components/Sparkle';
 import { ColorPicker } from '../components/ColorPicker';
 import { getAssetPath } from '../utils/assetPath';
 import { trackEvent } from '../utils/analytics';
+import { smoothDrawingStroke } from '../utils/drawingSmoothing';
 
 // Mobile bottom sheet components
 import { MobileBottomSheet } from '../components/mobile/MobileBottomSheet';
@@ -1326,6 +1327,11 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   // The canvas handles touch events properly through Konva's touch handlers.
 
   const handleMouseDown = (e) => {
+    // Prevent default touch behavior to avoid scrolling
+    if (e.evt && e.evt.type && e.evt.type.startsWith('touch')) {
+      e.evt.preventDefault();
+    }
+
     // Track mouse/touch down position
     const stage = e.target.getStage();
     const pos = stage.getPointerPosition();
@@ -1375,6 +1381,11 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   };
 
   const handleMouseMove = (e) => {
+    // Prevent default touch behavior to avoid scrolling
+    if (e.evt && e.evt.type && e.evt.type.startsWith('touch')) {
+      e.evt.preventDefault();
+    }
+
     // Cancel pending draw timeout if multi-touch is detected
     if (e.evt && e.evt.touches && e.evt.touches.length > 1) {
       if (mouseDownPos.current && mouseDownPos.current.touchTimeout) {
@@ -1404,9 +1415,25 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   };
 
   const handleMouseUp = (e) => {
+    // Prevent default touch behavior to avoid scrolling
+    if (e.evt && e.evt.type && e.evt.type.startsWith('touch')) {
+      e.evt.preventDefault();
+    }
+
     // Clear any pending draw timeout
     if (mouseDownPos.current && mouseDownPos.current.touchTimeout) {
       clearTimeout(mouseDownPos.current.touchTimeout);
+    }
+
+    // Smooth the last line if we were drawing
+    if (isDrawing && lines.length > 0) {
+      const lastLine = lines[lines.length - 1];
+      if (lastLine.points.length >= 6) {
+        // Apply smoothing to the completed stroke
+        const smoothedPoints = smoothDrawingStroke(lastLine.points);
+        const smoothedLine = { ...lastLine, points: smoothedPoints };
+        setLines([...lines.slice(0, -1), smoothedLine]);
+      }
     }
 
     setIsDrawing(false);
@@ -2002,12 +2029,16 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
             backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
             minHeight: isMobileLayout ? 'calc(50vh - 80px)' : '500px',
             flex: 1,
+            touchAction: 'none', // Prevent touch scrolling
           }}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="w-full h-full flex items-center justify-center">
+          <div
+            className="w-full h-full flex items-center justify-center"
+            style={{ touchAction: 'none' }}
+          >
             <Stage
               ref={stageRef}
               width={stageSize.width}
@@ -2026,7 +2057,8 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
               style={{
                 background: currentTheme?.id === 'midnightVelvetMeadow' ? '#1a0a1f' : '#f0f0f0',
                 borderRadius: '12px',
-                cursor: isPanning ? 'grabbing' : (spacePressed || panMode) ? 'grab' : 'default'
+                cursor: isPanning ? 'grabbing' : (spacePressed || panMode) ? 'grab' : 'default',
+                touchAction: 'none', // Prevent touch scrolling on canvas
               }}
             >
               {/* Layer 1: Objects behind body and drawings (zIndex < 0) */}

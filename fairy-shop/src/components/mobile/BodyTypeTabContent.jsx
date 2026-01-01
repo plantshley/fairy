@@ -46,13 +46,13 @@ export const BodyTypeTabContent = ({
       </div>
 
       {/* Body Type Grid */}
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className="grid grid-cols-3 gap-1">
         {bodyTypes.map((body) => (
           <button
             key={body.id}
-            className={`p-1.5 rounded-xl transition-all shadow-md aspect-square flex flex-col items-center justify-center ${
+            className={`p-1 rounded-lg transition-all shadow-md aspect-square flex flex-col items-center justify-center ${
               selectedBody?.id === body.id
-                ? 'ring-2 ring-offset-2 scale-105'
+                ? 'ring-2 ring-offset-1 scale-105'
                 : 'active:scale-95'
             }`}
             style={{
@@ -66,9 +66,9 @@ export const BodyTypeTabContent = ({
             }}
             onClick={() => onBodySelect(body)}
           >
-            <div className="text-4xl mb-1">{body.emoji}</div>
+            <div className="text-2xl mb-0.5">{body.emoji}</div>
             <div
-              className="text-sm font-semibold leading-tight text-center"
+              className="text-[10px] font-semibold leading-tight text-center"
               style={{ color: 'var(--text-primary)' }}
             >
               {body.name}
