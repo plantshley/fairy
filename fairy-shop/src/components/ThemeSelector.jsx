@@ -44,7 +44,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
     <>
       {/* Corner creature button with speech bubble */}
       <div className={`fixed z-50 ${
-        activeTab === 'build'
+        (activeTab === 'build' || activeTab === 'build-v2')
           ? 'top-2 left-2 md:top-auto md:left-auto md:bottom-20 md:right-2 lg:bottom-8 lg:right-8'
           : 'bottom-20 right-2 landscape:bottom-2 landscape:right-2 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8'
       }`}>

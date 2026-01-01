@@ -1,13 +1,16 @@
 import { motion } from 'framer-motion';
 import { trackEvent } from '../utils/analytics';
 
-export const AccessibilityToggle = ({ accessibleFonts, onToggle }) => {
+export const AccessibilityToggle = ({ accessibleFonts, onToggle, activeTab }) => {
   const handleToggle = () => {
     onToggle();
     trackEvent('accessible_fonts_toggled', {
       enabled: !accessibleFonts, // Will be the NEW state after toggle
     });
   };
+
+  // Check if on build page for special mobile positioning
+  const isBuild = activeTab === 'build';
 
   return (
     <>
@@ -32,9 +35,13 @@ export const AccessibilityToggle = ({ accessibleFonts, onToggle }) => {
         </span>
       </motion.button>
 
-      {/* Mobile & Landscape - above bottom navigation or above landscape nav */}
+      {/* Mobile & Landscape - next to theme selector on build in portrait, otherwise above nav */}
       <motion.button
-        className="fixed bottom-20 left-2 landscape:left-3 landscape:bottom-auto landscape:top-2 z-50 px-2.5 py-1.5 landscape:px-1.5 landscape:py-0.5 text-[10px] landscape:text-[8px] sm:px-3 sm:text-xs rounded-full backdrop-blur-sm lg:hidden"
+        className={`fixed z-50 px-2.5 py-1.5 text-[10px] rounded-full backdrop-blur-sm lg:hidden ${
+          isBuild
+            ? 'portrait:top-2 portrait:left-20 landscape:left-3 landscape:bottom-auto landscape:top-2 landscape:px-1.5 landscape:py-0.5 landscape:text-[8px]'
+            : 'bottom-20 left-2 landscape:left-3 landscape:bottom-auto landscape:top-2 landscape:px-1.5 landscape:py-0.5 landscape:text-[8px] sm:px-3 sm:text-xs'
+        }`}
         style={{
           background: accessibleFonts
             ? 'rgba(0, 0, 0, 0.3)'

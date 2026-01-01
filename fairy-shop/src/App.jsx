@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { Navigation } from './components/Navigation';
+import { MobileNavigationMenu } from './components/MobileNavigationMenu';
 import { ThemeSelector } from './components/ThemeSelector';
 import { AccessibilityToggle } from './components/AccessibilityToggle';
 import { CursorSparkles } from './components/CursorSparkles';
@@ -11,6 +12,7 @@ import { Shop } from './pages/Shop';
 import { Links } from './pages/Links';
 import { Gallery } from './pages/Gallery';
 import { BuildYourOwn } from './pages/BuildYourOwn';
+import { BuildYourOwnV2 } from './pages/BuildYourOwnV2';
 import { themes, applyTheme } from './themes';
 import { getAssetPath } from './utils/assetPath';
 import { trackPageView, trackTiming } from './utils/analytics';
@@ -87,7 +89,7 @@ function App() {
       case 'gallery':
         return <Gallery key="gallery" currentTheme={currentTheme} />;
       case 'build':
-        return <BuildYourOwn key="build" currentTheme={currentTheme} />;
+        return <BuildYourOwnV2 key="build" currentTheme={currentTheme} />;
       default:
         return <Home key="home" currentTheme={currentTheme} />;
     }
@@ -113,12 +115,22 @@ function App() {
         activeTab={activeTab}
       />
 
+      {/* Mobile navigation menu - only show on build */}
+      {activeTab === 'build' && (
+        <MobileNavigationMenu
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          currentTheme={currentTheme}
+        />
+      )}
+
       {/* Background music control (place after theme selector so it appears above other UI) */}
       <BackgroundMusic src={getAssetPath('/audio/background-music.mp3')} />
 
       <AccessibilityToggle
         accessibleFonts={accessibleFonts}
         onToggle={() => setAccessibleFonts(!accessibleFonts)}
+        activeTab={activeTab}
       />
     </div>
   );

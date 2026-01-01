@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { getAssetPath } from '../utils/assetPath';
 
 const tabs = [
@@ -10,6 +11,31 @@ const tabs = [
 ];
 
 export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
+  // Mobile layout detection
+  const [isMobilePortrait, setIsMobilePortrait] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const isPortrait = window.matchMedia('(orientation: portrait)').matches;
+      const isSmall = window.innerWidth < 768;
+      setIsMobilePortrait(isPortrait && isSmall);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    window.addEventListener('orientationchange', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('orientationchange', checkMobile);
+    };
+  }, []);
+
+  // Hide navigation on mobile build page
+  if (isMobilePortrait && activeTab === 'build') {
+    return null;
+  }
+
   const getThemeEmoji = () => {
     switch (currentTheme?.id) {
       case 'twinkleFairyDream':
