@@ -4,6 +4,8 @@ export const EditTabContent = ({
   selectedId,
   onFlip,
   onDuplicate,
+  onBringForward,
+  onSendBackward,
   onMoveToFront,
   onMoveToBack,
   onDelete,
@@ -24,8 +26,10 @@ export const EditTabContent = ({
   const actions = [
     { id: 'flip', label: 'Flip Horizontal', icon: '↔️', onClick: onFlip },
     { id: 'duplicate', label: 'Duplicate', icon: '📋', onClick: onDuplicate },
-    { id: 'toFront', label: 'Bring to Front', icon: '⬆️', onClick: onMoveToFront },
-    { id: 'toBack', label: 'Send to Back', icon: '⬇️', onClick: onMoveToBack },
+    { id: 'bringForward', label: 'Bring Forward', icon: '⬆', onClick: onBringForward },
+    { id: 'sendBackward', label: 'Send Backward', icon: '⬇', onClick: onSendBackward },
+    { id: 'toFront', label: 'Bring to Front', icon: '⏫', onClick: onMoveToFront },
+    { id: 'toBack', label: 'Send to Back', icon: '⏬', onClick: onMoveToBack },
   ];
 
   if (!selectedId) {
@@ -56,7 +60,7 @@ export const EditTabContent = ({
         Edit Object
       </h3>
 
-      {/* First 4 actions in 2-column grid */}
+      {/* Action buttons in 2-column grid */}
       <div className="grid grid-cols-2 gap-1.5 mb-1.5">
         {actions.map((action) => (
           <motion.button

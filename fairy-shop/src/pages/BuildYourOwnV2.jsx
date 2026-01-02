@@ -960,7 +960,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
       flipped: false,
       color: currentColor,
       outlineColor: '#000000', // Default black outline
-      zIndex: 1, // Start at 1 = in front of body (0), negative = behind body
+      zIndex: 10, // Start at 10 = on top of everything (body, drawings, other objects)
     };
     setPlacedObjects(prev => [...prev, newObject]);
   };
@@ -985,10 +985,14 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
 
     const newObjects = [...placedObjects];
 
-    if (direction === 'up' && index < newObjects.length - 1) {
-      [newObjects[index], newObjects[index + 1]] = [newObjects[index + 1], newObjects[index]];
-    } else if (direction === 'down' && index > 0) {
-      [newObjects[index], newObjects[index - 1]] = [newObjects[index - 1], newObjects[index]];
+    if (direction === 'up') {
+      // Bring forward: increase zIndex by 1
+      const currentZ = newObjects[index].zIndex || 0;
+      newObjects[index] = { ...newObjects[index], zIndex: currentZ + 1 };
+    } else if (direction === 'down') {
+      // Send backward: decrease zIndex by 1
+      const currentZ = newObjects[index].zIndex || 0;
+      newObjects[index] = { ...newObjects[index], zIndex: currentZ - 1 };
     } else if (direction === 'front') {
       // Move to front: set zIndex to 10+ (in front of body AND drawings)
       newObjects[index] = { ...newObjects[index], zIndex: 10 };
@@ -1272,7 +1276,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
         // Calculate the scale change from pinch
         const scaleChange = newDist / lastDist;
         let newScale = currentScale * scaleChange;
-        newScale = Math.max(0.5, Math.min(newScale, 3));
+        newScale = Math.max(0.5, Math.min(newScale, 10));
 
         // Calculate the content point under the last gesture center
         const contentX = (lastCenter.x - stageBox.left - currentPosition.x) / currentScale;
@@ -1345,6 +1349,11 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
 
     // Check if clicking on free draw controls (prevent drawing on the controls)
     if (clickedNode.attrs && clickedNode.attrs.id && clickedNode.attrs.id.startsWith('freedraw-')) {
+      return;
+    }
+
+    // Check if clicking on canvas control buttons (zoom, pan, reset)
+    if (clickedNode.attrs && clickedNode.attrs.id && clickedNode.attrs.id.startsWith('canvas-button-')) {
       return;
     }
 
@@ -1804,9 +1813,29 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
                     }}
+                    onClick={() => handleMoveLayer('up')}
+                  >
+                    ⬆ Bring Forward
+                  </button>
+                  <button
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
+                    style={{
+                      background: 'var(--bg-gradient-start)',
+                      color: 'var(--text-primary)',
+                    }}
+                    onClick={() => handleMoveLayer('down')}
+                  >
+                    ⬇ Send Backward
+                  </button>
+                  <button
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
+                    style={{
+                      background: 'var(--bg-gradient-start)',
+                      color: 'var(--text-primary)',
+                    }}
                     onClick={() => handleMoveLayer('front')}
                   >
-                    ⬆️ To Front
+                    ⏫ To Front
                   </button>
                   <button
                     className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
@@ -1816,7 +1845,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     }}
                     onClick={() => handleMoveLayer('back')}
                   >
-                    ⬇️ To Back
+                    ⏬ To Back
                   </button>
                 </div>
               </div>
@@ -1914,10 +1943,10 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                   color: 'var(--text-primary)',
                   opacity: selectedId ? 1 : 0.5,
                 }}
-                onClick={() => handleMoveLayer('front')}
+                onClick={() => handleMoveLayer('up')}
                 disabled={!selectedId}
               >
-                ⬆️ To Front
+                ⬆ Forward
               </button>
             </div>
 
@@ -1946,10 +1975,10 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                   color: 'var(--text-primary)',
                   opacity: selectedId ? 1 : 0.5,
                 }}
-                onClick={() => handleMoveLayer('back')}
+                onClick={() => handleMoveLayer('down')}
                 disabled={!selectedId}
               >
-                ⬇️ To Back
+                ⬇ Backward
               </button>
             </div>
 
@@ -2166,6 +2195,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                 <Group>
                   {/* Pan Mode Toggle Button */}
                   <Rect
+                    id="canvas-button-pan"
                     x={stageSize.width - (stageSize.width < 400 ? 180 : stageSize.width < 600 ? 205 : 230)}
                     y={15}
                     width={stageSize.width < 600 ? 32 : 45}
@@ -2210,6 +2240,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
 
                   {/* Zoom In Button */}
                   <Rect
+                    id="canvas-button-zoom-in"
                     x={stageSize.width - (stageSize.width < 400 ? 140 : stageSize.width < 600 ? 155 : 175)}
                     y={15}
                     width={stageSize.width < 600 ? 32 : 45}
@@ -2255,6 +2286,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
 
                   {/* Zoom Out Button */}
                   <Rect
+                    id="canvas-button-zoom-out"
                     x={stageSize.width - (stageSize.width < 400 ? 100 : stageSize.width < 600 ? 110 : 120)}
                     y={15}
                     width={stageSize.width < 600 ? 32 : 45}
@@ -2300,6 +2332,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
 
                   {/* Reset View Button */}
                   <Rect
+                    id="canvas-button-reset"
                     x={stageSize.width - (stageSize.width < 400 ? 60 : stageSize.width < 600 ? 65 : 65)}
                     y={15}
                     width={stageSize.width < 600 ? 32 : 45}
@@ -2835,6 +2868,8 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                   selectedId={selectedId}
                   onFlip={handleFlipObject}
                   onDuplicate={handleDuplicateObject}
+                  onBringForward={() => handleMoveLayer('up')}
+                  onSendBackward={() => handleMoveLayer('down')}
                   onMoveToFront={() => handleMoveLayer('front')}
                   onMoveToBack={() => handleMoveLayer('back')}
                   onDelete={() => {
