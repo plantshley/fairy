@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { Navigation } from './components/Navigation';
@@ -18,7 +19,31 @@ import { getAssetPath } from './utils/assetPath';
 import { trackPageView, trackTiming } from './utils/analytics';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('home');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Derive activeTab from current URL path
+  const pathToTab = {
+    '/': 'home',
+    '/shop': 'shop',
+    '/links': 'links',
+    '/gallery': 'gallery',
+    '/build': 'build',
+  };
+  const activeTab = pathToTab[location.pathname] || 'home';
+
+  // Navigation function that updates the URL
+  const setActiveTab = (tab) => {
+    const tabToPath = {
+      'home': '/',
+      'shop': '/shop',
+      'links': '/links',
+      'gallery': '/gallery',
+      'build': '/build',
+    };
+    navigate(tabToPath[tab] || '/');
+  };
+
   const [currentTheme, setCurrentTheme] = useState(themes.twinkleFairyDream);
   const [accessibleFonts, setAccessibleFonts] = useState(() => {
     const saved = localStorage.getItem('accessibleFonts');
@@ -78,22 +103,6 @@ function App() {
     previousTabRef.current = activeTab;
   }, [activeTab]);
 
-  const renderPage = () => {
-    switch (activeTab) {
-      case 'home':
-        return <Home key="home" currentTheme={currentTheme} />;
-      case 'shop':
-        return <Shop key="shop" currentTheme={currentTheme} />;
-      case 'links':
-        return <Links key="links" currentTheme={currentTheme} />;
-      case 'gallery':
-        return <Gallery key="gallery" currentTheme={currentTheme} />;
-      case 'build':
-        return <BuildYourOwnV2 key="build" currentTheme={currentTheme} />;
-      default:
-        return <Home key="home" currentTheme={currentTheme} />;
-    }
-  };
 
   return (
     <div className="min-h-screen overflow-hidden">
@@ -104,7 +113,13 @@ function App() {
 
       <main className="lg:ml-20 min-h-screen flex items-center justify-center">
         <AnimatePresence mode="wait">
-          {renderPage()}
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Home currentTheme={currentTheme} />} />
+            <Route path="/shop" element={<Shop currentTheme={currentTheme} />} />
+            <Route path="/links" element={<Links currentTheme={currentTheme} />} />
+            <Route path="/gallery" element={<Gallery currentTheme={currentTheme} />} />
+            <Route path="/build" element={<BuildYourOwnV2 currentTheme={currentTheme} />} />
+          </Routes>
         </AnimatePresence>
       </main>
 
