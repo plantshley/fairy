@@ -1579,14 +1579,14 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
       transition={{ duration: 0.3 }}
     >
       <motion.h1
-        className="font-kalnia text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-4 gradient-text text-center relative z-10"
+        className="font-kalnia text-xl sm:text-3xl md:text-4xl mb-2 sm:mb-4 gradient-text text-center relative z-10"
         style={{ overflow: 'visible' }}
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <Sparkle count={15} />
-        ˗ˏˋ ★ build your own ★ ˎˊ˗
+        ˗ˏˋ★ kirametki designer ★ˎˊ˗
       </motion.h1>
 
       <p className="text-center mb-2 sm:mb-4 text-sm sm:text-base md:text-lg lg:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
