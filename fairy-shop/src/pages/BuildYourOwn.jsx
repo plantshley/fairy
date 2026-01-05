@@ -1482,7 +1482,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <Sparkle count={15} />
-        ˗ˏˋ ★ build your own ★ ˎˊ˗
+        ˗ˏˋ ★ kirametki designer ★ ˎˊ˗
       </motion.h1>
 
       <p className="text-center mb-2 sm:mb-4 text-sm sm:text-base md:text-lg lg:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
