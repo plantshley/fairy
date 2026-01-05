@@ -1590,7 +1590,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
       </motion.h1>
 
       <p className="text-center mb-2 sm:mb-4 text-sm sm:text-base md:text-lg lg:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
-        ⋆｡°✩ design your kirametki creature ✩°｡⋆
+        ⋆｡°✩ build your own kirametki creature ✩°｡⋆
       </p>
 
       <div className="flex flex-col landscape:flex-row lg:flex-row gap-4 w-full max-w-7xl flex-1">
