@@ -75,7 +75,7 @@ const CategoryBox = ({ category, isHovered, currentTheme, onMouseEnter, onMouseL
     if (previewImage) {
       console.log(`[${category.name}] Attempting to load:`, previewImage);
       // Only encode spaces in the path, leave other special characters
-      const fullPath = `/${previewImage.replace(/ /g, '%20')}`;
+      const fullPath = getAssetPath(`/${previewImage.replace(/ /g, '%20')}`);
 
       // Directly set the image URL
       setImageUrl(fullPath);
