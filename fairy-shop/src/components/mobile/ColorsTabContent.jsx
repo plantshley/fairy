@@ -10,6 +10,9 @@ export const ColorsTabContent = ({
   onObjectColorChange,
   onDrawingColorChange,
   onHistorySave,
+  recentColors = [],
+  onRecentColorClick,
+  onSetActiveTarget,
   theme,
 }) => {
   const isDarkTheme = theme?.id === 'midnightVelvetMeadow';
@@ -53,6 +56,7 @@ export const ColorsTabContent = ({
             <ColorPicker
               color={selectedBody?.color || '#ff69b4'}
               onChange={onBodyColorChange}
+              onActivate={() => onSetActiveTarget?.('bodyColor')}
             />
           </div>
           {!hasBody && (
@@ -77,6 +81,7 @@ export const ColorsTabContent = ({
             <ColorPicker
               color={selectedBody?.outlineColor || '#000000'}
               onChange={onBodyOutlineColorChange}
+              onActivate={() => onSetActiveTarget?.('bodyOutline')}
             />
           </div>
           {!hasBody && (
@@ -101,6 +106,7 @@ export const ColorsTabContent = ({
                   onObjectColorChange?.(newColor);
                 }
               }}
+              onActivate={() => onSetActiveTarget?.(selectedObject ? 'objectColor' : 'drawing')}
             />
           </div>
         </div>
@@ -123,10 +129,36 @@ export const ColorsTabContent = ({
                 onHistorySave?.();
                 onObjectColorChange?.(newColor, true); // true = outline
               }}
+              onActivate={() => onSetActiveTarget?.('objectOutline')}
             />
           </div>
         </div>
       </div>
+
+      {/* Recent Colors */}
+      {recentColors.length > 0 && (
+        <div className="mt-3 p-2 rounded-xl" style={colorRowStyle}>
+          <span className="text-xs font-medium block text-center mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+            Recent Colors
+          </span>
+          <div className="flex gap-1.5 justify-center flex-wrap">
+            {recentColors.slice(0, 5).map((recentColor) => (
+              <button
+                key={recentColor}
+                type="button"
+                className="w-6 h-6 rounded-full border-2 transition-transform active:scale-90"
+                style={{
+                  backgroundColor: recentColor,
+                  borderColor: recentColor === '#ffffff'
+                    ? 'rgba(0,0,0,0.2)'
+                    : 'rgba(255,255,255,0.3)',
+                }}
+                onClick={() => onRecentColorClick?.(recentColor)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

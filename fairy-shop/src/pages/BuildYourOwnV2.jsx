@@ -650,6 +650,9 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   const [placedObjects, setPlacedObjects] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [currentColor, setCurrentColor] = useState('#ffffff');
+  const [currentOutlineColor, setCurrentOutlineColor] = useState('#000000');
+  const [recentColors, setRecentColors] = useState(['#ffffff', '#000000', '#ff69b4', '#c5a3ff', '#89cff0']);
+  const [activeColorTarget, setActiveColorTarget] = useState('drawing'); // 'bodyColor' | 'bodyOutline' | 'objectColor' | 'objectOutline' | 'drawing'
   const [freeDrawMode, setFreeDrawMode] = useState(false);
   const [eraserMode, setEraserMode] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -959,7 +962,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
       scaleY: 1.3,
       flipped: false,
       color: currentColor,
-      outlineColor: '#000000', // Default black outline
+      outlineColor: currentOutlineColor,
       zIndex: 10, // Start at 10 = on top of everything (body, drawings, other objects)
     };
     setPlacedObjects(prev => [...prev, newObject]);
@@ -1022,8 +1025,19 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
     saveToHistory();
   };
 
+  // Track recently used colors (max 10, most recent first)
+  const addRecentColor = (color) => {
+    const normalized = color.slice(0, 7).toLowerCase(); // Strip alpha, normalize
+    setRecentColors(prev => {
+      const filtered = prev.filter(c => c.toLowerCase() !== normalized);
+      return [normalized, ...filtered].slice(0, 10);
+    });
+  };
+
   const handleColorChange = (newColor) => {
+    setActiveColorTarget('objectColor');
     setCurrentColor(newColor);
+    addRecentColor(newColor);
     if (selectedId) {
       const currentSelectedId = selectedId; // Capture current value
       saveToHistory();
@@ -1036,6 +1050,9 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   };
 
   const handleObjectOutlineColorChange = (newColor) => {
+    setActiveColorTarget('objectOutline');
+    setCurrentOutlineColor(newColor);
+    addRecentColor(newColor);
     if (selectedId) {
       const currentSelectedId = selectedId; // Capture current value
       saveToHistory();
@@ -1048,6 +1065,8 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   };
 
   const handleBodyColorChange = (newColor) => {
+    setActiveColorTarget('bodyColor');
+    addRecentColor(newColor);
     if (selectedBody) {
       saveToHistory();
       setSelectedBody({ ...selectedBody, color: newColor });
@@ -1055,9 +1074,33 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   };
 
   const handleBodyOutlineColorChange = (newColor) => {
+    setActiveColorTarget('bodyOutline');
+    addRecentColor(newColor);
     if (selectedBody) {
       saveToHistory();
       setSelectedBody({ ...selectedBody, outlineColor: newColor });
+    }
+  };
+
+  const handleRecentColorClick = (color) => {
+    switch (activeColorTarget) {
+      case 'bodyColor':
+        handleBodyColorChange(color);
+        break;
+      case 'bodyOutline':
+        handleBodyOutlineColorChange(color);
+        break;
+      case 'objectOutline':
+        handleObjectOutlineColorChange(color);
+        break;
+      case 'objectColor':
+        handleColorChange(color);
+        break;
+      case 'drawing':
+      default:
+        setCurrentColor(color);
+        addRecentColor(color);
+        break;
     }
   };
 
@@ -1856,16 +1899,42 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
           <div className="mb-6 space-y-2 hidden portrait:max-md:hidden md:block">
             <h3 className="font-bonbon tracking-wider text-xl font-bold text-center mb-3" style={{ color: 'var(--text-primary)' }}>Colors</h3>
 
+            {/* Recent Colors - above pickers */}
+            {recentColors.length > 0 && (
+              <div className="mb-2 p-2 rounded-xl" style={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}>
+                <span className="text-xs font-medium block text-center mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+                  Recent Colors
+                </span>
+                <div className="flex gap-1.5 justify-center">
+                  {recentColors.slice(0, 5).map((rc) => (
+                    <button
+                      key={rc}
+                      type="button"
+                      className="w-5 h-5 rounded-full border-2 transition-transform hover:scale-125"
+                      style={{
+                        backgroundColor: rc,
+                        borderColor: rc === '#ffffff' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)',
+                      }}
+                      onClick={() => handleRecentColorClick(rc)}
+                      title={rc}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Body colors - always shown */}
             <ColorPicker
               color={selectedBody?.color || '#ff69b4'}
               onChange={handleBodyColorChange}
+              onActivate={() => setActiveColorTarget('bodyColor')}
               label="Body Color"
             />
 
             <ColorPicker
               color={selectedBody?.outlineColor || '#000000'}
               onChange={handleBodyOutlineColorChange}
+              onActivate={() => setActiveColorTarget('bodyOutline')}
               label="Body Outline"
             />
 
@@ -1874,30 +1943,15 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
               <>
                 <ColorPicker
                   color={placedObjects.find(obj => obj.id === selectedId)?.color || currentColor}
-                  onChange={(newColor) => {
-                    const objId = selectedId;
-                    setCurrentColor(newColor);
-                    saveToHistory();
-                    setPlacedObjects(prev =>
-                      prev.map((obj) =>
-                        obj.id === objId ? { ...obj, color: newColor } : obj
-                      )
-                    );
-                  }}
+                  onChange={handleColorChange}
+                  onActivate={() => setActiveColorTarget('objectColor')}
                   label="Object Color"
                 />
 
                 <ColorPicker
                   color={placedObjects.find(obj => obj.id === selectedId)?.outlineColor || '#000000'}
-                  onChange={(newColor) => {
-                    const objId = selectedId;
-                    saveToHistory();
-                    setPlacedObjects(prev =>
-                      prev.map((obj) =>
-                        obj.id === objId ? { ...obj, outlineColor: newColor } : obj
-                      )
-                    );
-                  }}
+                  onChange={handleObjectOutlineColorChange}
+                  onActivate={() => setActiveColorTarget('objectOutline')}
                   label="Object Outline"
                 />
               </>
@@ -1954,18 +2008,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
             <div className="flex items-center justify-between gap-2">
               <ColorPicker
                 color={placedObjects.find(obj => obj.id === selectedId)?.color || currentColor}
-                onChange={(newColor) => {
-                  const objId = selectedId;
-                  setCurrentColor(newColor);
-                  if (objId) {
-                    saveToHistory();
-                    setPlacedObjects(prev =>
-                      prev.map((obj) =>
-                        obj.id === objId ? { ...obj, color: newColor } : obj
-                      )
-                    );
-                  }
-                }}
+                onChange={handleColorChange}
                 label="Object & Drawing Color"
               />
               <button
@@ -1986,17 +2029,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
             <div className="flex items-center justify-between gap-2">
               <ColorPicker
                 color={placedObjects.find(obj => obj.id === selectedId)?.outlineColor || '#000000'}
-                onChange={(newColor) => {
-                  const objId = selectedId;
-                  if (objId) {
-                    saveToHistory();
-                    setPlacedObjects(prev =>
-                      prev.map((obj) =>
-                        obj.id === objId ? { ...obj, outlineColor: newColor } : obj
-                      )
-                    );
-                  }
-                }}
+                onChange={handleObjectOutlineColorChange}
                 label="Object Outline"
               />
               <button
@@ -2845,20 +2878,21 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                   onBodyColorChange={handleBodyColorChange}
                   onBodyOutlineColorChange={handleBodyOutlineColorChange}
                   onObjectColorChange={(newColor, isOutline) => {
-                    if (selectedId) {
-                      setPlacedObjects((prev) =>
-                        prev.map((obj) =>
-                          obj.id === selectedId
-                            ? isOutline
-                              ? { ...obj, outlineColor: newColor }
-                              : { ...obj, color: newColor }
-                            : obj
-                        )
-                      );
+                    if (isOutline) {
+                      handleObjectOutlineColorChange(newColor);
+                    } else {
+                      handleColorChange(newColor);
                     }
                   }}
-                  onDrawingColorChange={setCurrentColor}
+                  onDrawingColorChange={(newColor) => {
+                    setActiveColorTarget('drawing');
+                    setCurrentColor(newColor);
+                    addRecentColor(newColor);
+                  }}
                   onHistorySave={saveToHistory}
+                  recentColors={recentColors}
+                  onRecentColorClick={handleRecentColorClick}
+                  onSetActiveTarget={setActiveColorTarget}
                   theme={currentTheme}
                 />
               )}

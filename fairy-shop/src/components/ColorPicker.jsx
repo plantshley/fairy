@@ -3,16 +3,20 @@ import Pickr from '@simonwep/pickr';
 import '@simonwep/pickr/dist/themes/nano.min.css';
 import '@simonwep/pickr/dist/themes/classic.min.css';
 
-export const ColorPicker = ({ color, onChange, label }) => {
+export const ColorPicker = ({ color, onChange, onActivate, label }) => {
   const pickrRef = useRef(null);
   const buttonRef = useRef(null);
   const [pickrInstance, setPickrInstance] = useState(null);
   const onChangeRef = useRef(onChange);
+  const onActivateRef = useRef(onActivate);
 
-  // Keep onChange ref up to date
+  // Keep refs up to date
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
+  useEffect(() => {
+    onActivateRef.current = onActivate;
+  }, [onActivate]);
 
   // Initialize Pickr only once
   useEffect(() => {
@@ -64,6 +68,11 @@ export const ColorPicker = ({ color, onChange, label }) => {
             pickrButton.style.backgroundColor = color || '#ff69b4';
           }
         }, 50);
+
+        // Fire onActivate when picker is shown
+        pickr.on('show', () => {
+          if (onActivateRef.current) onActivateRef.current();
+        });
 
         // Track if we already called onChange to prevent double-calling
         let colorChanged = false;
