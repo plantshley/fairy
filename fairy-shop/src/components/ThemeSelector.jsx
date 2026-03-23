@@ -15,6 +15,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
       getAssetPath('/moon-custom1.png'),
       getAssetPath('/glacial-seas-dolphin1.png'),
       getAssetPath('/homura1.png'),
+      getAssetPath('/marcie1.png'),
     ];
 
     imagesToPreload.forEach((src) => {
@@ -35,6 +36,8 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
         return getAssetPath('/glacial-seas-dolphin1.png');
       case 'midnightVelvetMeadow':
         return getAssetPath('/homura1.png');
+      case 'sweetCherryLove':
+        return getAssetPath('/marcie1.png');
       default:
         return getAssetPath('/heart-bright1.png');
     }

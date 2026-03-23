@@ -23,7 +23,7 @@ const LinkCard = ({ link, index, currentTheme }) => {
 
   useEffect(() => {
     // Only initialize particles for themes that use them (all non-rainbow themes)
-    const particleThemes = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden', 'midnightVelvetMeadow'];
+    const particleThemes = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden', 'midnightVelvetMeadow', 'sweetCherryLove'];
     if (!particleThemes.includes(currentTheme?.id)) return;
 
     console.log('Initializing particles for card', index);
@@ -108,7 +108,7 @@ const LinkCard = ({ link, index, currentTheme }) => {
     return baseClass;
   };
 
-  const shouldShowParticles = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden', 'midnightVelvetMeadow'].includes(currentTheme?.id);
+  const shouldShowParticles = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden', 'midnightVelvetMeadow', 'sweetCherryLove'].includes(currentTheme?.id);
 
   return (
     <motion.a

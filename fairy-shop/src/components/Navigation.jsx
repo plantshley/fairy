@@ -48,6 +48,8 @@ export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
         return '🌊';
       case 'midnightVelvetMeadow':
         return '🥀';
+      case 'sweetCherryLove':
+        return '🍒';
       default:
         return '💕';
     }

@@ -95,7 +95,7 @@ const CategoryBox = ({ category, isHovered, currentTheme, onMouseEnter, onMouseL
 
   // Initialize particles once, not on every hover
   useEffect(() => {
-    const particleThemes = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden', 'midnightVelvetMeadow'];
+    const particleThemes = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden', 'midnightVelvetMeadow', 'sweetCherryLove'];
     if (!particleThemes.includes(currentTheme?.id)) return;
 
     initParticlesEngine(async (engine) => {
@@ -178,7 +178,7 @@ const CategoryBox = ({ category, isHovered, currentTheme, onMouseEnter, onMouseL
     return baseClass;
   };
 
-  const shouldShowParticles = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden', 'midnightVelvetMeadow'].includes(currentTheme?.id);
+  const shouldShowParticles = ['twinkleFairyDream', 'celestialAngelicClouds', 'crystalSeasideGarden', 'midnightVelvetMeadow', 'sweetCherryLove'].includes(currentTheme?.id);
 
   return (
     <div

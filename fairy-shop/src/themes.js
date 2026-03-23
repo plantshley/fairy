@@ -110,6 +110,28 @@ export const themes = {
     emojis: ['🔮', '🥀', '🦇', '🌒', '🌙', '🖤'],
     decorations: ['✧˖°', '⋆｡°✩', '･ﾟ✧', '˗ˏˋ ★ ˎˊ˗'],
   },
+  sweetCherryLove: {
+    id: 'sweetCherryLove',
+    name: '甘い♡Cherry Love',
+    colors: {
+      bgGradientStart: '#ffe0e6',
+      bgGradientMid: '#ffb3c1',
+      bgGradientEnd: '#fff0f3',
+      accentPrimary: '#e63956',
+      accentSecondary: '#ff7096',
+      textPrimary: '#8c1c3a',
+      textSecondary: '#b34563',
+      sparkleColor: '#ffd6e0',
+      gradientPrimary: '#e63956',
+      gradientSecondary: '#ff7096',
+    },
+    fonts: {
+      heading: '"Kalnia Glaze", serif',
+      body: '"JetBrains Mono", monospace',
+    },
+    emojis: ['🍒', '🍓', '🌹', '💗', '🍰', '🎀'],
+    decorations: ['♡₊˚', '⋆˚🪽˖°', '𓊆ྀི‧₊♡˚₊‧𓊇ྀི', '˚₊‧꒰ა ♡ ໒꒱ ‧₊˚'],
+  },
 };
 
 export const applyTheme = (theme) => {
