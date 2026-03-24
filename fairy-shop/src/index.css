@@ -179,11 +179,49 @@ body {
   animation: rainbow-glowing 20s linear infinite;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
-  border-radius: 1.5rem;
+  border-radius: 2rem;
 }
 
 .rainbow-glow-card:hover::before {
   opacity: 1;
+}
+
+/* Link card shine effect */
+.link-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.link-card-shine {
+  position: absolute;
+  left: -6rem;
+  top: -50%;
+  height: 200%;
+  width: 1.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  transform: rotate(30deg);
+  pointer-events: none;
+  z-index: 5;
+  visibility: hidden;
+}
+
+.link-card:hover .link-card-shine {
+  visibility: visible;
+  animation: shine-slide 1s ease-out forwards;
+}
+
+@keyframes shine-slide {
+  0% {
+    left: -6rem;
+  }
+  100% {
+    left: calc(100% + 4rem);
+  }
+}
+
+/* More subtle shine on dark themes */
+.midnight-theme .link-card-shine {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 @keyframes fairy-sparkle {

@@ -123,12 +123,10 @@ const LinkCard = ({ link, index, currentTheme }) => {
           link_platform: link.label.toLowerCase().replace(/ /g, '_'),
         });
       }}
-      className={getCardClassName()}
+      className={`${getCardClassName()} transition-transform duration-200 ease-out will-change-transform hover:scale-105 active:scale-[0.98]`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      whileHover={{ scale: 1.05, transition: { type: 'spring', stiffness: 400, damping: 25 } }}
-      whileTap={{ scale: 0.98 }}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -145,17 +143,20 @@ const LinkCard = ({ link, index, currentTheme }) => {
       )}
 
       <motion.div
-        className="relative backdrop-blur-md rounded-3xl p-6 shadow-xl h-32 w-full"
+        className={`link-card relative backdrop-blur-md p-3 h-32 w-full${currentTheme?.id === 'midnightVelvetMeadow' ? ' midnight-theme' : ''}`}
         style={{
+          borderRadius: '2rem',
           border: '3px solid transparent',
-          backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+          backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
           backgroundImage: currentTheme?.id === 'midnightVelvetMeadow'
-            ? 'linear-gradient(rgba(42, 16, 53, 0.9), rgba(42, 16, 53, 0.9)), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
-            : 'linear-gradient(white, white), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+            ? 'linear-gradient(rgba(42, 16, 53, 0.8), rgba(42, 16, 53, 0.8)), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
+            : 'linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
           backgroundOrigin: 'border-box',
           backgroundClip: 'padding-box, border-box',
+          boxShadow: `0 0 16px ${currentTheme?.colors.accentPrimary}40, 0 0 32px ${currentTheme?.colors.accentSecondary}20`,
         }}
       >
+        <div className="link-card-shine" />
 
         <div className="flex items-center gap-4 h-full">
           <motion.div
@@ -218,7 +219,7 @@ export const Links = ({ currentTheme }) => {
         ʚ♡ɞ connect with me across the web ʚ♡ɞ
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl w-full">
         {links.map((link, index) => (
           <LinkCard key={link.url} link={link} index={index} currentTheme={currentTheme} />
         ))}
