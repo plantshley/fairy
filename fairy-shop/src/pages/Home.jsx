@@ -25,16 +25,16 @@ export const Home = ({ currentTheme }) => {
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
     >
       <motion.div
         className="text-center space-y-4 sm:space-y-6 md:space-y-8 max-w-6xl w-full px-4 sm:px-6 lg:px-8"
-        initial={{ scale: 0.95 }}
+        initial={{ scale: 0.98 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         {/* Animated image header */}
         <div className="flex justify-center gap-4 sm:gap-6 md:gap-8 items-center">
@@ -88,9 +88,9 @@ export const Home = ({ currentTheme }) => {
         <motion.h1
           className="font-kalnia text-3xl sm:text-4xl md:text-5xl lg:text-6xl gradient-text leading-tight text-center relative z-10"
           style={{ overflow: 'visible', paddingBottom: '8px' }}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
         >
           <Sparkle count={15} />
           fairykun ♡ kirametki
@@ -102,7 +102,7 @@ export const Home = ({ currentTheme }) => {
           style={{ color: 'var(--text-primary)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.4, duration: 0.6, ease: 'easeOut' }}
         >
           ˚ ༘♡ welcome to fairy's magical realm of visual art & creaturely crochet ⋆˚✿˖°
         </motion.p>
@@ -113,9 +113,9 @@ export const Home = ({ currentTheme }) => {
           style={{
             backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
           }}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.6, duration: 0.6, ease: 'easeOut' }}
         >
           <p className="text-sm sm:text-base leading-relaxed text-center" style={{ color: 'var(--text-secondary)' }}>
             In this twinkling realm where strength meets serenity, fairy weave threads of whimsy into 
@@ -132,7 +132,7 @@ export const Home = ({ currentTheme }) => {
           className="flex justify-center gap-4 sm:gap-6 text-3xl sm:text-4xl md:text-5xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.8, duration: 0.6, ease: 'easeOut' }}
         >
           <motion.span
             animate={{
@@ -183,7 +183,7 @@ export const Home = ({ currentTheme }) => {
           style={{ color: 'var(--text-secondary)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 1, duration: 0.6, ease: 'easeOut' }}
         >
           <span className="hidden lg:inline">˗ˏˋ ★ Use the navigation on the left to explore and click the friend to the right to customize the theme ★ ˎˊ˗</span>
           <span className="lg:hidden">˗ˏˋ ★ Use the navigation below to explore and tap the friend to customize the theme ★ ˎˊ˗</span>

@@ -23,17 +23,17 @@ export const Shop = ({ currentTheme }) => {
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
     >
       <motion.h1
         className="font-kalnia text-2xl sm:text-3xl md:text-4xl mb-4 gradient-text text-center relative z-10"
         style={{ overflow: 'visible' }}
-        initial={{ scale: 0.9 }}
+        initial={{ scale: 0.97 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         <Sparkle count={15} />
         ✧･ﾟ: *✧･ﾟ:* shop *:･ﾟ✧*:･ﾟ✧
@@ -51,9 +51,9 @@ export const Shop = ({ currentTheme }) => {
           minHeight: '500px',
           backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
         }}
-        initial={{ scale: 0.95, opacity: 0 }}
+        initial={{ scale: 0.98, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2 }}
+        transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
       >
         <iframe
           id="kofiframe"

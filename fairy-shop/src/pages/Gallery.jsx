@@ -322,7 +322,7 @@ export const Gallery = ({ currentTheme }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         {/* Header with back button */}
         <div className="w-full max-w-7xl mb-4 sm:mb-6 flex items-center justify-between px-2 sm:px-0">
@@ -341,8 +341,9 @@ export const Gallery = ({ currentTheme }) => {
 
           <motion.h1
             className="font-kalnia text-lg sm:text-2xl md:text-3xl gradient-text text-center"
-            initial={{ scale: 0.9 }}
+            initial={{ scale: 0.97 }}
             animate={{ scale: 1 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
           >
             {selectedCategory.name}
           </motion.h1>
@@ -382,9 +383,9 @@ export const Gallery = ({ currentTheme }) => {
         {/* Image grid */}
         <motion.div
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 w-full max-w-7xl px-2 sm:px-0"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
         >
           {images.map((imagePath, index) => {
             // Only encode spaces in the path, leave other special characters
@@ -396,9 +397,9 @@ export const Gallery = ({ currentTheme }) => {
                 style={{
                   backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.3)' : 'rgba(255, 255, 255, 0.3)',
                 }}
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.02 }}
+                transition={{ delay: index * 0.02, duration: 0.4, ease: 'easeOut' }}
                 whileHover={{ scale: 1.05, zIndex: 10 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
@@ -551,17 +552,17 @@ export const Gallery = ({ currentTheme }) => {
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
     >
       <motion.h1
         className="font-kalnia text-2xl sm:text-3xl md:text-4xl mb-4 gradient-text text-center relative z-10"
         style={{ overflow: 'visible' }}
-        initial={{ scale: 0.9 }}
+        initial={{ scale: 0.97 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         <Sparkle count={15} />
         ₊˚⊹♡ gallery ♡⊹˚₊

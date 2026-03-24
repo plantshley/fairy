@@ -124,9 +124,9 @@ const LinkCard = ({ link, index, currentTheme }) => {
         });
       }}
       className={`${getCardClassName()} transition-transform duration-200 ease-out will-change-transform hover:scale-105 active:scale-[0.98]`}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
+      transition={{ delay: index * 0.08, duration: 0.5, ease: 'easeOut' }}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -195,17 +195,17 @@ export const Links = ({ currentTheme }) => {
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
     >
       <motion.h1
         className="font-kalnia text-2xl sm:text-3xl md:text-4xl mb-4 gradient-text text-center relative z-10"
         style={{ overflow: 'visible' }}
-        initial={{ scale: 0.9 }}
+        initial={{ scale: 0.97 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         <Sparkle count={15} />
         ⋆｡‧˚ʚ♡ɞ˚‧｡⋆ links ⋆｡‧˚ʚ♡ɞ˚‧｡⋆
@@ -226,7 +226,7 @@ export const Links = ({ currentTheme }) => {
         style={{ color: 'var(--text-secondary)' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
+        transition={{ delay: 0.6, duration: 0.6, ease: 'easeOut' }}
       >
         {decorations.join(' ')}
       </motion.p>
