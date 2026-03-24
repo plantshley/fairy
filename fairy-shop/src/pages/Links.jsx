@@ -143,20 +143,16 @@ const LinkCard = ({ link, index, currentTheme }) => {
       )}
 
       <motion.div
-        className={`link-card relative backdrop-blur-md p-3 h-32 w-full${currentTheme?.id === 'midnightVelvetMeadow' ? ' midnight-theme' : ''}`}
+        className={`link-card relative p-3 h-24 w-full${currentTheme?.id === 'midnightVelvetMeadow' ? ' midnight-theme' : ''}`}
         style={{
           borderRadius: '2rem',
-          border: '3px solid transparent',
-          backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-          backgroundImage: currentTheme?.id === 'midnightVelvetMeadow'
-            ? 'linear-gradient(rgba(42, 16, 53, 0.8), rgba(42, 16, 53, 0.8)), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
-            : 'linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-          backgroundOrigin: 'border-box',
-          backgroundClip: 'padding-box, border-box',
+          backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.5)' : 'rgba(255, 255, 255, 0.5)',
           boxShadow: `0 0 16px ${currentTheme?.colors.accentPrimary}40, 0 0 32px ${currentTheme?.colors.accentSecondary}20`,
         }}
       >
-        <div className="link-card-shine" />
+        <div className="link-card-shine-wrapper">
+          <div className="link-card-shine" />
+        </div>
 
         <div className="flex items-center gap-4 h-full">
           <motion.div
@@ -219,7 +215,7 @@ export const Links = ({ currentTheme }) => {
         ʚ♡ɞ connect with me across the web ʚ♡ɞ
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl w-full">
         {links.map((link, index) => (
           <LinkCard key={link.url} link={link} index={index} currentTheme={currentTheme} />
         ))}

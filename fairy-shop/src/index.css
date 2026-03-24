@@ -186,10 +186,36 @@ body {
   opacity: 1;
 }
 
-/* Link card shine effect */
+/* Link card gradient border + shine effect */
 .link-card {
   position: relative;
+}
+
+.link-card::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: calc(2rem + 3px);
+  padding: 3px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.link-card-shine-wrapper {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
 }
 
 .link-card-shine {
