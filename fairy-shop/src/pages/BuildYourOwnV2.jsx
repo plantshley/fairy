@@ -1931,8 +1931,8 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                 <span className="text-xs font-medium block text-center mb-1.5" style={{ color: 'var(--text-secondary)' }}>
                   Recent Colors
                 </span>
-                <div className="flex gap-1.5 justify-center">
-                  {recentColors.slice(0, 5).map((rc) => (
+                <div className="grid grid-cols-5 gap-1.5 justify-items-center max-w-[10rem] mx-auto">
+                  {recentColors.slice(0, 10).map((rc) => (
                     <button
                       key={rc}
                       type="button"

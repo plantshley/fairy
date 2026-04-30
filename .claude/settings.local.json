@@ -3,7 +3,10 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(npx vite:*)",
-      "Bash(grep -r \"bgGradientMid2\\\\|gradientPrimary\\\\|gradientSecondary\" /c/Users/ashle/Documents/GitHub/fairy/fairy-shop/src --include=*.jsx --include=*.js --include=*.css)"
+      "Bash(grep -r \"bgGradientMid2\\\\|gradientPrimary\\\\|gradientSecondary\" /c/Users/ashle/Documents/GitHub/fairy/fairy-shop/src --include=*.jsx --include=*.js --include=*.css)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(npm view:*)",
+      "Bash(claude mcp:*)"
     ]
   }
 }

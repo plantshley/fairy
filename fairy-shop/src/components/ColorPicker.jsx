@@ -52,9 +52,13 @@ export const ColorPicker = ({ color, onChange, onActivate, label }) => {
           },
         });
 
+        // Track whether the user actually interacted with the picker
+        let userChanged = false;
+        let colorChanged = false;
+
         // Update preview button color in real-time
         pickr.on('change', (color) => {
-          // Update Pickr's button element directly
+          userChanged = true;
           const pickrButton = pickr.getRoot().button;
           if (pickrButton) {
             pickrButton.style.backgroundColor = color.toHEXA().toString();
@@ -69,13 +73,12 @@ export const ColorPicker = ({ color, onChange, onActivate, label }) => {
           }
         }, 50);
 
-        // Fire onActivate when picker is shown
+        // Fire onActivate when picker is shown; reset interaction flag
         pickr.on('show', () => {
+          userChanged = false;
+          colorChanged = false;
           if (onActivateRef.current) onActivateRef.current();
         });
-
-        // Track if we already called onChange to prevent double-calling
-        let colorChanged = false;
 
         // Call onChange when save button is clicked (nano theme)
         pickr.on('save', (color) => {
@@ -86,13 +89,17 @@ export const ColorPicker = ({ color, onChange, onActivate, label }) => {
           pickr.hide();
         });
 
-        // Also call onChange when picker is hidden (only if not already called by save)
+        // On hide, only commit the picker's current color if the user actually
+        // changed it via the picker. Otherwise, an outside-click (e.g. on a
+        // recent-color button) would clobber that external update.
         pickr.on('hide', () => {
-          const currentColor = pickr.getColor();
-          if (currentColor && onChangeRef.current && !colorChanged) {
-            onChangeRef.current(currentColor.toHEXA().toString());
+          if (userChanged && !colorChanged) {
+            const currentColor = pickr.getColor();
+            if (currentColor && onChangeRef.current) {
+              onChangeRef.current(currentColor.toHEXA().toString());
+            }
           }
-          // Reset flag for next time
+          userChanged = false;
           colorChanged = false;
         });
 
@@ -129,10 +136,17 @@ export const ColorPicker = ({ color, onChange, onActivate, label }) => {
   useEffect(() => {
     if (pickrInstance && color) {
       const currentColor = pickrInstance.getColor();
-      if (!currentColor || currentColor.toHEXA().toString() !== color) {
-        pickrInstance.setColor(color, true); // silent update
+      if (!currentColor || currentColor.toHEXA().toString().toLowerCase() !== color.toLowerCase()) {
+        pickrInstance.setColor(color, true); // silent: update picker UI without firing events
+        // Also commit as the "applied" color so the swatch button reflects it
+        // when the picker closes. silent=true so no save event fires.
+        try {
+          pickrInstance.applyColor(true);
+        } catch (_) {
+          // older Pickr versions may not support applyColor(silent)
+        }
 
-        // Also update the button background color
+        // Manual button background update as a safety net
         const pickrButton = pickrInstance.getRoot().button;
         if (pickrButton) {
           pickrButton.style.backgroundColor = color;

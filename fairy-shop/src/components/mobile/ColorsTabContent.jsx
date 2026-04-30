@@ -141,8 +141,8 @@ export const ColorsTabContent = ({
           <span className="text-xs font-medium block text-center mb-1.5" style={{ color: 'var(--text-secondary)' }}>
             Recent Colors
           </span>
-          <div className="flex gap-1.5 justify-center flex-wrap">
-            {recentColors.slice(0, 5).map((recentColor) => (
+          <div className="grid grid-cols-5 gap-1.5 justify-items-center max-w-[12rem] mx-auto">
+            {recentColors.slice(0, 10).map((recentColor) => (
               <button
                 key={recentColor}
                 type="button"
