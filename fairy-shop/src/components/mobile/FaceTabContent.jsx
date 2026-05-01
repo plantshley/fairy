@@ -9,13 +9,13 @@ export const FaceTabContent = ({ parts, onAddObject, theme }) => {
   return (
     <div className="pb-4">
       <h3
-        className="font-bonbon tracking-wider text-lg font-bold text-center mb-3"
+        className="font-bonbon tracking-wider text-lg sm:text-xl md:text-2xl font-bold text-center mb-3"
         style={{ color: 'var(--text-primary)' }}
       >
         Facial Features
       </h3>
 
-      <div className="grid grid-cols-5 gap-1.5">
+      <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-1.5">
         {facialParts.map((part) => (
           <motion.button
             key={part.id}

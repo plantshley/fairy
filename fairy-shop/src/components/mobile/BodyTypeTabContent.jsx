@@ -14,7 +14,7 @@ export const BodyTypeTabContent = ({
   return (
     <div className="space-y-4">
       <h3
-        className="font-bonbon tracking-wider text-lg font-bold text-center"
+        className="font-bonbon tracking-wider text-lg sm:text-xl md:text-2xl font-bold text-center"
         style={{ color: 'var(--text-primary)' }}
       >
         Choose Your Body
@@ -46,7 +46,7 @@ export const BodyTypeTabContent = ({
       </div>
 
       {/* Body Type Grid */}
-      <div className="grid grid-cols-3 gap-1">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-1">
         {bodyTypes.map((body) => (
           <button
             key={body.id}
@@ -66,9 +66,9 @@ export const BodyTypeTabContent = ({
             }}
             onClick={() => onBodySelect(body)}
           >
-            <div className="text-2xl mb-0.5">{body.emoji}</div>
+            <div className="text-2xl sm:text-3xl mb-0.5">{body.emoji}</div>
             <div
-              className="text-[10px] font-semibold leading-tight text-center"
+              className="text-[10px] sm:text-xs md:text-sm font-semibold leading-tight text-center"
               style={{ color: 'var(--text-primary)' }}
             >
               {body.name}

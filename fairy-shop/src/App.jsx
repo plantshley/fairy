@@ -136,6 +136,8 @@ function App() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           currentTheme={currentTheme}
+          accessibleFonts={accessibleFonts}
+          onToggleAccessibleFonts={() => setAccessibleFonts(!accessibleFonts)}
         />
       )}
 

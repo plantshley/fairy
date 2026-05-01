@@ -17,7 +17,9 @@ export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
   useEffect(() => {
     const checkMobile = () => {
       const isPortrait = window.matchMedia('(orientation: portrait)').matches;
-      const isSmall = window.innerWidth < 768;
+      // < 1024 (lg) so tablets like iPad Air portrait are treated as mobile
+      // — hides the bottom tab bar on the build page (hamburger menu only).
+      const isSmall = window.innerWidth < 1024;
       setIsMobilePortrait(isPortrait && isSmall);
     };
 

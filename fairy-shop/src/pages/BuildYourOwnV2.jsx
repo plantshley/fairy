@@ -573,8 +573,9 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
           const dy = currentY - dragStartPos.current.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          // Only enable dragging if moved more than 15 pixels
-          if (distance > 15) {
+          // Only enable dragging if moved more than 3 pixels
+          // (low threshold so finger drags register reliably on mobile)
+          if (distance > 3) {
             isDragging.current = true;
           }
 
@@ -682,7 +683,14 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   const [freeDrawMode, setFreeDrawMode] = useState(false);
   const [eraserMode, setEraserMode] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
+  // lines: each entry has { points, color, size, eraser, groupId, zIndex }.
+  // groupId identifies a "drawing instance" — strokes made between enabling
+  // and disabling free-draw mode. Each group has its own zIndex so it can be
+  // layered independently of other drawings and objects.
   const [lines, setLines] = useState([]);
+  // Tracks the drawing group currently being built. Cleared when free-draw is
+  // disabled so the next session starts a fresh group.
+  const currentDrawGroupRef = useRef(null);
   const [brushSize, setBrushSize] = useState(5);
   const [tempSliderPos, setTempSliderPos] = useState(null);
   const [trashHovered, setTrashHovered] = useState(false);
@@ -777,7 +785,9 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   useEffect(() => {
     const checkMobile = () => {
       const isPortrait = window.matchMedia('(orientation: portrait)').matches;
-      const isSmall = window.innerWidth < 768;
+      // < 1024 (lg) so tablets like iPad Air (820w portrait) get the mobile
+      // bottom-sheet layout instead of the cramped desktop sidebar.
+      const isSmall = window.innerWidth < 1024;
       setIsMobileLayout(isPortrait && isSmall);
     };
 
@@ -790,6 +800,12 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
       window.removeEventListener('orientationchange', checkMobile);
     };
   }, []);
+
+  // Close out the active drawing instance whenever free-draw is turned off,
+  // so the next time it's enabled, a new layer is created.
+  useEffect(() => {
+    if (!freeDrawMode) currentDrawGroupRef.current = null;
+  }, [freeDrawMode]);
 
   // Save state to localStorage
   const handleSaveDesign = () => {
@@ -989,7 +1005,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
       flipped: false,
       color: currentColor,
       outlineColor: currentOutlineColor,
-      zIndex: 10, // Start at 10 = on top of everything (body, drawings, other objects)
+      zIndex: 1, // Start above body but BEHIND drawings; user can "Move to Front" (zIndex=10) to put it in front of drawings
     };
     setPlacedObjects(prev => [...prev, newObject]);
   };
@@ -1012,28 +1028,41 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
     const index = placedObjects.findIndex(obj => obj.id === selectedId);
     if (index === -1) return;
 
-    const newObjects = [...placedObjects];
+    const currentZ = placedObjects[index].zIndex || 0;
 
+    // Build a list of all stack items (other objects + drawing groups), so we
+    // can move past whichever item happens to be the next neighbor in zIndex
+    // order — including drawings.
+    const drawingGroupZs = new Map();
+    for (const line of lines) {
+      const z = line.zIndex !== undefined ? line.zIndex : 0;
+      const id = line.groupId || 'legacy';
+      if (!drawingGroupZs.has(id)) drawingGroupZs.set(id, z);
+    }
+    const otherZs = [
+      ...placedObjects
+        .filter(o => o.id !== selectedId)
+        .map(o => o.zIndex || 0),
+      ...drawingGroupZs.values(),
+    ];
+
+    let newZ = currentZ;
     if (direction === 'up') {
-      // Bring forward: increase zIndex by 1
-      const currentZ = newObjects[index].zIndex || 0;
-      newObjects[index] = { ...newObjects[index], zIndex: currentZ + 1 };
+      const above = otherZs.filter(z => z >= currentZ).sort((a, b) => a - b)[0];
+      newZ = above !== undefined ? above + 1 : currentZ + 1;
     } else if (direction === 'down') {
-      // Send backward: decrease zIndex by 1
-      const currentZ = newObjects[index].zIndex || 0;
-      newObjects[index] = { ...newObjects[index], zIndex: currentZ - 1 };
+      const below = otherZs.filter(z => z <= currentZ).sort((a, b) => b - a)[0];
+      newZ = below !== undefined ? below - 1 : currentZ - 1;
     } else if (direction === 'front') {
-      // Move to front: set zIndex to 10+ (in front of body AND drawings)
-      newObjects[index] = { ...newObjects[index], zIndex: 10 };
-      const obj = newObjects.splice(index, 1)[0];
-      newObjects.push(obj);
+      const max = otherZs.length ? Math.max(...otherZs) : 0;
+      newZ = max + 1;
     } else if (direction === 'back') {
-      // Move to back: set zIndex to negative (behind body AND drawings)
-      newObjects[index] = { ...newObjects[index], zIndex: -1 };
-      const obj = newObjects.splice(index, 1)[0];
-      newObjects.unshift(obj);
+      const min = otherZs.length ? Math.min(...otherZs) : 0;
+      newZ = min - 1;
     }
 
+    const newObjects = [...placedObjects];
+    newObjects[index] = { ...newObjects[index], zIndex: newZ };
     setPlacedObjects(newObjects);
   };
 
@@ -1449,7 +1478,31 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
       // Transform pointer position to account for zoom and pan
       const transformedX = (pos.x - stagePosition.x) / stageScale;
       const transformedY = (pos.y - stagePosition.y) / stageScale;
-      setLines([...lines, { points: [transformedX, transformedY], color: currentColor, size: brushSize, eraser: eraserMode }]);
+
+      // Start a new drawing instance (group) on the first stroke after
+      // entering free-draw mode. Its zIndex sits above everything currently
+      // on the canvas so the new drawing renders on top.
+      if (!currentDrawGroupRef.current) {
+        const allZ = [
+          ...placedObjects.map(o => o.zIndex || 0),
+          ...lines.map(l => (l.zIndex !== undefined ? l.zIndex : 0)),
+        ];
+        const maxZ = allZ.length ? Math.max(...allZ) : 0;
+        currentDrawGroupRef.current = {
+          id: `draw-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          zIndex: maxZ + 1,
+        };
+      }
+      const { id: groupId, zIndex } = currentDrawGroupRef.current;
+
+      setLines([...lines, {
+        points: [transformedX, transformedY],
+        color: currentColor,
+        size: brushSize,
+        eraser: eraserMode,
+        groupId,
+        zIndex,
+      }]);
     }, 50); // 50ms delay to detect multi-touch
 
     // Store timeout so we can cancel it if needed
@@ -1884,7 +1937,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     }}
                     onClick={() => handleMoveLayer('up')}
                   >
-                    ⬆ Bring Forward
+                     ⬆ Send Forward
                   </button>
                   <button
                     className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
@@ -1894,7 +1947,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     }}
                     onClick={() => handleMoveLayer('down')}
                   >
-                    ⬇ Send Backward
+                     ⬇ Send Backward
                   </button>
                   <button
                     className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
@@ -2149,28 +2202,31 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                 touchAction: 'none', // Prevent touch scrolling on canvas
               }}
             >
-              {/* Layer 1: Objects behind body and drawings (zIndex < 0) */}
+              {/* Bottom: objects with zIndex < 0 render behind the body */}
               <Layer>
-                {/* Objects behind body (negative zIndex) */}
-                {placedObjects.filter(obj => (obj.zIndex || 0) < 0).map((obj) => (
-                  <DraggableImage
-                    key={obj.id}
-                    object={obj}
-                    isSelected={obj.id === selectedId}
-                    onSelect={() => setSelectedId(obj.id)}
-                    onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
-                    onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
-                    onTransformStart={handleTransformStart}
-                    onDragStart={handleDragStart}
-                    freeDrawMode={freeDrawMode}
-                    stageSize={stageSize}
-                    stageScale={stageScale}
-                    stagePosition={stagePosition}
-                    currentTheme={currentTheme}
-                  />
-                ))}
+                {placedObjects
+                  .filter(obj => (obj.zIndex || 0) < 0)
+                  .slice()
+                  .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
+                  .map((obj) => (
+                    <DraggableImage
+                      key={obj.id}
+                      object={obj}
+                      isSelected={obj.id === selectedId}
+                      onSelect={() => setSelectedId(obj.id)}
+                      onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
+                      onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
+                      onTransformStart={handleTransformStart}
+                      onDragStart={handleDragStart}
+                      freeDrawMode={freeDrawMode}
+                      stageSize={stageSize}
+                      stageScale={stageScale}
+                      stagePosition={stagePosition}
+                      currentTheme={currentTheme}
+                    />
+                  ))}
 
-                {/* Body SVG */}
+                {/* Body */}
                 {selectedBody && (
                   <BodyImage
                     body={selectedBody}
@@ -2181,66 +2237,99 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     bodySizeMultiplier={bodySizeMultiplier}
                   />
                 )}
-
-                {/* Objects in front of body but behind drawings (0 <= zIndex < 10) */}
-                {placedObjects.filter(obj => {
-                  const z = obj.zIndex || 0;
-                  return z >= 0 && z < 10;
-                }).map((obj) => (
-                  <DraggableImage
-                    key={obj.id}
-                    object={obj}
-                    isSelected={obj.id === selectedId}
-                    onSelect={() => setSelectedId(obj.id)}
-                    onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
-                    onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
-                    onTransformStart={handleTransformStart}
-                    onDragStart={handleDragStart}
-                    freeDrawMode={freeDrawMode}
-                    stageSize={stageSize}
-                    stageScale={stageScale}
-                    stagePosition={stagePosition}
-                    currentTheme={currentTheme}
-                  />
-                ))}
               </Layer>
 
-              {/* Layer 2: Free Draw Lines (eraser only affects this layer) */}
-              <Layer>
-                {lines.map((line, i) => (
-                  <Line
-                    key={i}
-                    points={line.points}
-                    stroke={line.color}
-                    strokeWidth={line.size}
-                    tension={0.5}
-                    lineCap="round"
-                    lineJoin="round"
-                    globalCompositeOperation={line.eraser ? "destination-out" : "source-over"}
-                  />
-                ))}
-              </Layer>
+              {/* Above the body: objects (zIndex >= 0) and drawing groups
+                  interleaved by zIndex. Each drawing group renders in its own
+                  Konva Layer (so the eraser scoping via destination-out only
+                  affects strokes within that group), with listening={false}
+                  so taps pass through to objects underneath. Consecutive
+                  objects share a single layer for performance. */}
+              {(() => {
+                // Collect drawing groups from the lines array.
+                const groupMap = new Map();
+                for (const line of lines) {
+                  const id = line.groupId || 'legacy';
+                  if (!groupMap.has(id)) {
+                    groupMap.set(id, {
+                      groupId: id,
+                      zIndex: line.zIndex !== undefined ? line.zIndex : 0,
+                      lines: [],
+                    });
+                  }
+                  groupMap.get(id).lines.push(line);
+                }
 
-              {/* Layer 3: Objects in front of drawings (zIndex >= 10) */}
-              <Layer>
-                {placedObjects.filter(obj => (obj.zIndex || 0) >= 10).map((obj) => (
-                  <DraggableImage
-                    key={obj.id}
-                    object={obj}
-                    isSelected={obj.id === selectedId}
-                    onSelect={() => setSelectedId(obj.id)}
-                    onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
-                    onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
-                    onTransformStart={handleTransformStart}
-                    onDragStart={handleDragStart}
-                    freeDrawMode={freeDrawMode}
-                    stageSize={stageSize}
-                    stageScale={stageScale}
-                    stagePosition={stagePosition}
-                    currentTheme={currentTheme}
-                  />
-                ))}
-              </Layer>
+                const items = [
+                  ...placedObjects
+                    .filter(obj => (obj.zIndex || 0) >= 0)
+                    .map(obj => ({ kind: 'object', z: obj.zIndex || 0, data: obj })),
+                  ...Array.from(groupMap.values())
+                    .map(g => ({ kind: 'drawing', z: g.zIndex, data: g })),
+                ].sort((a, b) => a.z - b.z);
+
+                // Group consecutive objects so they share a layer.
+                const layers = [];
+                let pendingObjects = null;
+                const flush = () => {
+                  if (pendingObjects && pendingObjects.length) {
+                    layers.push({ kind: 'objects', items: pendingObjects });
+                  }
+                  pendingObjects = null;
+                };
+                for (const item of items) {
+                  if (item.kind === 'object') {
+                    if (!pendingObjects) pendingObjects = [];
+                    pendingObjects.push(item.data);
+                  } else {
+                    flush();
+                    layers.push({ kind: 'drawing', group: item.data });
+                  }
+                }
+                flush();
+
+                return layers.map((layer, i) => {
+                  if (layer.kind === 'drawing') {
+                    return (
+                      <Layer key={`draw-${layer.group.groupId}`} listening={false}>
+                        {layer.group.lines.map((line, j) => (
+                          <Line
+                            key={j}
+                            points={line.points}
+                            stroke={line.color}
+                            strokeWidth={line.size}
+                            tension={0.5}
+                            lineCap="round"
+                            lineJoin="round"
+                            globalCompositeOperation={line.eraser ? 'destination-out' : 'source-over'}
+                          />
+                        ))}
+                      </Layer>
+                    );
+                  }
+                  return (
+                    <Layer key={`obj-${i}`}>
+                      {layer.items.map((obj) => (
+                        <DraggableImage
+                          key={obj.id}
+                          object={obj}
+                          isSelected={obj.id === selectedId}
+                          onSelect={() => setSelectedId(obj.id)}
+                          onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
+                          onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
+                          onTransformStart={handleTransformStart}
+                          onDragStart={handleDragStart}
+                          freeDrawMode={freeDrawMode}
+                          stageSize={stageSize}
+                          stageScale={stageScale}
+                          stagePosition={stagePosition}
+                          currentTheme={currentTheme}
+                        />
+                      ))}
+                    </Layer>
+                  );
+                });
+              })()}
 
               {/* Layer 4: UI Controls (NOT exported) */}
               <Layer

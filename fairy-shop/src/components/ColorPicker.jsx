@@ -31,6 +31,9 @@ export const ColorPicker = ({ color, onChange, onActivate, label }) => {
           el: buttonRef.current,
           theme: 'nano',
           default: color || '#ff69b4',
+          // Open to the right of the swatch so the popup doesn't cover the
+          // Recent Colors row above the pickers.
+          position: 'right-middle',
           swatches: [
             '#ff69b4', '#c5a3ff', '#89cff0', '#98fb98',
             '#ffb347', '#ff6b9d', '#ffffff', '#000000',

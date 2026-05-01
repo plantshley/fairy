@@ -35,11 +35,12 @@ export const AccessibilityToggle = ({ accessibleFonts, onToggle, activeTab }) =>
         </span>
       </motion.button>
 
-      {/* Mobile & Landscape - next to theme selector on build in portrait, otherwise above nav */}
+      {/* Mobile & Landscape - on build, the toggle lives inside the hamburger
+          menu instead, so hide this floating one. Otherwise show above nav. */}
       <motion.button
         className={`fixed z-50 px-2.5 py-1.5 text-[10px] rounded-full backdrop-blur-sm lg:hidden ${
           isBuild
-            ? 'portrait:top-2 portrait:left-20 landscape:left-3 landscape:bottom-auto landscape:top-2 landscape:px-1.5 landscape:py-0.5 landscape:text-[8px]'
+            ? 'hidden'
             : 'bottom-20 left-2 landscape:left-3 landscape:bottom-auto landscape:top-2 landscape:px-1.5 landscape:py-0.5 landscape:text-[8px] sm:px-3 sm:text-xs'
         }`}
         style={{

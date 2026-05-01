@@ -54,7 +54,7 @@ export const EditTabContent = ({
   return (
     <div className="pb-4">
       <h3
-        className="font-mono tracking-wider text-lg font-bold text-center mb-3"
+        className="font-bonbon tracking-wider text-lg sm:text-xl md:text-2xl font-bold text-center mb-3"
         style={{ color: 'var(--text-primary)' }}
       >
         Edit Object
@@ -65,13 +65,13 @@ export const EditTabContent = ({
         {actions.map((action) => (
           <motion.button
             key={action.id}
-            className="py-1.5 px-2 rounded-xl font-mono text-xs flex items-center gap-1.5 transition-colors justify-center"
+            className="py-1.5 px-2 rounded-xl text-xs sm:text-sm md:text-base flex items-center gap-1.5 transition-colors justify-center"
             style={buttonStyle}
             onClick={action.onClick}
             whileTap={{ scale: 0.98 }}
             whileHover={{ scale: 1.01 }}
           >
-            <span className="text-sm">{action.icon}</span>
+            <span className="text-sm sm:text-base md:text-lg">{action.icon}</span>
             <span>{action.label}</span>
           </motion.button>
         ))}
@@ -79,13 +79,13 @@ export const EditTabContent = ({
 
       {/* Delete button - full width below */}
       <motion.button
-        className="w-full py-1.5 px-2 rounded-xl font-mono text-xs flex items-center gap-1.5 transition-colors justify-center"
+        className="w-full py-1.5 px-2 rounded-xl text-xs sm:text-sm md:text-base flex items-center gap-1.5 transition-colors justify-center"
         style={deleteButtonStyle}
         onClick={onDelete}
         whileTap={{ scale: 0.98 }}
         whileHover={{ scale: 1.01 }}
       >
-        <span className="text-sm">🗑️</span>
+        <span className="text-sm sm:text-base md:text-lg">🗑️</span>
         <span>Delete Object</span>
       </motion.button>
     </div>

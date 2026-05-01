@@ -32,7 +32,7 @@ export const MobileTabNavigation = ({
           return (
             <button
               key={tab.id}
-              className="flex-1 flex items-center justify-center py-2 px-1 rounded-xl font-bonbon text-sm transition-colors"
+              className="flex-1 flex items-center justify-center py-2 px-1 rounded-xl font-bonbon text-sm sm:text-base md:text-lg transition-colors"
               style={{
                 background: isActive
                   ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'

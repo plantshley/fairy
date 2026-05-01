@@ -12,7 +12,7 @@ const CollapsibleSection = ({ title, parts, isCollapsed, onToggle, onAddObject, 
         onClick={onToggle}
       >
         <span
-          className="font-bonbon tracking-wider text-base font-bold"
+          className="font-bonbon tracking-wider text-base sm:text-lg md:text-xl font-bold"
           style={{ color: 'var(--text-primary)' }}
         >
           {title}
@@ -37,7 +37,7 @@ const CollapsibleSection = ({ title, parts, isCollapsed, onToggle, onAddObject, 
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="grid grid-cols-5 gap-1.5 pb-2">
+            <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 gap-1.5 pb-2">
               {parts.map((part) => (
                 <motion.button
                   key={part.id}
@@ -90,7 +90,7 @@ export const BodyPartsTabContent = ({ parts, onAddObject, theme }) => {
   return (
     <div className="pb-4">
       <h3
-        className="font-bonbon tracking-wider text-lg font-bold text-center mb-3"
+        className="font-bonbon tracking-wider text-lg sm:text-xl md:text-2xl font-bold text-center mb-3"
         style={{ color: 'var(--text-primary)' }}
       >
         Body Parts

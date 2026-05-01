@@ -10,7 +10,7 @@ const tabs = [
   { id: 'build', label: 'build', icon: getAssetPath('/visualis.png') },
 ];
 
-export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme }) => {
+export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, accessibleFonts, onToggleAccessibleFonts }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isDarkTheme = currentTheme?.id === 'midnightVelvetMeadow';
 
@@ -74,6 +74,37 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme }) =
                     <span className="whitespace-nowrap">{tab.label}</span>
                   </motion.button>
                 ))}
+
+                {onToggleAccessibleFonts && (
+                  <>
+                    <div
+                      className="my-1 h-px"
+                      style={{ backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
+                    />
+                    <motion.button
+                      className="w-full px-3 py-2 rounded-xl font-bonbon text-sm transition-all text-left flex items-center gap-2"
+                      style={{
+                        background: accessibleFonts
+                          ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
+                          : 'transparent',
+                        color: accessibleFonts ? 'white' : 'var(--text-primary)',
+                      }}
+                      onClick={() => {
+                        onToggleAccessibleFonts();
+                        setIsOpen(false);
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <span
+                        className="w-5 h-5 flex items-center justify-center text-sm font-bold leading-none"
+                        style={{ fontFamily: 'serif' }}
+                      >
+                        {accessibleFonts ? '✓' : 'Aa'}
+                      </span>
+                      <span className="whitespace-nowrap">accessible fonts</span>
+                    </motion.button>
+                  </>
+                )}
               </div>
             </motion.div>
           </>

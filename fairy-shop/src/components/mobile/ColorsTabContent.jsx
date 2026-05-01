@@ -34,7 +34,7 @@ export const ColorsTabContent = ({
   return (
     <div className="pb-4">
       <h3
-        className="font-bonbon tracking-wider text-lg font-bold text-center mb-3"
+        className="font-bonbon tracking-wider text-lg sm:text-xl md:text-2xl font-bold text-center mb-3"
         style={{ color: 'var(--text-primary)' }}
       >
         Colors
@@ -50,7 +50,7 @@ export const ColorsTabContent = ({
           }}
         >
           <div className="flex flex-col items-center space-y-1">
-            <span className="text-xs font-medium text-center" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-xs sm:text-sm md:text-base font-medium text-center" style={{ color: 'var(--text-secondary)' }}>
               Body Color
             </span>
             <ColorPicker
@@ -75,7 +75,7 @@ export const ColorsTabContent = ({
           }}
         >
           <div className="flex flex-col items-center space-y-1">
-            <span className="text-xs font-medium text-center" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-xs sm:text-sm md:text-base font-medium text-center" style={{ color: 'var(--text-secondary)' }}>
               Body Outline
             </span>
             <ColorPicker
@@ -94,7 +94,7 @@ export const ColorsTabContent = ({
         {/* Object & Drawing Color - Combined */}
         <div className="p-2 rounded-xl" style={colorRowStyle}>
           <div className="flex flex-col items-center space-y-1">
-            <span className="text-xs font-medium text-center" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-xs sm:text-sm md:text-base font-medium text-center" style={{ color: 'var(--text-secondary)' }}>
               Object & Drawing
             </span>
             <ColorPicker
@@ -120,7 +120,7 @@ export const ColorsTabContent = ({
           }}
         >
           <div className="flex flex-col items-center space-y-1">
-            <span className="text-xs font-medium text-center" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-xs sm:text-sm md:text-base font-medium text-center" style={{ color: 'var(--text-secondary)' }}>
               Object Outline
             </span>
             <ColorPicker
@@ -138,7 +138,7 @@ export const ColorsTabContent = ({
       {/* Recent Colors */}
       {recentColors.length > 0 && (
         <div className="mt-3 p-2 rounded-xl" style={colorRowStyle}>
-          <span className="text-xs font-medium block text-center mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+          <span className="text-s font-medium block text-center mb-1.5" style={{ color: 'var(--text-secondary)' }}>
             Recent Colors
           </span>
           <div className="grid grid-cols-5 gap-1.5 justify-items-center max-w-[12rem] mx-auto">
