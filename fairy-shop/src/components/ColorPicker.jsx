@@ -27,13 +27,20 @@ export const ColorPicker = ({ color, onChange, onActivate, label }) => {
       if (!buttonRef.current || pickrInstance) return;
 
       try {
+        // Position the popup so it never overlaps the Recent Colors row:
+        //   - Desktop / landscape → open BELOW the swatch
+        //   - Mobile / tablet portrait → open ABOVE the swatch
+        const isPortraitSmall =
+          typeof window !== 'undefined' &&
+          window.matchMedia('(orientation: portrait)').matches &&
+          window.innerWidth < 1024;
+        const pickrPosition = isPortraitSmall ? 'top-middle' : 'bottom-middle';
+
         const pickr = Pickr.create({
           el: buttonRef.current,
           theme: 'nano',
           default: color || '#ff69b4',
-          // Open to the right of the swatch so the popup doesn't cover the
-          // Recent Colors row above the pickers.
-          position: 'right-middle',
+          position: pickrPosition,
           swatches: [
             '#ff69b4', '#c5a3ff', '#89cff0', '#98fb98',
             '#ffb347', '#ff6b9d', '#ffffff', '#000000',
