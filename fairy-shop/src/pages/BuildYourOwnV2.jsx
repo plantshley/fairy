@@ -540,8 +540,8 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
     const trashY = stageSize.height - 30;  // y + height/2
 
     const distance = Math.sqrt(Math.pow(screenX - trashX, 2) + Math.pow(screenY - trashY, 2));
-    // Smaller detection radius to prevent accidental deletions
-    const detectionRadius = Math.min(25 + (Math.max(scale - 1, 0) * 30), 60);
+    // Generous detection radius so finger drags reliably register a delete.
+    const detectionRadius = Math.min(70 + (Math.max(scale - 1, 0) * 40), 130);
     return distance < detectionRadius;
   };
 
@@ -1908,7 +1908,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1918,7 +1918,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     ↔️ Flip
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1930,27 +1930,27 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
                     }}
                     onClick={() => handleMoveLayer('up')}
                   >
-                     ⬆ Send Forward
+                     ⬆  Forward
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
                     }}
                     onClick={() => handleMoveLayer('down')}
                   >
-                     ⬇ Send Backward
+                     ⬇  Backward
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1960,7 +1960,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     ⏫ To Front
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-left"
+                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1970,6 +1970,22 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     ⏬ To Back
                   </button>
                 </div>
+                <button
+                  className="w-full py-1.5 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 flex items-center justify-center gap-1.5"
+                  style={{
+                    background: currentTheme?.id === 'midnightVelvetMeadow'
+                      ? 'rgba(255, 100, 100, 0.3)'
+                      : 'rgba(255, 100, 100, 0.2)',
+                    color: currentTheme?.id === 'midnightVelvetMeadow' ? '#ff9999' : '#cc0000',
+                  }}
+                  onClick={() => {
+                    saveToHistory();
+                    setPlacedObjects(prev => prev.filter(o => o.id !== selectedId));
+                    setSelectedId(null);
+                  }}
+                >
+                  🗑️ Delete Object
+                </button>
               </div>
             </div>
           )}
