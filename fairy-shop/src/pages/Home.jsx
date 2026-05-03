@@ -16,7 +16,7 @@ export const Home = ({ currentTheme }) => {
       case 'midnightVelvetMeadow':
         return ['🔮', '🥀', '🌙'];
       default:
-        return ['🪻', '🦋', '🌷'];
+        return ['🍒', '🍰', '🌹'];
     }
   };
 
@@ -39,8 +39,8 @@ export const Home = ({ currentTheme }) => {
         {/* Animated image header */}
         <div className="flex justify-center gap-4 sm:gap-6 md:gap-8 items-center">
           <motion.img
-            src={getAssetPath('/vday-birb-png1.png')}
-            alt="Valentine's bird"
+            src={getAssetPath('/cutie-wizard-star1.png')}
+            alt="Cutie Wizard Star"
             className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 object-contain"
             style={{ willChange: 'transform' }}
             animate={{
@@ -68,8 +68,8 @@ export const Home = ({ currentTheme }) => {
             }}
           />
           <motion.img
-            src={getAssetPath('/butterflies.png')}
-            alt="Butterflies"
+            src={getAssetPath('/sparkle-bun1.png')}
+            alt="Sparkle bunny"
             className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain"
             style={{ willChange: 'transform' }}
             animate={{
@@ -104,7 +104,7 @@ export const Home = ({ currentTheme }) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6, ease: 'easeOut' }}
         >
-          ˚ ༘♡ welcome to fairy's magical realm of visual art & creaturely crochet ⋆˚✿˖°
+          ˚꒰ა ♡ welcome to fairy's magical realm of visual art & creaturely crochet ⋆˚✿˖°
         </motion.p>
 
         {/* Description */}
@@ -185,8 +185,8 @@ export const Home = ({ currentTheme }) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.6, ease: 'easeOut' }}
         >
-          <span className="hidden lg:inline">˗ˏˋ ★ Use the navigation on the left to explore and click the friend to the right to customize the theme ★ ˎˊ˗</span>
-          <span className="lg:hidden">˗ˏˋ ★ Use the navigation below to explore and tap the friend to customize the theme ★ ˎˊ˗</span>
+          <span className="hidden lg:inline">˚₊‧꒰ა  Use the navigation on the left to explore and click the friend to the right to customize the theme ໒꒱ ‧₊˚</span>
+          <span className="lg:hidden">˚₊‧꒰ა  Use the navigation below to explore and tap the friend to customize the theme ໒꒱ ‧₊˚</span>
         </motion.p>
       </motion.div>
     </motion.div>

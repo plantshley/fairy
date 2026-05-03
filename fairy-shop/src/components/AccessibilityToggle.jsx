@@ -19,10 +19,10 @@ export const AccessibilityToggle = ({ accessibleFonts, onToggle, activeTab }) =>
         className="fixed bottom-6 left-2 z-50 px-3 py-1.5 sm:px-4 sm:py-2 lg:px-3 lg:py-1.5 rounded-full backdrop-blur-sm hidden lg:block"
         style={{
           background: accessibleFonts
-            ? 'rgba(0, 0, 0, 0.3)'
+            ? 'var(--accent-secondary)'
             : 'rgba(255, 255, 255, 0.3)',
           color: accessibleFonts
-            ? 'white'
+            ? 'var(--text-primary)'
             : 'var(--text-primary)',
         }}
         onClick={handleToggle}
@@ -35,20 +35,19 @@ export const AccessibilityToggle = ({ accessibleFonts, onToggle, activeTab }) =>
         </span>
       </motion.button>
 
-      {/* Mobile & Landscape - on build, the toggle lives inside the hamburger
-          menu instead, so hide this floating one. Otherwise show above nav. */}
+      {/* Mobile & Landscape - next to theme selector on build in portrait, otherwise above nav */}
       <motion.button
         className={`fixed z-50 px-2.5 py-1.5 text-[10px] rounded-full backdrop-blur-sm lg:hidden ${
           isBuild
-            ? 'hidden'
+            ? 'portrait:top-2 portrait:left-20 landscape:left-3 landscape:bottom-auto landscape:top-2 landscape:px-1.5 landscape:py-0.5 landscape:text-[8px]'
             : 'bottom-20 left-2 landscape:left-3 landscape:bottom-auto landscape:top-2 landscape:px-1.5 landscape:py-0.5 landscape:text-[8px] sm:px-3 sm:text-xs'
         }`}
         style={{
           background: accessibleFonts
-            ? 'rgba(0, 0, 0, 0.3)'
+            ? 'var(--accent-secondary)'
             : 'rgba(255, 255, 255, 0.3)',
           color: accessibleFonts
-            ? 'white'
+            ? 'var(--text-primary)'
             : 'var(--text-primary)',
         }}
         onClick={handleToggle}

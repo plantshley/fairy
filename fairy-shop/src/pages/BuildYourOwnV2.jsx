@@ -1708,7 +1708,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <Sparkle count={15} />
-        ˗ˏˋ★ kirametki designer ★ˎˊ˗
+        ˚₊‧꒰ა ★ kirametki designer ★ ໒꒱ ‧₊˚
       </motion.h1>
 
       <p className="text-center mb-2 sm:mb-4 text-sm sm:text-base md:text-lg lg:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
@@ -1908,7 +1908,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1918,7 +1918,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     ↔️ Flip
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1930,7 +1930,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1940,7 +1940,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                      ⬆  Forward
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1950,7 +1950,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                      ⬇  Backward
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1960,7 +1960,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     ⏫ To Front
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1971,7 +1971,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                   </button>
                 </div>
                 <button
-                  className="w-full py-1.5 px-2 rounded-xl text-xs font-medium transition-all hover:scale-105 flex items-center justify-center gap-1.5"
+                  className="w-full py-1.5 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 flex items-center justify-center gap-1.5"
                   style={{
                     background: currentTheme?.id === 'midnightVelvetMeadow'
                       ? 'rgba(255, 100, 100, 0.3)'

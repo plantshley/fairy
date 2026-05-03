@@ -139,7 +139,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
                 </h2>
 
                 <p className="text-center text-xs sm:text-sm mb-4 sm:mb-6" style={{ color: 'var(--text-secondary)' }}>
-                  ˚ ༘♡ Select a theme ♡⋆˚
+                  ⋆˚₊‧꒰ა ♡ Select a theme ♡ ໒꒱ ‧₊˚⋆
                 </p>
 
                 <div className="space-y-4">
