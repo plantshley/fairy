@@ -1,7 +1,17 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 import { Sparkle } from '../components/Sparkle';
+import { LinkCard } from '../components/LinkCard';
 import { trackPageView, trackTiming } from '../utils/analytics';
+
+const shopLink = {
+  url: 'https://ko-fi.com/kirametki/shop',
+  label: '˚₊‧ ꒰ა ♡ ko-fi shop ♡ ໒꒱ ‧₊˚',
+  emoji: '🌺',
+  color: '#ff6fdd',
+  subtitle: '⋆˚࿔ personal product grid in progress ࿔˚⋆',
+  trackEvent: 'shop_link_clicked',
+};
 
 export const Shop = ({ currentTheme }) => {
   const entryTimeRef = useRef(null);
@@ -22,12 +32,13 @@ export const Shop = ({ currentTheme }) => {
 
   return (
     <motion.div
-      className="w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
+      className="w-full min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
     >
+      {/* Title + subtitle pinned to the top */}
       <motion.h1
         className="font-kalnia text-2xl sm:text-3xl md:text-4xl mb-4 gradient-text text-center relative z-10"
         style={{ overflow: 'visible' }}
@@ -39,35 +50,25 @@ export const Shop = ({ currentTheme }) => {
         ✧･ﾟ: *✧･ﾟ:* shop *:･ﾟ✧*:･ﾟ✧
       </motion.h1>
 
-      <p className="text-center mb-8 text-sm sm:text-base md:text-lg lg:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
+      <p className="text-center text-sm sm:text-base md:text-lg lg:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
         ･ﾟ✧ browse my crochet creatures ✧ﾟ･
       </p>
 
-      {/* Ko-fi Shop Embed */}
-      <motion.div
-        className="w-full max-w-5xl backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden mx-2 sm:mx-4"
-        style={{
-          height: '75vh',
-          minHeight: '500px',
-          backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-        }}
-        initial={{ scale: 0.98, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
-      >
-        <iframe
-          id="kofiframe"
-          src="https://ko-fi.com/kirametki/shop"
-          style={{
-            border: 'none',
-            width: '100%',
-            height: '100%',
-          }}
-          title="Ko-fi Shop"
+      {/* Ko-fi shop link, centered in the remaining space.
+          Ko-fi blocks iframe embedding, so we link out instead.
+          A custom product grid that links to each item is planned. */}
+      <div className="flex-1 flex items-center justify-center w-full">
+        <LinkCard
+          link={shopLink}
+          index={0}
+          currentTheme={currentTheme}
+          className="block w-full max-w-md"
+          allowSubtitleWrap
         />
-      </motion.div>
+      </div>
 
-      <p className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+      {/* Pinned to the bottom */}
+      <p className="text-sm text-center" style={{ color: 'var(--text-secondary)' }}>
         ⋆⁺₊⋆ handmade with love & care ⋆⁺₊⋆
       </p>
     </motion.div>

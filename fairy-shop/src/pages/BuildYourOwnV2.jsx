@@ -1719,7 +1719,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
         {/* Left Control Panel - hidden on mobile when using bottom sheet */}
         {!isMobileLayout && (
         <motion.div
-          className="backdrop-blur-md rounded-3xl p-4 shadow-xl landscape:w-64 lg:w-64 flex-shrink-0 overflow-y-auto"
+          className="backdrop-blur-md rounded-3xl p-4 shadow-xl landscape:w-80 lg:w-96 flex-shrink-0 overflow-y-auto"
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
@@ -1755,8 +1755,8 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                       }}
                       onClick={() => handleBodySelect(body)}
                     >
-                      <div className="text-2xl mb-0.5">{body.emoji}</div>
-                      <div className="text-[10px] font-semibold leading-tight" style={{ color: 'var(--text-primary)' }}>
+                      <div className="text-3xl mb-1">{body.emoji}</div>
+                      <div className="text-xs font-semibold leading-tight" style={{ color: 'var(--text-primary)' }}>
                         {body.name}
                       </div>
                     </button>
@@ -1908,7 +1908,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[13px] font-medium transition-all hover:scale-105 text-center"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1918,7 +1918,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     ↔️ Flip
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[13px] font-medium transition-all hover:scale-105 text-center"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1930,7 +1930,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[13px] font-medium transition-all hover:scale-105 text-center"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1940,7 +1940,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                      ⬆  Forward
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[13px] font-medium transition-all hover:scale-105 text-center"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1950,7 +1950,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                      ⬇  Backward
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[13px] font-medium transition-all hover:scale-105 text-center"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1960,7 +1960,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                     ⏫ To Front
                   </button>
                   <button
-                    className="py-1 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 text-right"
+                    className="py-1 px-2 rounded-xl text-[13px] font-medium transition-all hover:scale-105 text-center"
                     style={{
                       background: 'var(--bg-gradient-start)',
                       color: 'var(--text-primary)',
@@ -1971,7 +1971,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                   </button>
                 </div>
                 <button
-                  className="w-full py-1.5 px-2 rounded-xl text-[11px] font-medium transition-all hover:scale-105 flex items-center justify-center gap-1.5"
+                  className="w-full py-1.5 px-2 rounded-xl text-[13px] font-medium transition-all hover:scale-105 flex items-center justify-center gap-1.5"
                   style={{
                     background: currentTheme?.id === 'midnightVelvetMeadow'
                       ? 'rgba(255, 100, 100, 0.3)'

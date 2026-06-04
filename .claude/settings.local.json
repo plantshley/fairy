@@ -6,7 +6,8 @@
       "Bash(grep -r \"bgGradientMid2\\\\|gradientPrimary\\\\|gradientSecondary\" /c/Users/ashle/Documents/GitHub/fairy/fairy-shop/src --include=*.jsx --include=*.js --include=*.css)",
       "WebFetch(domain:www.npmjs.com)",
       "Bash(npm view:*)",
-      "Bash(claude mcp:*)"
+      "Bash(claude mcp:*)",
+      "Bash(git stash *)"
     ]
   }
 }

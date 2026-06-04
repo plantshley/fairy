@@ -57,7 +57,7 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, acc
                 {tabs.map((tab) => (
                   <motion.button
                     key={tab.id}
-                    className="w-full px-3 py-2 rounded-xl font-bonbon text-sm transition-all text-left flex items-center gap-2"
+                    className="w-full px-3 py-2 rounded-xl font-bonbon text-sm lg:text-lg transition-all text-left flex items-center gap-2"
                     style={{
                       background: activeTab === tab.id
                         ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
@@ -70,13 +70,13 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, acc
                     }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <img src={tab.icon} alt={tab.label} className="w-5 h-5 object-contain" />
+                    <img src={tab.icon} alt={tab.label} className="w-5 h-5 lg:w-7 lg:h-7 object-contain" />
                     <span className="whitespace-nowrap">{tab.label}</span>
                   </motion.button>
                 ))}
 
                 {onToggleAccessibleFonts && (
-                  <>
+                  <div className="lg:hidden">
                     <div
                       className="my-1 h-px"
                       style={{ backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
@@ -103,7 +103,7 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, acc
                       </span>
                       <span className="whitespace-nowrap">accessible fonts</span>
                     </motion.button>
-                  </>
+                  </div>
                 )}
               </div>
             </motion.div>

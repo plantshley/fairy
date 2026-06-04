@@ -111,7 +111,7 @@ function App() {
 
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} currentTheme={currentTheme} />
 
-      <main className="lg:ml-20 min-h-screen flex items-center justify-center">
+      <main className={`${activeTab === 'build' ? '' : 'lg:ml-20'} min-h-screen flex items-center justify-center`}>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Home currentTheme={currentTheme} />} />

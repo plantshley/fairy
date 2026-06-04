@@ -16,7 +16,7 @@ export const AccessibilityToggle = ({ accessibleFonts, onToggle, activeTab }) =>
     <>
       {/* Desktop - aligns with left navigation */}
       <motion.button
-        className="fixed bottom-6 left-2 z-50 px-3 py-1.5 sm:px-4 sm:py-2 lg:px-3 lg:py-1.5 rounded-full backdrop-blur-sm hidden lg:block"
+        className="fixed bottom-6 left-2 z-50 px-3 py-1 sm:px-4 sm:py-2 lg:px-3 lg:py-1.5 rounded-full backdrop-blur-sm hidden lg:block"
         style={{
           background: accessibleFonts
             ? 'var(--accent-secondary)'

@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
 import { getAssetPath } from '../utils/assetPath';
 
 const tabs = [
@@ -11,30 +10,8 @@ const tabs = [
 ];
 
 export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
-  // Mobile layout detection
-  const [isMobilePortrait, setIsMobilePortrait] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      const isPortrait = window.matchMedia('(orientation: portrait)').matches;
-      // < 1024 (lg) so tablets like iPad Air portrait are treated as mobile
-      // — hides the bottom tab bar on the build page (hamburger menu only).
-      const isSmall = window.innerWidth < 1024;
-      setIsMobilePortrait(isPortrait && isSmall);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    window.addEventListener('orientationchange', checkMobile);
-
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-      window.removeEventListener('orientationchange', checkMobile);
-    };
-  }, []);
-
-  // Hide navigation on mobile build page
-  if (isMobilePortrait && activeTab === 'build') {
+  // Hide navigation entirely on the build page — hamburger menu is the only nav there.
+  if (activeTab === 'build') {
     return null;
   }
 

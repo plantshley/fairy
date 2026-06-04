@@ -114,8 +114,8 @@ export const themes = {
     id: 'sweetCherryLove',
     name: '甘い♡Cherry Love',
     colors: {
-      bgGradientStart: '#ff718e',
-      bgGradientMid: '#ffafbe',
+      bgGradientStart: '#ffafbe',
+      bgGradientMid: '#ff718e',
       bgGradientEnd: '#ff95ca',
       accentPrimary: '#e63956',
       accentSecondary: '#ff82ba',
