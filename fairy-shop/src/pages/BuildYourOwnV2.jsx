@@ -671,6 +671,9 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
   );
 };
 
+// Default recent-color swatches; restored only when the user hits "Clear All".
+const DEFAULT_RECENT_COLORS = ['#ffffff', '#000000', '#ff69b4', '#c5a3ff', '#89cff0'];
+
 export const BuildYourOwnV2 = ({ currentTheme }) => {
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
   const [selectedBody, setSelectedBody] = useState(null);
@@ -678,10 +681,14 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   const [selectedId, setSelectedId] = useState(null);
   const [currentColor, setCurrentColor] = useState('#ffffff');
   const [currentOutlineColor, setCurrentOutlineColor] = useState('#000000');
-  const [recentColors, setRecentColors] = useState(['#ffffff', '#000000', '#ff69b4', '#c5a3ff', '#89cff0']);
+  const [recentColors, setRecentColors] = useState(DEFAULT_RECENT_COLORS);
   const [activeColorTarget, setActiveColorTarget] = useState('drawing'); // 'bodyColor' | 'bodyOutline' | 'objectColor' | 'objectOutline' | 'drawing'
   const [freeDrawMode, setFreeDrawMode] = useState(false);
   const [eraserMode, setEraserMode] = useState(false);
+  // Fill tool: when active, clicking a drawn stroke recolors every stroke of
+  // that same color within the same drawing instance. Mutually exclusive with
+  // the pen and eraser.
+  const [fillMode, setFillMode] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
   // lines: each entry has { points, color, size, eraser, groupId, zIndex }.
   // groupId identifies a "drawing instance" — strokes made between enabling
@@ -773,6 +780,14 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
         if (state.bodySizeMultiplier) setBodySizeMultiplier(state.bodySizeMultiplier);
         if (state.currentColor) setCurrentColor(state.currentColor);
         if (state.brushSize) setBrushSize(state.brushSize);
+        // Restore recent colors so the palette survives a refresh once saved.
+        if (Array.isArray(state.recentColors) && state.recentColors.length > 0) {
+          setRecentColors(state.recentColors);
+        }
+        // Restore undo/redo history so the user can undo past prior saves even
+        // after a browser refresh.
+        if (Array.isArray(state.history)) setHistory(state.history);
+        if (Array.isArray(state.redoHistory)) setRedoHistory(state.redoHistory);
         // Don't restore zoom/pan state to avoid duplication bug
         // Always start with default zoom/pan
       }
@@ -817,6 +832,10 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
         bodySizeMultiplier,
         currentColor,
         brushSize,
+        recentColors,
+        // Cap persisted history so a long session doesn't overflow localStorage.
+        history: history.slice(-50),
+        redoHistory: redoHistory.slice(-50),
         timestamp: Date.now(),
       };
       localStorage.setItem('fairyBuilderState', JSON.stringify(state));
@@ -991,6 +1010,17 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
         : (isBiggerPart ? screenSize * 0.1 : screenSize * 0.18);
     }
 
+    // New objects always render on the topmost layer — sit one above the
+    // highest zIndex among existing objects AND drawing groups, so a freshly
+    // added object never lands behind something previously sent to front.
+    const allZ = [
+      ...placedObjects.map(o => o.zIndex || 0),
+      ...lines.map(l => (l.zIndex !== undefined ? l.zIndex : 0)),
+    ];
+    // Clamp to >= 0 so that even if everything was sent behind the body
+    // (negative zIndex), the new object still lands in front of the body.
+    const topZ = allZ.length ? Math.max(0, ...allZ) : 0;
+
     const newObject = {
       id: `${part.id}-${Date.now()}`,
       type: part.id,
@@ -1005,7 +1035,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
       flipped: false,
       color: currentColor,
       outlineColor: currentOutlineColor,
-      zIndex: 1, // Start above body but BEHIND drawings; user can "Move to Front" (zIndex=10) to put it in front of drawings
+      zIndex: topZ + 1, // Always on top of everything currently on the canvas
     };
     setPlacedObjects(prev => [...prev, newObject]);
   };
@@ -1428,6 +1458,54 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   // scrolling on the control panel and clicking buttons on mobile.
   // The canvas handles touch events properly through Konva's touch handlers.
 
+  // Fill tool: given a point in canvas (content) coordinates, find the closest
+  // drawn stroke under the cursor and recolor every stroke that shares its
+  // color within the same drawing instance (groupId) to the current color.
+  const handleFillAt = (px, py) => {
+    // Shortest distance from point (px,py) to line segment (x1,y1)-(x2,y2).
+    const distToSegment = (x1, y1, x2, y2) => {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const lenSq = dx * dx + dy * dy;
+      let t = lenSq === 0 ? 0 : ((px - x1) * dx + (py - y1) * dy) / lenSq;
+      t = Math.max(0, Math.min(1, t));
+      const cx = x1 + t * dx;
+      const cy = y1 + t * dy;
+      return Math.hypot(px - cx, py - cy);
+    };
+
+    let target = null;
+    let targetDist = Infinity;
+    for (const line of lines) {
+      if (line.eraser) continue; // eraser strokes have no fillable color
+      const pts = line.points;
+      // Click tolerance scales with the stroke so thin lines stay clickable.
+      const threshold = (line.size || 1) / 2 + 8;
+      if (pts.length === 2) {
+        const d = Math.hypot(px - pts[0], py - pts[1]);
+        if (d < threshold && d < targetDist) { targetDist = d; target = line; }
+        continue;
+      }
+      for (let i = 0; i + 3 < pts.length; i += 2) {
+        const d = distToSegment(pts[i], pts[i + 1], pts[i + 2], pts[i + 3]);
+        if (d < threshold && d < targetDist) { targetDist = d; target = line; }
+      }
+    }
+
+    if (!target) return; // clicked empty space — nothing to fill
+
+    const targetColor = target.color;
+    const targetGroup = target.groupId || 'legacy';
+    saveToHistory();
+    setLines(prev => prev.map(l => {
+      const g = l.groupId || 'legacy';
+      if (!l.eraser && g === targetGroup && l.color === targetColor) {
+        return { ...l, color: currentColor };
+      }
+      return l;
+    }));
+  };
+
   const handleMouseDown = (e) => {
     // Prevent default touch behavior to avoid scrolling
     if (e.evt && e.evt.type && e.evt.type.startsWith('touch')) {
@@ -1457,6 +1535,14 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
 
     if (!freeDrawMode) {
       // Don't deselect here - wait for mouseup to check if it was a tap
+      return;
+    }
+
+    // Fill tool: recolor the clicked stroke's color group instead of drawing.
+    if (fillMode) {
+      const transformedX = (pos.x - stagePosition.x) / stageScale;
+      const transformedY = (pos.y - stagePosition.y) / stageScale;
+      handleFillAt(transformedX, transformedY);
       return;
     }
 
@@ -1594,11 +1680,14 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
     if (!window.confirm('Are you sure you want to clear everything? This will delete your current design and any saved progress.')) {
       return;
     }
-    saveToHistory();
     setPlacedObjects([]);
     setLines([]);
     setSelectedBody(null);
     setSelectedId(null);
+    // Clear All is the reset: wipe undo history and restore default swatches.
+    setHistory([]);
+    setRedoHistory([]);
+    setRecentColors(DEFAULT_RECENT_COLORS);
     // Also clear saved state
     try {
       localStorage.removeItem('fairyBuilderState');
@@ -1615,24 +1704,21 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
       has_body: !!selectedBody,
     });
 
-    // Get only the content layers (first three layers), excluding UI controls layer (fourth layer)
+    // The number of layers is dynamic: every drawing group renders in its own
+    // Konva Layer, so we can't hardcode the UI layer's index. The UI controls
+    // layer is always rendered LAST, so target it by position and treat every
+    // other layer as exportable content. (Hardcoding children[3] meant the real
+    // UI layer stayed visible once any drawing existed, leaking the on-canvas
+    // buttons into the export.)
     const stage = stageRef.current;
-    const contentLayer1 = stage.children[0]; // Layer 1: Objects behind body and drawings
-    const drawingLayer = stage.children[1]; // Layer 2: Free Draw Lines
-    const contentLayer2 = stage.children[2]; // Layer 3: Objects in front of drawings
-    const uiLayer = stage.children[3]; // Layer 4: UI controls - will be hidden during export
+    const allLayers = stage.getLayers();
+    const uiLayer = allLayers[allLayers.length - 1]; // UI controls - hidden during export
+    const contentLayers = allLayers.slice(0, -1);
 
-    // Calculate bounding box of all content with generous padding
-    const contentGroup = contentLayer1.getChildren().find(child => child !== undefined);
-    if (!contentGroup) return;
-
-    // Get bounds of all visible content
-    const box1 = contentLayer1.getClientRect({ skipTransform: false });
-    const drawBox = drawingLayer.getClientRect({ skipTransform: false });
-    const box2 = contentLayer2.getClientRect({ skipTransform: false });
-
-    // Collect only non-empty boxes (ignore layers with no content)
-    const boxes = [box1, drawBox, box2].filter(box => box.width > 0 && box.height > 0);
+    // Get bounds of every content layer; ignore any with no drawn content.
+    const boxes = contentLayers
+      .map(layer => layer.getClientRect({ skipTransform: false }))
+      .filter(box => box.width > 0 && box.height > 0);
 
     if (boxes.length === 0) return; // Nothing to export
 
@@ -1644,13 +1730,6 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
     const width = x2 - x;
     const height = y2 - y;
 
-    // Debug: Log bounding box info
-    console.log('Bounding box:', { x, y, width, height, x2, y2 });
-    console.log('Canvas size:', stageSize);
-    console.log('Box1:', box1);
-    console.log('DrawBox:', drawBox);
-    console.log('Box2:', box2);
-
     // Add very minimal padding - just enough to not clip edges
     const padding = 20;
 
@@ -1661,8 +1740,6 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
     // Position at content bounds with padding
     const exportX = x - padding;
     const exportY = y - padding;
-
-    console.log('Export dimensions:', { exportX, exportY, exportWidth, exportHeight });
 
     // Hide UI layer before export
     if (uiLayer) {
@@ -2609,20 +2686,18 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                       onClick={() => {
                         const newMode = !freeDrawMode;
                         setFreeDrawMode(newMode);
-                        if (newMode) {
-                          trackEvent('drawing_mode_enabled');
-                          setEraserMode(false);
-                        }
-                        if (!newMode) setEraserMode(false);
+                        if (newMode) trackEvent('drawing_mode_enabled');
+                        // Always reset to the pen when toggling draw mode.
+                        setEraserMode(false);
+                        setFillMode(false);
                       }}
                       onTap={() => {
                         const newMode = !freeDrawMode;
                         setFreeDrawMode(newMode);
-                        if (newMode) {
-                          trackEvent('drawing_mode_enabled');
-                          setEraserMode(false);
-                        }
-                        if (!newMode) setEraserMode(false);
+                        if (newMode) trackEvent('drawing_mode_enabled');
+                        // Always reset to the pen when toggling draw mode.
+                        setEraserMode(false);
+                        setFillMode(false);
                       }}
                       onMouseEnter={(e) => {
                         const container = e.target.getStage().container();
@@ -2661,25 +2736,25 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                   {/* Expanded controls when free draw is enabled */}
                   {freeDrawMode && (
                     <Group y={stageSize.width < 600 ? 36 : 43}>
-                      {/* Pen/Eraser toggle buttons */}
+                      {/* Pen / Fill / Eraser toggle buttons */}
                       <Group>
                         {/* Pen button */}
                         <Group>
                           <Rect
                             id="freedraw-pen"
-                            width={stageSize.width < 600 ? 50 : 58}
+                            width={stageSize.width < 600 ? 34 : 39}
                             height={stageSize.width < 600 ? 26 : 30}
-                            fill={!eraserMode
+                            fill={!eraserMode && !fillMode
                               ? currentTheme?.colors?.accentPrimary || '#ff9dda'
                               : '#e5e7eb'}
                             cornerRadius={8}
-                            onClick={() => setEraserMode(false)}
-                            onTap={() => setEraserMode(false)}
+                            onClick={() => { setEraserMode(false); setFillMode(false); }}
+                            onTap={() => { setEraserMode(false); setFillMode(false); }}
                             onMouseEnter={(e) => {
                               const container = e.target.getStage().container();
                               container.style.cursor = 'pointer';
                               e.target.to({
-                                shadowColor: !eraserMode ? (currentTheme?.colors?.accentPrimary || '#ff9dda') : '#9ca3af',
+                                shadowColor: (!eraserMode && !fillMode) ? (currentTheme?.colors?.accentPrimary || '#ff9dda') : '#9ca3af',
                                 shadowBlur: 15,
                                 shadowOpacity: 0.6,
                                 duration: 0.2
@@ -2697,11 +2772,57 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                           />
                           <Text
                             text="Pen"
-                            fontSize={stageSize.width < 600 ? 10 : 11}
+                            fontSize={stageSize.width < 600 ? 9 : 10}
                             fontFamily={currentFont}
                             fontStyle="500"
-                            fill={!eraserMode ? 'white' : '#6b7280'}
-                            width={stageSize.width < 600 ? 50 : 58}
+                            fill={(!eraserMode && !fillMode) ? 'white' : '#6b7280'}
+                            width={stageSize.width < 600 ? 34 : 39}
+                            height={stageSize.width < 600 ? 26 : 30}
+                            align="center"
+                            verticalAlign="middle"
+                            listening={false}
+                          />
+                        </Group>
+
+                        {/* Fill button */}
+                        <Group x={stageSize.width < 600 ? 38 : 43}>
+                          <Rect
+                            id="freedraw-fill"
+                            width={stageSize.width < 600 ? 34 : 39}
+                            height={stageSize.width < 600 ? 26 : 30}
+                            fill={fillMode
+                              ? currentTheme?.colors?.accentPrimary || '#ff9dda'
+                              : '#e5e7eb'}
+                            cornerRadius={8}
+                            onClick={() => { setFillMode(true); setEraserMode(false); }}
+                            onTap={() => { setFillMode(true); setEraserMode(false); }}
+                            onMouseEnter={(e) => {
+                              const container = e.target.getStage().container();
+                              container.style.cursor = 'pointer';
+                              e.target.to({
+                                shadowColor: fillMode ? (currentTheme?.colors?.accentPrimary || '#ff9dda') : '#9ca3af',
+                                shadowBlur: 15,
+                                shadowOpacity: 0.6,
+                                duration: 0.2
+                              });
+                            }}
+                            onMouseLeave={(e) => {
+                              const container = e.target.getStage().container();
+                              container.style.cursor = 'default';
+                              e.target.to({
+                                shadowBlur: 0,
+                                shadowOpacity: 0,
+                                duration: 0.2
+                              });
+                            }}
+                          />
+                          <Text
+                            text="Fill"
+                            fontSize={stageSize.width < 600 ? 9 : 10}
+                            fontFamily={currentFont}
+                            fontStyle="500"
+                            fill={fillMode ? 'white' : '#6b7280'}
+                            width={stageSize.width < 600 ? 34 : 39}
                             height={stageSize.width < 600 ? 26 : 30}
                             align="center"
                             verticalAlign="middle"
@@ -2710,17 +2831,17 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                         </Group>
 
                         {/* Eraser button */}
-                        <Group x={stageSize.width < 600 ? 58 : 66}>
+                        <Group x={stageSize.width < 600 ? 76 : 86}>
                           <Rect
                             id="freedraw-eraser"
-                            width={stageSize.width < 600 ? 50 : 58}
+                            width={stageSize.width < 600 ? 34 : 39}
                             height={stageSize.width < 600 ? 26 : 30}
                             fill={eraserMode
                               ? currentTheme?.colors?.accentPrimary || '#ff9dda'
                               : '#e5e7eb'}
                             cornerRadius={8}
-                            onClick={() => setEraserMode(true)}
-                            onTap={() => setEraserMode(true)}
+                            onClick={() => { setEraserMode(true); setFillMode(false); }}
+                            onTap={() => { setEraserMode(true); setFillMode(false); }}
                             onMouseEnter={(e) => {
                               const container = e.target.getStage().container();
                               container.style.cursor = 'pointer';
@@ -2742,12 +2863,12 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
                             }}
                           />
                           <Text
-                            text="Eraser"
+                            text="Erase"
                             fontSize={stageSize.width < 600 ? 9 : 10}
                             fontFamily={currentFont}
                             fontStyle="500"
                             fill={eraserMode ? 'white' : '#6b7280'}
-                            width={stageSize.width < 600 ? 50 : 58}
+                            width={stageSize.width < 600 ? 34 : 39}
                             height={stageSize.width < 600 ? 26 : 30}
                             align="center"
                             verticalAlign="middle"
