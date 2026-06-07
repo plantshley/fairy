@@ -4,7 +4,7 @@ import { themes } from '../themes';
 import { getAssetPath } from '../utils/assetPath';
 import { trackEvent } from '../utils/analytics';
 
-export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
+export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMotion = false }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // Preload all creature images on mount
@@ -93,11 +93,11 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab }) => {
             src={getModalCreature()}
             alt="Change theme"
             className="w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 object-contain"
-            animate={{
+            animate={reduceMotion ? undefined : {
               y: [0, -8, 0],
               rotate: [0, 5, -5, 0],
             }}
-            transition={{
+            transition={reduceMotion ? undefined : {
               duration: 3,
               repeat: Infinity,
               ease: 'easeInOut',

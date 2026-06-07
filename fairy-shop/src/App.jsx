@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { Navigation } from './components/Navigation';
 import { MobileNavigationMenu } from './components/MobileNavigationMenu';
 import { ThemeSelector } from './components/ThemeSelector';
-import { AccessibilityToggle } from './components/AccessibilityToggle';
+import { AccessibilityMenu } from './components/AccessibilityMenu';
 import { CursorSparkles } from './components/CursorSparkles';
 import BackgroundMusic from './components/BackgroundMusic';
 import { Home } from './pages/Home';
@@ -17,6 +17,7 @@ import { BuildYourOwnV2 } from './pages/BuildYourOwnV2';
 import { themes, applyTheme } from './themes';
 import { getAssetPath } from './utils/assetPath';
 import { trackPageView, trackTiming } from './utils/analytics';
+import { useAccessibilitySettings } from './hooks/useAccessibilitySettings';
 
 function App() {
   const location = useLocation();
@@ -45,10 +46,8 @@ function App() {
   };
 
   const [currentTheme, setCurrentTheme] = useState(themes.twinkleFairyDream);
-  const [accessibleFonts, setAccessibleFonts] = useState(() => {
-    const saved = localStorage.getItem('accessibleFonts');
-    return saved === 'true';
-  });
+  const a11y = useAccessibilitySettings();
+  const [a11yMenuOpen, setA11yMenuOpen] = useState(false);
   const sessionStartRef = useRef(null);
   const pageStartRef = useRef(null);
   const previousTabRef = useRef(null);
@@ -56,15 +55,6 @@ function App() {
   useEffect(() => {
     applyTheme(currentTheme);
   }, [currentTheme]);
-
-  useEffect(() => {
-    localStorage.setItem('accessibleFonts', accessibleFonts);
-    if (accessibleFonts) {
-      document.body.classList.add('accessible-fonts');
-    } else {
-      document.body.classList.remove('accessible-fonts');
-    }
-  }, [accessibleFonts]);
 
   // Track session start time on mount
   useEffect(() => {
@@ -105,9 +95,10 @@ function App() {
 
 
   return (
+    <MotionConfig reducedMotion={a11y.reduceMotion ? 'always' : 'never'}>
     <div className="min-h-screen overflow-hidden">
-      <AnimatedBackground themeEmojis={currentTheme.emojis} />
-      {activeTab !== 'build' && <CursorSparkles currentTheme={currentTheme} />}
+      <AnimatedBackground themeEmojis={currentTheme.emojis} reduceMotion={a11y.reduceMotion} />
+      {activeTab !== 'build' && !a11y.reduceMotion && <CursorSparkles currentTheme={currentTheme} />}
 
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} currentTheme={currentTheme} />
 
@@ -126,8 +117,8 @@ function App() {
       <ThemeSelector
         currentTheme={currentTheme}
         onThemeChange={setCurrentTheme}
-        accessibleFonts={accessibleFonts}
         activeTab={activeTab}
+        reduceMotion={a11y.reduceMotion}
       />
 
       {/* Mobile navigation menu - only show on build */}
@@ -136,20 +127,30 @@ function App() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           currentTheme={currentTheme}
-          accessibleFonts={accessibleFonts}
-          onToggleAccessibleFonts={() => setAccessibleFonts(!accessibleFonts)}
+          onOpenAccessibility={() => setA11yMenuOpen(true)}
         />
       )}
 
       {/* Background music control (place after theme selector so it appears above other UI) */}
       <BackgroundMusic src={getAssetPath('/audio/background-music.mp3')} />
 
-      <AccessibilityToggle
-        accessibleFonts={accessibleFonts}
-        onToggle={() => setAccessibleFonts(!accessibleFonts)}
+      <AccessibilityMenu
+        currentTheme={currentTheme}
         activeTab={activeTab}
+        isOpen={a11yMenuOpen}
+        onOpenChange={setA11yMenuOpen}
+        fontScale={a11y.fontScale}
+        readableFonts={a11y.readableFonts}
+        highContrast={a11y.highContrast}
+        reduceMotion={a11y.reduceMotion}
+        setFontScale={a11y.setFontScale}
+        toggleReadableFonts={a11y.toggleReadableFonts}
+        toggleHighContrast={a11y.toggleHighContrast}
+        toggleReduceMotion={a11y.toggleReduceMotion}
+        reset={a11y.reset}
       />
     </div>
+    </MotionConfig>
   );
 }
 

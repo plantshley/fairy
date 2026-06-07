@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
-const Sparkle = ({ delay = 0, x, y }) => {
+const Sparkle = ({ delay = 0, x, y, reduceMotion = false }) => {
   return (
     <motion.div
       className="absolute w-2 h-2 rounded-full"
@@ -11,11 +11,11 @@ const Sparkle = ({ delay = 0, x, y }) => {
         background: 'var(--sparkle-color)',
         boxShadow: '0 0 10px var(--sparkle-color)',
       }}
-      animate={{
+      animate={reduceMotion ? undefined : {
         opacity: [0, 1, 0],
         scale: [0.5, 1.2, 0.5],
       }}
-      transition={{
+      transition={reduceMotion ? undefined : {
         duration: 2,
         repeat: Infinity,
         delay,
@@ -25,7 +25,7 @@ const Sparkle = ({ delay = 0, x, y }) => {
   );
 };
 
-const Cloud = ({ delay = 0, x, y, emoji }) => {
+const Cloud = ({ delay = 0, x, y, emoji, reduceMotion = false }) => {
   return (
     <motion.div
       className="absolute text-2xl opacity-30"
@@ -33,10 +33,10 @@ const Cloud = ({ delay = 0, x, y, emoji }) => {
         left: `${x}%`,
         top: `${y}%`,
       }}
-      animate={{
+      animate={reduceMotion ? undefined : {
         y: [0, -20, 0],
       }}
-      transition={{
+      transition={reduceMotion ? undefined : {
         duration: 4,
         repeat: Infinity,
         delay,
@@ -48,7 +48,7 @@ const Cloud = ({ delay = 0, x, y, emoji }) => {
   );
 };
 
-const Heart = ({ delay = 0, x, y, emoji }) => {
+const Heart = ({ delay = 0, x, y, emoji, reduceMotion = false }) => {
   return (
     <motion.div
       className="absolute text-2xl"
@@ -57,11 +57,11 @@ const Heart = ({ delay = 0, x, y, emoji }) => {
         top: `${y}%`,
         opacity: 0.4,
       }}
-      animate={{
+      animate={reduceMotion ? undefined : {
         y: [0, -20, 0],
         opacity: [0.4, 0.7, 0.4],
       }}
-      transition={{
+      transition={reduceMotion ? undefined : {
         duration: 3,
         repeat: Infinity,
         delay,
@@ -73,7 +73,7 @@ const Heart = ({ delay = 0, x, y, emoji }) => {
   );
 };
 
-export const AnimatedBackground = ({ themeEmojis = ['💖', '🌸', '✨', '☁️', '🦋', '💗'] }) => {
+export const AnimatedBackground = ({ themeEmojis = ['💖', '🌸', '✨', '☁️', '🦋', '💗'], reduceMotion = false }) => {
   const [sparkles, setSparkles] = useState([]);
   const [clouds, setClouds] = useState([]);
   const [hearts, setHearts] = useState([]);
@@ -112,13 +112,13 @@ export const AnimatedBackground = ({ themeEmojis = ['💖', '🌸', '✨', '☁�
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden animated-gradient-bg">
       {sparkles.map((sparkle) => (
-        <Sparkle key={sparkle.id} x={sparkle.x} y={sparkle.y} delay={sparkle.delay} />
+        <Sparkle key={sparkle.id} x={sparkle.x} y={sparkle.y} delay={sparkle.delay} reduceMotion={reduceMotion} />
       ))}
       {clouds.map((cloud) => (
-        <Cloud key={cloud.id} x={cloud.x} y={cloud.y} delay={cloud.delay} emoji={cloud.emoji} />
+        <Cloud key={cloud.id} x={cloud.x} y={cloud.y} delay={cloud.delay} emoji={cloud.emoji} reduceMotion={reduceMotion} />
       ))}
       {hearts.map((heart) => (
-        <Heart key={heart.id} x={heart.x} y={heart.y} delay={heart.delay} emoji={heart.emoji} />
+        <Heart key={heart.id} x={heart.x} y={heart.y} delay={heart.delay} emoji={heart.emoji} reduceMotion={reduceMotion} />
       ))}
     </div>
   );

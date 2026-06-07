@@ -10,7 +10,7 @@ const tabs = [
   { id: 'build', label: 'build', icon: getAssetPath('/visualis.png') },
 ];
 
-export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, accessibleFonts, onToggleAccessibleFonts }) => {
+export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, onOpenAccessibility }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isDarkTheme = currentTheme?.id === 'midnightVelvetMeadow';
 
@@ -75,7 +75,7 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, acc
                   </motion.button>
                 ))}
 
-                {onToggleAccessibleFonts && (
+                {onOpenAccessibility && (
                   <div className="lg:hidden">
                     <div
                       className="my-1 h-px"
@@ -83,25 +83,19 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, acc
                     />
                     <motion.button
                       className="w-full px-3 py-2 rounded-xl font-bonbon text-sm transition-all text-left flex items-center gap-2"
-                      style={{
-                        background: accessibleFonts
-                          ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
-                          : 'transparent',
-                        color: accessibleFonts ? 'white' : 'var(--text-primary)',
-                      }}
+                      style={{ color: 'var(--text-primary)' }}
                       onClick={() => {
-                        onToggleAccessibleFonts();
                         setIsOpen(false);
+                        onOpenAccessibility();
                       }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <span
-                        className="w-5 h-5 flex items-center justify-center text-sm font-bold leading-none"
-                        style={{ fontFamily: 'serif' }}
-                      >
-                        {accessibleFonts ? '✓' : 'Aa'}
-                      </span>
-                      <span className="whitespace-nowrap">accessible fonts</span>
+                      <img
+                        src={getAssetPath('/icons/acc-icon.png')}
+                        alt=""
+                        className="w-5 h-5 object-contain"
+                      />
+                      <span className="whitespace-nowrap">accessibility</span>
                     </motion.button>
                   </div>
                 )}

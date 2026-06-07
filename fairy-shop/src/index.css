@@ -57,6 +57,31 @@
   --font-decorative: 'Comic Sans MS', 'Arial', sans-serif;
 }
 
+/* High contrast mode - !important beats the inline theme vars applyTheme sets on :root */
+.high-contrast {
+  --bg-gradient-start: #ffffff !important;
+  --bg-gradient-mid: #ffffff !important;
+  --bg-gradient-end: #f0f0f0 !important;
+  --accent-primary: #0b3d91 !important;
+  --accent-secondary: #6a1b9a !important;
+  --text-primary: #000000 !important;
+  --text-secondary: #1a1a1a !important;
+  --sparkle-color: #000000 !important;
+  --gradient-primary: #0b3d91 !important;
+  --gradient-secondary: #6a1b9a !important;
+  --rainbow-gradient: none !important;
+}
+
+/* Reduce motion - neutralize decorative CSS keyframe animations (gradient bg,
+   sparkles, shine, rainbow glow). Functional transitions (e.g. the gallery
+   category expand) are intentionally left alone so the UI doesn't feel broken. */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+}
+
 body {
   margin: 0;
   padding: 0;
