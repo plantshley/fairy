@@ -88,7 +88,11 @@ export const AccessibilityMenu = ({
   const anyActive = readableFonts || highContrast || reduceMotion || fontScale !== 1;
 
   const buttonStyle = {
-    background: anyActive ? 'var(--accent-secondary)' : 'rgba(255, 255, 255, 0.3)',
+    background: anyActive
+      ? 'var(--accent-secondary)'
+      : isDarkTheme
+        ? 'rgba(42, 16, 53, 0.6)'
+        : 'rgba(255, 255, 255, 0.3)',
   };
 
   const decreaseFont = () => {
@@ -120,7 +124,7 @@ export const AccessibilityMenu = ({
     <>
       {/* Desktop - aligns with left navigation (where the fonts pill used to be) */}
       <motion.button
-        className="fixed bottom-6 left-2 z-50 w-10 h-10 rounded-full backdrop-blur-sm hidden lg:flex items-center justify-center focus:outline-none focus:ring-2"
+        className="fixed bottom-6 left-2 z-50 w-12 h-12 rounded-full backdrop-blur-sm hidden lg:flex items-center justify-center focus:outline-none focus:ring-2"
         style={buttonStyle}
         onClick={() => setIsOpen(true)}
         whileHover={{ opacity: 0.85 }}
@@ -128,14 +132,14 @@ export const AccessibilityMenu = ({
         aria-label="Accessibility settings"
         aria-expanded={isOpen}
       >
-        <img src={getAssetPath('/icons/acc-icon.png')} alt="" className="w-6 h-6 object-contain" />
+        <img src={getAssetPath('/icons/acc-icon.png')} alt="" className="w-7 h-7 object-contain" />
       </motion.button>
 
       {/* Mobile & Landscape - above nav. On the build page this floating button is
           hidden; the accessibility option lives inside the hamburger menu instead. */}
       {!isBuild && (
         <motion.button
-          className="fixed z-50 w-8 h-8 rounded-full backdrop-blur-sm lg:hidden flex items-center justify-center focus:outline-none focus:ring-2 bottom-20 left-2 landscape:left-3 landscape:bottom-auto landscape:top-2"
+          className="fixed z-50 w-10 h-10 rounded-full backdrop-blur-sm lg:hidden flex items-center justify-center focus:outline-none focus:ring-2 bottom-20 left-2 landscape:left-3 landscape:bottom-auto landscape:top-2"
           style={buttonStyle}
           onClick={() => setIsOpen(true)}
           whileHover={{ opacity: 0.85 }}
@@ -143,7 +147,7 @@ export const AccessibilityMenu = ({
           aria-label="Accessibility settings"
           aria-expanded={isOpen}
         >
-          <img src={getAssetPath('/icons/acc-icon.png')} alt="" className="w-5 h-5 object-contain" />
+          <img src={getAssetPath('/icons/acc-icon.png')} alt="" className="w-6 h-6 object-contain" />
         </motion.button>
       )}
 

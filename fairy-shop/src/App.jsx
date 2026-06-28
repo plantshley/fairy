@@ -14,8 +14,11 @@ import { Links } from './pages/Links';
 import { Gallery } from './pages/Gallery';
 import { BuildYourOwn } from './pages/BuildYourOwn';
 import { BuildYourOwnV2 } from './pages/BuildYourOwnV2';
+import { PixelHome } from './pages/pixel/PixelHome';
+import { PixelShop } from './pages/pixel/PixelShop';
+import { PixelLinks } from './pages/pixel/PixelLinks';
+import { PixelGallery } from './pages/pixel/PixelGallery';
 import { themes, applyTheme } from './themes';
-import { getAssetPath } from './utils/assetPath';
 import { trackPageView, trackTiming } from './utils/analytics';
 import { useAccessibilitySettings } from './hooks/useAccessibilitySettings';
 
@@ -94,22 +97,34 @@ function App() {
   }, [activeTab]);
 
 
+  // Alternate-skin themes render their own in-page nav + background, so the
+  // standard left rail and AnimatedBackground are suppressed. CursorSparkles is
+  // kept on pixel pages. See src/themes.js (layout flag) and src/styles/pixel.css.
+  const pixel = currentTheme.layout === 'pixel';
+  const openAccessibility = () => setA11yMenuOpen(true);
+  const pixelPageProps = {
+    currentTheme,
+    activeTab,
+    onTabChange: setActiveTab,
+    onOpenAccessibility: openAccessibility,
+  };
+
   return (
     <MotionConfig reducedMotion={a11y.reduceMotion ? 'always' : 'never'}>
-    <div className="min-h-screen overflow-hidden">
-      <AnimatedBackground themeEmojis={currentTheme.emojis} reduceMotion={a11y.reduceMotion} />
+    <div className="min-h-dvh overflow-hidden">
+      {!pixel && <AnimatedBackground themeEmojis={currentTheme.emojis} reduceMotion={a11y.reduceMotion} />}
       {activeTab !== 'build' && !a11y.reduceMotion && <CursorSparkles currentTheme={currentTheme} />}
 
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} currentTheme={currentTheme} />
+      {!pixel && <Navigation activeTab={activeTab} onTabChange={setActiveTab} currentTheme={currentTheme} />}
 
-      <main className={`${activeTab === 'build' ? '' : 'lg:ml-20'} min-h-screen flex items-center justify-center`}>
+      <main className={`min-h-dvh ${pixel ? 'w-full' : `${activeTab === 'build' ? '' : 'lg:ml-20'} flex items-center justify-center`}`}>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<Home currentTheme={currentTheme} />} />
-            <Route path="/shop" element={<Shop currentTheme={currentTheme} />} />
-            <Route path="/links" element={<Links currentTheme={currentTheme} />} />
-            <Route path="/gallery" element={<Gallery currentTheme={currentTheme} />} />
-            <Route path="/build" element={<BuildYourOwnV2 currentTheme={currentTheme} />} />
+            <Route path="/" element={pixel ? <PixelHome {...pixelPageProps} onThemeChange={setCurrentTheme} /> : <Home currentTheme={currentTheme} />} />
+            <Route path="/shop" element={pixel ? <PixelShop {...pixelPageProps} /> : <Shop currentTheme={currentTheme} />} />
+            <Route path="/links" element={pixel ? <PixelLinks {...pixelPageProps} /> : <Links currentTheme={currentTheme} />} />
+            <Route path="/gallery" element={pixel ? <PixelGallery {...pixelPageProps} /> : <Gallery currentTheme={currentTheme} />} />
+            <Route path="/build" element={<BuildYourOwnV2 currentTheme={currentTheme} activeTab={activeTab} onTabChange={setActiveTab} onOpenAccessibility={openAccessibility} />} />
           </Routes>
         </AnimatePresence>
       </main>
@@ -121,18 +136,23 @@ function App() {
         reduceMotion={a11y.reduceMotion}
       />
 
-      {/* Mobile navigation menu - only show on build */}
+      {/* Mobile navigation menu - only show on build. Under the pixel theme the
+          desktop build page uses the in-page pixel NavBar instead, so the
+          hamburger is hidden on large screens there. */}
       {activeTab === 'build' && (
-        <MobileNavigationMenu
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          currentTheme={currentTheme}
-          onOpenAccessibility={() => setA11yMenuOpen(true)}
-        />
+        <div className={pixel ? 'lg:hidden' : undefined}>
+          <MobileNavigationMenu
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            currentTheme={currentTheme}
+            onOpenAccessibility={() => setA11yMenuOpen(true)}
+          />
+        </div>
       )}
 
-      {/* Background music control (place after theme selector so it appears above other UI) */}
-      <BackgroundMusic src={getAssetPath('/audio/background-music.mp3')} />
+      {/* Background music control. Hidden under the pixel theme, where the
+          in-page "now playing" widget on PixelHome controls the same audio. */}
+      {!pixel && <BackgroundMusic />}
 
       <AccessibilityMenu
         currentTheme={currentTheme}

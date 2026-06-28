@@ -16,6 +16,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMo
       getAssetPath('/glacial-seas-dolphin1.png'),
       getAssetPath('/homura1.png'),
       getAssetPath('/marcie1.png'),
+      getAssetPath('/rarity1.png'),
     ];
 
     imagesToPreload.forEach((src) => {
@@ -38,6 +39,8 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMo
         return getAssetPath('/homura1.png');
       case 'sweetCherryLove':
         return getAssetPath('/marcie1.png');
+      case 'pixelPegasusOasis':
+        return getAssetPath('/rarity1.png');
       default:
         return getAssetPath('/heart-bright1.png');
     }
@@ -151,6 +154,9 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMo
                         border: currentTheme.id === theme.id ? `3px solid ${theme.colors.accentPrimary}` : 'none',
                         background: theme.id === 'glitterGroovyRainbow'
                           ? 'linear-gradient(90deg, #ff3399, #ff9933, #ffdd00, #00d4ff, #5599ff, #aa66ff, #ff3399)'
+                          : theme.id === 'pixelPegasusOasis'
+                          // Pet / feed / play button colors from the pixel home.
+                          ? 'linear-gradient(135deg, #ff3aa0, #5ce0f0, #ffe85c)'
                           : `linear-gradient(135deg, ${theme.colors.bgGradientStart}, ${theme.colors.bgGradientMid})`,
                       }}
                       onClick={() => {

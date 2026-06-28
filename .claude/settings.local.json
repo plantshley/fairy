@@ -13,7 +13,9 @@
       "Bash(npx eslint *)",
       "Bash(git -C \"c:/Users/ashle/Documents/GitHub/fairy\" --no-pager diff --stat)",
       "Bash(git -C \"c:/Users/ashle/Documents/GitHub/fairy\" --no-pager diff -- fairy-shop/src/pages/BuildYourOwnV2.jsx)",
-      "mcp__chrome-devtools__press_key"
+      "mcp__chrome-devtools__press_key",
+      "Bash(grep -A4 -E \"GalleryLightbox.jsx|pixel\\\\\\\\\\\\\\\\PixelKit.jsx|pixel/PixelKit.jsx\")",
+      "Bash(node -e ' *)"
     ]
   }
 }

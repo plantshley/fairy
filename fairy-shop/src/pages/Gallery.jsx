@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Sparkle } from '../components/Sparkle';
 import { useState, useEffect, useMemo } from 'react';
 import { Particles, initParticlesEngine } from '@tsparticles/react';
@@ -6,39 +6,8 @@ import { loadFull } from 'tsparticles';
 import galleryManifest from '../galleryManifest.json';
 import { getAssetPath } from '../utils/assetPath';
 import { trackEvent } from '../utils/analytics';
-
-const categories = [
-  {
-    id: 'crochet',
-    name: 'crochet',
-    key: 'crochet',
-    description: 'handmade creaturely companions',
-  },
-  {
-    id: 'digital',
-    name: 'digital works',
-    key: 'digital works',
-    description: 'digital illustrations, logos, & stickers',
-  },
-  {
-    id: 'traditional',
-    name: 'traditional works',
-    key: 'traditional works',
-    description: 'colored pencil, graphite, & painted art',
-  },
-  {
-    id: 'cards',
-    name: 'cards & sketches',
-    key: 'cards-and-sketches',
-    description: 'a peek into my sketchbook & hand-painted cards',
-  },
-  {
-    id: 'plantshley',
-    name: 'plantshley books',
-    key: 'plantshley books',
-    description: 'illustrations from my childrens book series',
-  },
-];
+import { GalleryLightbox } from '../components/GalleryLightbox';
+import { categories } from '../galleryCategories';
 
 const CategoryBox = ({ category, isHovered, currentTheme, onMouseEnter, onMouseLeave, onClick }) => {
   const [particleState, setParticlesReady] = useState();
@@ -286,35 +255,14 @@ export const Gallery = ({ currentTheme }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [hoveredCategory, setHoveredCategory] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
 
   const getCategoryImages = (key) => {
     // Images are already sorted by modification date in the manifest (preview first, then newest to oldest)
     return galleryManifest[key] || [];
   };
 
-  // Reset zoom when image changes
-  useEffect(() => {
-    setZoomLevel(1);
-    setDragPosition({ x: 0, y: 0 });
-  }, [selectedImage]);
-
-  // Lock body scroll when lightbox is open
-  useEffect(() => {
-    if (selectedImage) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [selectedImage]);
-
   if (selectedCategory) {
     const images = getCategoryImages(selectedCategory.key);
-    const currentIndex = selectedImage ? images.indexOf(selectedImage) : -1;
 
     return (
       <motion.div
@@ -427,124 +375,12 @@ export const Gallery = ({ currentTheme }) => {
         </motion.div>
 
         {/* Lightbox for selected image */}
-        <AnimatePresence>
-          {selectedImage && (
-            <motion.div
-              className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => {
-                setSelectedImage(null);
-                setZoomLevel(1);
-                setDragPosition({ x: 0, y: 0 });
-              }}
-              onWheel={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const delta = e.deltaY * -0.001;
-                setZoomLevel((prev) => Math.max(1, Math.min(5, prev + delta)));
-              }}
-            >
-              <motion.button
-                className="absolute top-4 right-4 text-white text-4xl font-bold hover:opacity-70"
-                style={{ zIndex: 100 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedImage(null);
-                  setZoomLevel(1);
-                  setDragPosition({ x: 0, y: 0 });
-                }}
-              >
-                ×
-              </motion.button>
-
-              {/* Zoom indicator */}
-              {zoomLevel > 1 && (
-                <motion.div
-                  className="absolute top-4 left-4 text-white text-sm font-bonbon tracking-wider px-3 py-2 rounded-full pointer-events-none"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    zIndex: 100,
-                  }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  {Math.round(zoomLevel * 100)}%
-                </motion.div>
-              )}
-
-              {/* Previous button */}
-              {currentIndex > 0 && (
-                <motion.button
-                  className="absolute left-4 text-white text-4xl font-bold hover:opacity-70"
-                  style={{ zIndex: 100 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedImage(images[currentIndex - 1]);
-                  }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  ←
-                </motion.button>
-              )}
-
-              {/* Next button */}
-              {currentIndex < images.length - 1 && (
-                <motion.button
-                  className="absolute right-4 text-white text-4xl font-bold hover:opacity-70"
-                  style={{ zIndex: 100 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedImage(images[currentIndex + 1]);
-                  }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  →
-                </motion.button>
-              )}
-
-              <motion.img
-                src={getAssetPath(`/${selectedImage.replace(/ /g, '%20')}`)}
-                alt="Selected gallery image"
-                className="max-w-full max-h-full object-contain select-none"
-                style={{
-                  cursor: zoomLevel > 1 ? 'grab' : 'default',
-                }}
-                initial={{ scale: 0.8 }}
-                animate={{
-                  scale: 0.8 * zoomLevel,
-                  x: dragPosition.x,
-                  y: dragPosition.y,
-                }}
-                exit={{ scale: 0.8 }}
-                onClick={(e) => e.stopPropagation()}
-                drag={zoomLevel > 1}
-                dragConstraints={{ left: -1000, right: 1000, top: -1000, bottom: 1000 }}
-                dragElastic={0.05}
-                onDragEnd={(_e, info) => {
-                  setDragPosition({
-                    x: dragPosition.x + info.offset.x,
-                    y: dragPosition.y + info.offset.y,
-                  });
-                }}
-                whileDrag={{ cursor: 'grabbing' }}
-              />
-
-              {/* Instructions hint */}
-              <motion.p
-                className="absolute bottom-4 text-white text-xs font-bonbon tracking-wider opacity-50"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
-                transition={{ delay: 1 }}
-              >
-                scroll to zoom • drag to pan
-              </motion.p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <GalleryLightbox
+          images={images}
+          currentImage={selectedImage}
+          onClose={() => setSelectedImage(null)}
+          onSelect={setSelectedImage}
+        />
       </motion.div>
     );
   }
