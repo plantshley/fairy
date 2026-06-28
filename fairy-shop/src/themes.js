@@ -91,6 +91,7 @@ export const themes = {
   midnightVelvetMeadow: {
     id: 'midnightVelvetMeadow',
     name: 'Midnight Velvet Meadow',
+    isDark: true,
     colors: {
       bgGradientStart: '#a700a7ff',
       bgGradientMid: '#650087ff',
@@ -132,10 +133,48 @@ export const themes = {
     emojis: ['🍒', '🍰', '🌹', '💗', '🍓', '🎀'],
     decorations: ['♡₊˚', '⋆˚🪽˖°', '𓊆ྀི‧₊♡˚₊‧𓊇ྀི', '˚₊‧꒰ა ♡ ໒꒱ ‧₊˚'],
   },
+  // Alternate-skin theme. Unlike the others, `layout: 'pixel'` swaps the whole
+  // page rendering (pixel/Y2K layout) — see App.jsx's layout branch and
+  // src/styles/pixel.css. The colors below map the holo palette onto the shared
+  // CSS-var names so common chrome (ThemeSelector, AccessibilityMenu) stays
+  // coherent; the pixel-specific --d-*/--b-* palette lives in pixel.css.
+  pixelPegasusOasis: {
+    id: 'pixelPegasusOasis',
+    name: 'Pixel Pegasus Oasis',
+    layout: 'pixel',
+    colors: {
+      bgGradientStart: '#ffd8ec',
+      bgGradientMid: '#d4a8ff',
+      bgGradientEnd: '#a8e0ff',
+      accentPrimary: '#ff5aaf',
+      accentSecondary: '#b890e8',
+      textPrimary: '#5a1f6b',
+      textSecondary: '#8a4dc8',
+      sparkleColor: '#ffe85c',
+      gradientPrimary: '#ff5aaf',
+      gradientSecondary: '#b890e8',
+    },
+    fonts: {
+      heading: '"Rainyhearts", "Pixelify Sans", monospace',
+      body: '"Silkscreen", "Pixelify Sans", monospace',
+    },
+    emojis: ['🦄', '✦', '♡', '✿', '★', '✧'],
+    decorations: ['⋆˚｡⋆', '⊹˚. ♡ .˚⊹', '✦°｡⋆', '｡°✩'],
+  },
 };
 
 export const applyTheme = (theme) => {
   const root = document.documentElement;
+
+  // Alternate-skin themes opt in via `layout: 'pixel'`. The body class gates all
+  // pixel-specific CSS (palette, fonts, window chrome) in src/styles/pixel.css,
+  // keeping the :root variable system below untouched for standard themes.
+  document.body.classList.toggle('theme-pixel', theme.layout === 'pixel');
+
+  // Mark dark themes so high-contrast mode can use a dark (near-white on
+  // near-black) scheme for them instead of forcing dark-on-light. See the
+  // `.high-contrast.theme-dark` block in src/index.css.
+  document.body.classList.toggle('theme-dark', !!theme.isDark);
 
   // Apply rainbow gradient if specified, otherwise clear it
   if (theme.id === 'glitterGroovyRainbow') {

@@ -29,6 +29,8 @@ export const Navigation = ({ activeTab, onTabChange, currentTheme }) => {
         return '🥀';
       case 'sweetCherryLove':
         return '🍒';
+      case 'pixelPegasusOasis':
+        return '🦄';
       default:
         return '💕';
     }

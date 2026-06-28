@@ -7,6 +7,7 @@ import { ColorPicker } from '../components/ColorPicker';
 import { getAssetPath } from '../utils/assetPath';
 import { trackEvent } from '../utils/analytics';
 import { smoothDrawingStroke } from '../utils/drawingSmoothing';
+import { NavBar } from '../components/pixel/PixelKit';
 
 // Mobile bottom sheet components
 import { MobileBottomSheet } from '../components/mobile/MobileBottomSheet';
@@ -674,7 +675,18 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
 // Default recent-color swatches; restored only when the user hits "Clear All".
 const DEFAULT_RECENT_COLORS = ['#ffffff', '#000000', '#ff69b4', '#c5a3ff', '#89cff0'];
 
-export const BuildYourOwnV2 = ({ currentTheme }) => {
+// ─────────────────────────────────────────────────────────────────────────────
+// PIXEL-THEME NOTE / BuildCore boundary (deferred refactor)
+// Under the "Pixel Pegasus Oasis" theme (currentTheme.layout === 'pixel') this
+// page is reskinned in place: a holo background + pixel fonts + squared pixel
+// chrome are applied via the `pixel` flag below + the `.theme-pixel .pixel-build`
+// rules in src/styles/pixel.css. The Konva canvas/state logic is untouched.
+// EVENTUAL REFACTOR: extract the canvas + builder state into a reusable
+// `BuildCore`, then host it inside dedicated `StandardBuildShell` /
+// `PixelBuildShell` components instead of branching styles inline here.
+// ─────────────────────────────────────────────────────────────────────────────
+export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange, onOpenAccessibility }) => {
+  const pixel = currentTheme?.layout === 'pixel';
   const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
   const [selectedBody, setSelectedBody] = useState(null);
   const [placedObjects, setPlacedObjects] = useState([]);
@@ -717,9 +729,8 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
   const [spacePressed, setSpacePressed] = useState(false);
   const [panMode, setPanMode] = useState(false);
 
-  // Mobile bottom sheet state
+  // Mobile bottom sheet state (the sheet owns its own drag position internally)
   const [isMobileLayout, setIsMobileLayout] = useState(false);
-  const [bottomSheetState, setBottomSheetState] = useState('half');
   const [mobileActiveTab, setMobileActiveTab] = useState('bodyType');
 
   const stageRef = useRef(null);
@@ -1771,37 +1782,51 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
 
   return (
     <motion.div
-      className="w-full min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-4 overflow-hidden relative z-10"
+      className={`w-full min-h-dvh flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-4 overflow-hidden relative z-10 ${pixel ? 'bgD pixel-build' : ''}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
     >
-      <motion.h1
-        className="font-kalnia text-xl sm:text-3xl md:text-4xl mb-2 sm:mb-4 gradient-text text-center relative z-10"
-        style={{ overflow: 'visible' }}
-        initial={{ scale: 0.9 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-      >
-        <Sparkle count={15} />
-        ˚₊‧꒰ა ★ kirametki designer ★ ໒꒱ ‧₊˚
-      </motion.h1>
+      {/* Desktop pixel nav — matches the other pixel pages (replaces the
+          hamburger, which stays for mobile via MobileNavigationMenu). */}
+      {pixel && (
+        <div className="hidden lg:block w-full max-w-7xl relative z-10 mb-3">
+          <NavBar accent="var(--d-plum)" active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
+        </div>
+      )}
 
-      <p className="text-center mb-2 sm:mb-4 text-sm sm:text-base md:text-lg lg:text-xl font-bonbon tracking-wider px-4" style={{ color: 'var(--text-primary)' }}>
+      {pixel ? (
+        <h1 className="deco-title deco-title--d deco-title--d-pink font-rainy text-center relative z-10 mb-2 sm:mb-4" style={{ fontSize: 'clamp(28px, 6vw, 64px)' }}>
+          ✦ kirametki designer ✦
+        </h1>
+      ) : (
+        <motion.h1
+          className="font-kalnia text-xl sm:text-3xl md:text-4xl mb-2 sm:mb-4 gradient-text text-center relative z-10"
+          style={{ overflow: 'visible' }}
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+        >
+          <Sparkle count={15} />
+          ˚₊‧꒰ა ★ kirametki designer ★ ໒꒱ ‧₊˚
+        </motion.h1>
+      )}
+
+      <p className={`text-center mb-2 sm:mb-4 text-sm sm:text-base md:text-lg lg:text-xl tracking-wider px-4 ${pixel ? 'font-pixel' : 'font-bonbon'}`} style={{ color: 'var(--text-primary)' }}>
         ⋆｡°✩ build your own kirametki creature ✩°｡⋆
       </p>
 
-      <div className="flex flex-col landscape:flex-row lg:flex-row gap-4 w-full max-w-7xl flex-1">
+      <div className="flex flex-col landscape:flex-row lg:flex-row landscape:items-stretch lg:items-stretch gap-4 w-full max-w-7xl flex-1 min-h-0">
         {/* Left Control Panel - hidden on mobile when using bottom sheet */}
         {!isMobileLayout && (
         <motion.div
-          className="backdrop-blur-md rounded-3xl p-4 shadow-xl landscape:w-80 lg:w-96 flex-shrink-0 overflow-y-auto"
+          className="backdrop-blur-md rounded-3xl p-4 shadow-xl landscape:w-80 lg:w-96 flex-shrink-0 overflow-y-auto landscape:self-stretch lg:self-stretch"
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
           style={{
-            maxHeight: 'calc(100vh - 180px)',
+            maxHeight: 'calc(100vh - 162px)',
             backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
           }}
         >
@@ -2261,7 +2286,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
           className="backdrop-blur-md rounded-3xl shadow-xl p-4 overflow-hidden"
           style={{
             backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-            minHeight: isMobileLayout ? 'calc(50vh - 80px)' : '500px',
+            minHeight: isMobileLayout ? 'calc(50dvh - 80px)' : '500px',
             flex: 1,
             touchAction: 'none', // Prevent touch scrolling
           }}
@@ -3062,11 +3087,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
 
       {/* Mobile Bottom Sheet UI */}
       {isMobileLayout && (
-        <MobileBottomSheet
-          currentState={bottomSheetState}
-          onStateChange={setBottomSheetState}
-          theme={currentTheme}
-        >
+        <MobileBottomSheet theme={currentTheme}>
           {/* Quick Actions now inside sheet header */}
           <MobileQuickActions
             onExport={handleExport}
@@ -3086,13 +3107,7 @@ export const BuildYourOwnV2 = ({ currentTheme }) => {
             theme={currentTheme}
           />
 
-            <div className="overflow-y-auto" style={{
-              maxHeight: bottomSheetState === 'full'
-                ? 'calc(85vh - 140px)'  // Account for drag handle + quick actions + tab nav
-                : bottomSheetState === 'half'
-                ? 'calc(50vh - 140px)'
-                : 'calc(60px - 140px)'  // Collapsed (essentially hidden)
-            }}>
+            <div className="flex-1 min-h-0 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
               {mobileActiveTab === 'bodyType' && (
                 <BodyTypeTabContent
                   bodyTypes={bodyTypes}

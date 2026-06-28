@@ -57,8 +57,11 @@
   --font-decorative: 'Comic Sans MS', 'Arial', sans-serif;
 }
 
-/* High contrast mode - !important beats the inline theme vars applyTheme sets on :root */
-.high-contrast {
+/* High contrast mode - !important beats the inline theme vars applyTheme sets on
+   :root. Light themes get a dark-on-light scheme; dark themes (body.theme-dark,
+   set by applyTheme) get a near-white-on-near-black scheme instead. The two are
+   mutually exclusive so they never fight. */
+.high-contrast:not(.theme-dark) {
   --bg-gradient-start: #ffffff !important;
   --bg-gradient-mid: #ffffff !important;
   --bg-gradient-end: #f0f0f0 !important;
@@ -69,7 +72,40 @@
   --sparkle-color: #000000 !important;
   --gradient-primary: #0b3d91 !important;
   --gradient-secondary: #6a1b9a !important;
-  --rainbow-gradient: none !important;
+  /* Solid, not `none`: `none` is a valid value so .animated-gradient-bg's
+     var() fallback would be skipped, leaving the page background transparent
+     (showing the browser's default white). A solid color paints flat. */
+  --rainbow-gradient: #ffffff !important;
+}
+
+.high-contrast.theme-dark {
+  --bg-gradient-start: #000000 !important;
+  --bg-gradient-mid: #000000 !important;
+  --bg-gradient-end: #0a0a0a !important;
+  --accent-primary: #ff5c8a !important;
+  --accent-secondary: #d98aff !important;
+  --text-primary: #ffffff !important;
+  --text-secondary: #f0f0f0 !important;
+  --sparkle-color: #ffffff !important;
+  --gradient-primary: #ff5c8a !important;
+  --gradient-secondary: #d98aff !important;
+  /* Solid, not `none` — see note in the light-scheme block above. */
+  --rainbow-gradient: #0a0a0a !important;
+}
+
+/* Theme-tinted translucent surfaces hardcode their background inline (white, or
+   rgba(42,16,53,...) under the midnight theme), which the variable overrides
+   above can't reach. Force those content surfaces to a solid high-contrast
+   surface so the forced text color stays readable. (Modal dim-overlays use
+   blur-sm and are intentionally left alone.) */
+.high-contrast:not(.theme-dark) .backdrop-blur-md,
+.high-contrast:not(.theme-dark) .link-card {
+  background-color: #ffffff !important;
+}
+
+.high-contrast.theme-dark .backdrop-blur-md,
+.high-contrast.theme-dark .link-card {
+  background-color: #141414 !important;
 }
 
 /* Reduce motion - neutralize decorative CSS keyframe animations (gradient bg,
@@ -87,6 +123,7 @@ body {
   padding: 0;
   font-family: var(--font-body);
   min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport: accounts for mobile address bar */
   overflow-x: hidden;
 }
 
@@ -95,6 +132,20 @@ body {
 }
 
 @layer utilities {
+  /* Dynamic viewport height with a vh fallback for browsers without dvh.
+     Use instead of Tailwind's min-h-screen so mobile chrome (address bar /
+     bottom toolbar) doesn't add a phantom screen of empty space. */
+  .min-h-dvh {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Safe-area bottom clearance (requires viewport-fit=cover, set in index.html).
+     max()es with a base pad so content always clears the home indicator. */
+  .pb-safe {
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  }
+
   .gradient-text {
     background: linear-gradient(135deg, var(--gradient-primary), var(--gradient-secondary));
     -webkit-background-clip: text;

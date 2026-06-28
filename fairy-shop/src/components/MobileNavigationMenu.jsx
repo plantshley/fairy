@@ -21,7 +21,7 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, onO
         aria-label="Open navigation menu"
         title="Navigation"
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed z-50 top-3 right-12 w-7 h-7 flex flex-col items-center justify-center gap-1 opacity-90 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1"
+        className="fixed z-50 top-[calc(0.75rem+env(safe-area-inset-top))] right-12 w-7 h-7 flex flex-col items-center justify-center gap-1 opacity-90 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1"
         style={{ background: 'transparent' }}
       >
         <span className="w-4 h-0.5 rounded-full" style={{ backgroundColor: 'var(--text-primary)' }} />
@@ -44,7 +44,7 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, onO
 
             {/* Menu */}
             <motion.div
-              className="fixed top-14 right-3 z-50 backdrop-blur-md rounded-2xl shadow-2xl p-2"
+              className="fixed top-[calc(3.5rem+env(safe-area-inset-top))] right-3 z-50 backdrop-blur-md rounded-2xl shadow-2xl p-2"
               style={{
                 backgroundColor: isDarkTheme ? 'rgba(42, 16, 53, 0.95)' : 'rgba(255, 255, 255, 0.95)',
               }}

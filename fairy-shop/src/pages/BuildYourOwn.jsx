@@ -1468,7 +1468,7 @@ export const BuildYourOwn = ({ currentTheme }) => {
 
   return (
     <motion.div
-      className="w-full min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-4 overflow-hidden relative z-10"
+      className="w-full min-h-dvh flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-4 overflow-hidden relative z-10"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}

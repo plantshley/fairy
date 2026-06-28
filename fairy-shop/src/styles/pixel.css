@@ -1,0 +1,360 @@
+/* =========================================================
+   Pixel Pegasus Oasis — alternate-skin theme styles
+   Ported from the design project's styles.css, scoped under
+   `.theme-pixel` (toggled on <body> by applyTheme). Standard themes
+   are unaffected. Fonts are routed through CSS vars so the
+   readable-fonts a11y toggle can override them.
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Pacifico&family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@400;500;600;700&display=swap');
+
+/* Rainyhearts — pixel display font. Bundled from src/assets so Vite hashes it
+   and rewrites the URL for the production base path (public/ + absolute url()
+   would 404 under /fairy/). */
+@font-face {
+  font-family: 'Rainyhearts';
+  src: url('../assets/fonts/rainyhearts.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* ---------- Palette + font vars (scoped) ---------- */
+.theme-pixel {
+  /* Y2K Holo Pegasus */
+  --b-hotpink: #ff3aa0;
+  --b-pink: #ff85c8;
+  --b-pink-soft: #ffb8dc;
+  --b-cyan: #5ce0f0;
+  --b-cyan-soft: #b0f0fa;
+  --b-lilac: #c08aff;
+  --b-yellow: #ffe85c;
+  --b-cream: #fff8fc;
+  --b-deep: #5a1a6b;
+  --b-deep-2: #8a2a9b;
+
+  /* Direction D: Refined Mix (pink/purple holo) */
+  --d-pink: #ffb0d8;
+  --d-pink-2: #ff85c8;
+  --d-pink-3: #ff5aaf;
+  --d-pink-hot: #ff2e96;
+  --d-lilac: #d8b8f0;
+  --d-lilac-2: #b890e8;
+  --d-purple: #8a4dc8;
+  --d-purple-deep: #5a1a8a;
+  --d-rose: #ff9ec5;
+  --d-cream: #fff4f8;
+  --d-cream-2: #ffe0ec;
+  --d-mint: #d4eee0;
+  --d-cyan: #b0e0f0;
+  --d-plum: #5a1f6b;
+  --d-ink: #3a0f4a;
+
+  /* Pixel fonts as vars so .accessible-fonts can override them */
+  --font-pixel: 'Silkscreen', 'Pixelify Sans', monospace;
+  --font-rainy: 'Rainyhearts', 'Pixelify Sans', 'Silkscreen', monospace;
+  --font-deco: 'Bagel Fat One', 'Rainyhearts', 'Silkscreen', cursive;
+}
+
+/* Readable-fonts a11y override: swap pixel display fonts for a legible stack.
+   Both classes sit on <body>, so this beats the .theme-pixel defaults above. */
+.theme-pixel.accessible-fonts {
+  --font-pixel: 'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif;
+  --font-rainy: 'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif;
+  --font-deco: 'Comic Sans MS', 'Arial', sans-serif;
+}
+
+/* ---------- Type ---------- */
+.theme-pixel .font-pixel,
+.theme-pixel .font-pixel * {
+  font-family: var(--font-pixel);
+  letter-spacing: 0.02em;
+}
+.theme-pixel .font-rainy,
+.theme-pixel .font-rainy * {
+  font-family: var(--font-rainy);
+  letter-spacing: 0.02em;
+}
+
+.theme-pixel .pixel-img {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* "decodreams" layered candy-3D title. */
+.theme-pixel .deco-title {
+  font-family: var(--font-deco);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  display: inline-block;
+}
+.theme-pixel .deco-title--d {
+  filter:
+    drop-shadow(1px 1px 0px #ff91d4)
+    drop-shadow(-1px -1px 0px #fff)
+    drop-shadow(2px 2px 1px #ffc6e8)
+    drop-shadow(1px 1px 0px #ff70c3)
+    drop-shadow(0px 0px 2px #ffc6e8);
+  background: linear-gradient(to bottom, #ffbde4, #fff7fc, #ffbde4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: floating 3s ease-in-out infinite;
+  display: inline-block;
+  padding: 8px 4px;
+}
+.theme-pixel .deco-title--d-pink {
+  filter:
+    drop-shadow(2px 2px 0 #ff2e96) drop-shadow(3px 3px 0 #ff2e96)
+    drop-shadow(-2px -2px 0 #fff) drop-shadow(0 0 6px #ff70c3);
+  background: linear-gradient(to bottom, #ff70c3 0%, #fff7fc 45%, #ff2e96 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.theme-pixel .deco-title--d-purple {
+  filter:
+    drop-shadow(2px 2px 0 #8a4dc8) drop-shadow(3px 3px 0 #8a4dc8)
+    drop-shadow(-2px -2px 0 #fff) drop-shadow(0 0 6px #c08aff);
+  background: linear-gradient(to bottom, #d8b8f0 0%, #fff7fc 45%, #8a4dc8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.theme-pixel .deco-title--d-yellow {
+  filter:
+    drop-shadow(2px 2px 0 #ff85c8) drop-shadow(3px 3px 0 #ff5aaf)
+    drop-shadow(-2px -2px 0 #fff) drop-shadow(0 0 8px #ffe85c);
+  background: linear-gradient(to bottom, #ffe85c 0%, #fff7e0 40%, #ffc4dc 70%, #ff85c8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.theme-pixel .deco-title--d-neon {
+  filter:
+    drop-shadow(2px 2px 0 #ff4dff) drop-shadow(3px 3px 0 #ff4dff)
+    drop-shadow(-2px -2px 0 #fff) drop-shadow(0 0 8px #ff4dff);
+  background: linear-gradient(to bottom, #ff4dff 0%, #fff7fc 45%, #c08aff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.theme-pixel .deco-title--d-rainbow {
+  filter:
+    drop-shadow(2px 2px 0 #6a0dad) drop-shadow(3px 3px 0 #6a0dad)
+    drop-shadow(-2px -2px 0 #fff) drop-shadow(0 0 8px #ff70c3);
+  background: linear-gradient(90deg, #ff2e96 0%, #ff85c8 14%, #ffaa3c 28%, #ffe85c 42%,
+    #5ee0d0 56%, #5ce0f0 70%, #c08aff 84%, #ff4dff 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: floating 3s ease-in-out infinite, rainbow-slide 6s linear infinite;
+}
+
+/* ---------- Window chrome ---------- */
+.theme-pixel .pxwin {
+  background: var(--pxwin-bg, #fff);
+  position: relative;
+  box-shadow:
+    0 0 0 3px var(--pxwin-border, var(--d-plum)),
+    6px 6px 0 0 var(--pxwin-shadow, rgba(90, 31, 107, 0.25));
+  border-radius: 0;
+}
+.theme-pixel .pxwin__bar {
+  background: var(--pxwin-bar, var(--pxwin-border, var(--d-plum)));
+  color: var(--pxwin-bar-fg, #fff);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+}
+.theme-pixel .pxwin__bar-dots { display: flex; gap: 4px; }
+.theme-pixel .pxwin__bar-dots span {
+  width: 8px; height: 8px;
+  background: var(--pxwin-bar-fg, #fff);
+  display: inline-block;
+}
+.theme-pixel .pxwin__bar-x {
+  width: 14px; height: 14px;
+  background: var(--pxwin-bar-fg, #fff);
+  color: var(--pxwin-bar, var(--d-plum));
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.theme-pixel .pxwin__body { padding: 14px; }
+
+/* ---------- Buttons ---------- */
+.theme-pixel .pxbtn {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  background: var(--btn-bg, var(--d-pink));
+  color: var(--btn-fg, var(--d-plum));
+  padding: 8px 14px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  box-shadow:
+    inset 0 0 0 2px var(--btn-border, var(--d-plum)),
+    3px 3px 0 0 var(--btn-border, var(--d-plum));
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.theme-pixel .pxbtn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: inset 0 0 0 2px var(--btn-border, var(--d-plum)), 2px 2px 0 0 var(--btn-border, var(--d-plum));
+}
+.theme-pixel .pxbtn:active {
+  transform: translate(3px, 3px);
+  box-shadow: inset 0 0 0 2px var(--btn-border, var(--d-plum)), 0 0 0 0 var(--btn-border, var(--d-plum));
+}
+.theme-pixel .pxbtn--wide { padding: 10px 18px; font-size: 13px; }
+
+/* ---------- Blinkies (88×31) ---------- */
+.theme-pixel .blinkie {
+  width: 88px;
+  height: 31px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 auto;
+  line-height: 1.15;
+  padding: 2px 4px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55), inset 0 0 0 2px rgba(0,0,0,0.4);
+  image-rendering: pixelated;
+}
+.theme-pixel .blinkie--1 { background: linear-gradient(90deg, #ff66cc, #ff99dd); }
+.theme-pixel .blinkie--2 { background: linear-gradient(90deg, #5ce0f0, #b0f0fa); color: #1a0f3a; }
+.theme-pixel .blinkie--3 { background: #1a0f3a; color: #ffe085; }
+.theme-pixel .blinkie--4 { background: linear-gradient(90deg, #c08aff, #e0c8f0); }
+.theme-pixel .blinkie--5 { background: #6b3a73; color: #ffc4dc; }
+.theme-pixel .blinkie--6 { background: linear-gradient(90deg, #ffe85c, #ff85c8); color: #5a1a6b; }
+.theme-pixel .blinkie--7 { background: #c8e8d4; color: #6b3a73; }
+.theme-pixel .blinkie--8 { background: linear-gradient(90deg, #ff3aa0, #c08aff, #5ce0f0); }
+.theme-pixel .blinkie--9 { background: #2a1a55; color: #c8b0f0; }
+.theme-pixel .blinkie--blink { animation: blink-anim 0.85s step-end infinite; }
+.theme-pixel .blinkie--rainbow { animation: hue-cycle 4s linear infinite; }
+
+/* ---------- Page backgrounds ---------- */
+.theme-pixel .bgD {
+  background: linear-gradient(135deg,
+    #ffd8ec 0%, #ffafe5 18%, #d4a8ff 36%, #a8e0ff 56%, #ffe85c 78%, #ffd1ec 100%);
+  background-size: 220% 220%;
+  animation: holo-shift 14s ease-in-out infinite;
+}
+
+/* Scene backgrounds are applied inline (via getAssetPath) on the page container,
+   tagged with .pixel-scene so a11y can neutralize them. */
+
+/* ---------- Asset slot placeholder ---------- */
+.theme-pixel .asset-slot {
+  background-color: var(--slot-bg, #f3ecdb);
+  background-image: repeating-linear-gradient(
+    45deg, transparent 0, transparent 6px,
+    rgba(90,31,107,0.10) 6px, rgba(90,31,107,0.10) 12px);
+  color: var(--slot-fg, var(--d-plum));
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6px;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+
+/* ---------- Marquee ---------- */
+.theme-pixel .marquee { overflow: hidden; white-space: nowrap; }
+.theme-pixel .marquee__inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  animation: marquee 40s linear infinite;
+  padding-right: 18px;
+}
+
+.theme-pixel .nav-btn:hover { color: #fff !important; }
+
+/* =========================================================
+   Keyframes (global — harmless when unused)
+   ========================================================= */
+@keyframes holo-shift { 0%, 100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
+@keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes rainbow-slide { from { background-position: 0% 0; } to { background-position: 200% 0; } }
+@keyframes blink-anim { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0.5; } }
+@keyframes hue-cycle { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
+
+/* =========================================================
+   Accessibility parity
+   ========================================================= */
+
+/* High contrast: drop decorative GIF layers, neutralize animated/scene
+   backgrounds, force legible text. (!important beats inline styles.) */
+.high-contrast .pixel-deco { display: none !important; }
+.high-contrast .pixel-scene,
+.high-contrast .bgD {
+  background-image: none !important;
+  background: #ffffff !important;
+  animation: none !important;
+}
+.high-contrast.theme-pixel .deco-title,
+.high-contrast.theme-pixel .deco-title * {
+  filter: none !important;
+  background: none !important;
+  -webkit-text-fill-color: #000 !important;
+  color: #000 !important;
+}
+
+/* Reduce motion: the global `.reduce-motion *` rule already neutralizes CSS
+   keyframes (marquee, blinkie blink, holo shifts, floating titles). Animated
+   GIFs can't be paused via CSS, so drop the decorative GIF overlays and swap
+   animated scene backgrounds for the static holo gradient. */
+.reduce-motion .pixel-deco { display: none !important; }
+.reduce-motion .pixel-scene {
+  background-image: none !important;
+  background: linear-gradient(135deg, #ffd8ec 0%, #d4a8ff 50%, #a8e0ff 100%) !important;
+}
+
+/* =========================================================
+   Build page reskin (in-place pixel chrome)
+   BuildYourOwnV2 keeps its Konva DOM; these rules give it the pixel look when
+   the theme is active. The font-var override maps the standard --font-* tokens
+   (used by .font-kalnia/.font-bonbon/.font-mono on the build page) to pixel
+   fonts — but only when readable-fonts is OFF, so the a11y toggle still wins.
+   ========================================================= */
+.theme-pixel:not(.accessible-fonts) {
+  --font-heading: 'Rainyhearts', 'Pixelify Sans', monospace;
+  --font-decorative: 'Silkscreen', 'Pixelify Sans', monospace;
+  --font-body: 'Silkscreen', 'Pixelify Sans', monospace;
+}
+
+/* Square the rounded chrome and swap glassy panels for hard pixel borders.
+   Scoped to .pixel-build so only the build page is affected. */
+.theme-pixel .pixel-build [class*="rounded"] { border-radius: 0 !important; }
+.theme-pixel .pixel-build .backdrop-blur-md,
+.theme-pixel .pixel-build .backdrop-blur-sm,
+.theme-pixel .pixel-build .backdrop-blur {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: inset 0 0 0 3px var(--d-plum), 4px 4px 0 0 var(--d-plum) !important;
+}
