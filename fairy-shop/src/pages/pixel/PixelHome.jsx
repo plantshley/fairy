@@ -181,7 +181,7 @@ const PICKER = Object.values(themes).map((t) => ({
   // Short lowercase label derived from the theme name (drop trailing "love" etc.
   // is unnecessary — just lowercase the display name).
   label: t.name.toLowerCase(),
-  swatch: [t.colors.bgGradientStart, t.colors.bgGradientMid, t.colors.accentPrimary].filter(Boolean),
+  swatch: [t.colors.bgGradientStart, t.colors.bgGradientMid, t.colors.accentSecondary].filter(Boolean),
 }));
 
 export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange, onOpenAccessibility }) {
