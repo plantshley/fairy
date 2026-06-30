@@ -51,7 +51,7 @@
   /* Pixel fonts as vars so .accessible-fonts can override them */
   --font-pixel: 'Silkscreen', 'Pixelify Sans', monospace;
   --font-rainy: 'Rainyhearts', 'Pixelify Sans', 'Silkscreen', monospace;
-  --font-deco: 'Bagel Fat One', 'Rainyhearts', 'Silkscreen', cursive;
+  --font-deco: 'Rainyhearts', 'Bagel Fat One', 'Silkscreen', cursive;
 }
 
 /* Readable-fonts a11y override: swap pixel display fonts for a legible stack.
@@ -87,13 +87,17 @@
   line-height: 1;
   display: inline-block;
 }
+/* Candy-3D recipe (per the reference): a medium-tone shadow, a white highlight,
+   a soft light shadow + highlight pair, a deeper shadow, and a soft glow — over a
+   light → white → light gradient fill. Each variant re-tints the same 6 layers. */
 .theme-pixel .deco-title--d {
   filter:
-    drop-shadow(1px 1px 0px #ff91d4)
+    drop-shadow(1px 1px 0px #ff5cb0)
     drop-shadow(-1px -1px 0px #fff)
-    drop-shadow(2px 2px 1px #ffc6e8)
-    drop-shadow(1px 1px 0px #ff70c3)
-    drop-shadow(0px 0px 2px #ffc6e8);
+    drop-shadow(2px 2px 1px #ff8fcf)
+    drop-shadow(-1px -1px 1px #ff8fcf)
+    drop-shadow(2px 2px 0px #d6005f)
+    drop-shadow(0px 0px 2px #ff70c3);
   background: linear-gradient(to bottom, #ffbde4, #fff7fc, #ffbde4);
   -webkit-background-clip: text;
   background-clip: text;
@@ -104,8 +108,12 @@
 }
 .theme-pixel .deco-title--d-pink {
   filter:
-    drop-shadow(2px 2px 0 #ff2e96) drop-shadow(3px 3px 0 #ff2e96)
-    drop-shadow(-2px -2px 0 #fff) drop-shadow(0 0 6px #ff70c3);
+    drop-shadow(1px 1px 0px #ff5cb0)
+    drop-shadow(-1px -1px 0px #fff)
+    drop-shadow(2px 2px 1px #ff8fcf)
+    drop-shadow(-1px -1px 1px #ff8fcf)
+    drop-shadow(2px 2px 0px #d6005f)
+    drop-shadow(0px 0px 2px #ff70c3);
   background: linear-gradient(to bottom, #ff70c3 0%, #fff7fc 45%, #ff2e96 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -113,8 +121,12 @@
 }
 .theme-pixel .deco-title--d-purple {
   filter:
-    drop-shadow(2px 2px 0 #8a4dc8) drop-shadow(3px 3px 0 #8a4dc8)
-    drop-shadow(-2px -2px 0 #fff) drop-shadow(0 0 6px #c08aff);
+    drop-shadow(1px 1px 0px #a45ee0)
+    drop-shadow(-1px -1px 0px #fff)
+    drop-shadow(2px 2px 1px #b884e8)
+    drop-shadow(-1px -1px 1px #b884e8)
+    drop-shadow(2px 2px 0px #5f1fa8)
+    drop-shadow(0px 0px 2px #9a5fd0);
   background: linear-gradient(to bottom, #d8b8f0 0%, #fff7fc 45%, #8a4dc8 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -122,8 +134,12 @@
 }
 .theme-pixel .deco-title--d-yellow {
   filter:
-    drop-shadow(2px 2px 0 #ff85c8) drop-shadow(3px 3px 0 #ff5aaf)
-    drop-shadow(-2px -2px 0 #fff) drop-shadow(0 0 8px #ffe85c);
+    drop-shadow(1px 1px 0px #ffbf4a)
+    drop-shadow(-1px -1px 0px #fff)
+    drop-shadow(2px 2px 1px #ffb86a)
+    drop-shadow(-1px -1px 1px #ffb86a)
+    drop-shadow(2px 2px 0px #ff4f9e)
+    drop-shadow(0px 0px 2px #ffd36b);
   background: linear-gradient(to bottom, #ffe85c 0%, #fff7e0 40%, #ffc4dc 70%, #ff85c8 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -131,8 +147,12 @@
 }
 .theme-pixel .deco-title--d-neon {
   filter:
-    drop-shadow(2px 2px 0 #ff4dff) drop-shadow(3px 3px 0 #ff4dff)
-    drop-shadow(-2px -2px 0 #fff) drop-shadow(0 0 8px #ff4dff);
+    drop-shadow(1px 1px 0px #ff5cf0)
+    drop-shadow(-1px -1px 0px #fff)
+    drop-shadow(2px 2px 1px #ff7af2)
+    drop-shadow(-1px -1px 1px #ff7af2)
+    drop-shadow(2px 2px 0px #b81fa0)
+    drop-shadow(0px 0px 2px #ec4ad9);
   background: linear-gradient(to bottom, #ff4dff 0%, #fff7fc 45%, #c08aff 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -140,8 +160,12 @@
 }
 .theme-pixel .deco-title--d-rainbow {
   filter:
-    drop-shadow(2px 2px 0 #6a0dad) drop-shadow(3px 3px 0 #6a0dad)
-    drop-shadow(-2px -2px 0 #fff) drop-shadow(0 0 8px #ff70c3);
+    drop-shadow(1px 1px 0px #ff5cb0)
+    drop-shadow(-1px -1px 0px #fff)
+    drop-shadow(2px 2px 1px #c98ae8)
+    drop-shadow(-1px -1px 1px #c98ae8)
+    drop-shadow(2px 2px 0px #6a1fb8)
+    drop-shadow(0px 0px 2px #ff70c3);
   background: linear-gradient(90deg, #ff2e96 0%, #ff85c8 14%, #ffaa3c 28%, #ffe85c 42%,
     #5ee0d0 56%, #5ce0f0 70%, #c08aff 84%, #ff4dff 100%);
   background-size: 200% 100%;
@@ -241,13 +265,13 @@
 }
 .theme-pixel .blinkie--1 { background: linear-gradient(90deg, #ff66cc, #ff99dd); }
 .theme-pixel .blinkie--2 { background: linear-gradient(90deg, #5ce0f0, #b0f0fa); color: #1a0f3a; }
-.theme-pixel .blinkie--3 { background: #1a0f3a; color: #ffe085; }
+.theme-pixel .blinkie--3 { background: #c727a2; color: #ffe085; }
 .theme-pixel .blinkie--4 { background: linear-gradient(90deg, #c08aff, #e0c8f0); }
-.theme-pixel .blinkie--5 { background: #6b3a73; color: #ffc4dc; }
+.theme-pixel .blinkie--5 { background: #c810b8; color: #fff6d0; }
 .theme-pixel .blinkie--6 { background: linear-gradient(90deg, #ffe85c, #ff85c8); color: #5a1a6b; }
 .theme-pixel .blinkie--7 { background: #c8e8d4; color: #6b3a73; }
 .theme-pixel .blinkie--8 { background: linear-gradient(90deg, #ff3aa0, #c08aff, #5ce0f0); }
-.theme-pixel .blinkie--9 { background: #2a1a55; color: #c8b0f0; }
+.theme-pixel .blinkie--9 { background: #8f28c6; color: #c8b0f0; }
 .theme-pixel .blinkie--blink { animation: blink-anim 0.85s step-end infinite; }
 .theme-pixel .blinkie--rainbow { animation: hue-cycle 4s linear infinite; }
 

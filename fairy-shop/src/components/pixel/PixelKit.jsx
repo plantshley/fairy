@@ -70,9 +70,12 @@ export function PxButton({ children, bg, fg, border, style, onClick, wide, type 
 // ---------------------------------------------------------------
 //  Blinkie (88×31) — decorative web badge
 // ---------------------------------------------------------------
-export function Blinkie({ variant = 1, blink, rainbow, children }) {
+export function Blinkie({ variant = 1, blink, rainbow, delay, children }) {
   return (
-    <span className={`blinkie pixel-deco blinkie--${variant} ${blink ? 'blinkie--blink' : ''} ${rainbow ? 'blinkie--rainbow' : ''}`}>
+    <span
+      className={`blinkie pixel-deco blinkie--${variant} ${blink ? 'blinkie--blink' : ''} ${rainbow ? 'blinkie--rainbow' : ''}`}
+      style={delay ? { animationDelay: delay } : undefined}
+    >
       {children}
     </span>
   );
@@ -241,13 +244,14 @@ export function MusicPlayer({
     <PxWindow title="♪ now playing" border={border || accent} bar={bar || border || accent} barFg={barFg} bg={bg} close={false} style={{ width }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 36, height: 36, background: accent, display: 'grid', placeItems: 'center' }}>
-            <span className="font-pixel" style={{ color: '#fff', fontSize: 18 }}>♪</span>
+          <div style={{ width: 36, height: 36, background: accent, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            <img src={px('icons/music.gif')} alt="" className="pixel-img pixel-deco" style={{ width: 26, height: 26 }} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="font-pixel" style={{ fontSize: 10, color: accent, lineHeight: 1.3 }}>{track}</div>
             <div className="font-pixel" style={{ fontSize: 8, color: accent, opacity: 0.65 }}>{artist}</div>
           </div>
+          <img src={px('icons/happy-notes.gif')} alt="" className="pixel-img pixel-deco" style={{ height: 22, width: 'auto', flexShrink: 0, opacity: playing ? 1 : 0.75 }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <button
@@ -284,11 +288,20 @@ const NAV_LINKS = ['home', 'shop', 'links', 'gallery', 'build'];
 
 export function NavBar({ accent = 'var(--d-plum)', active = 'home', onTabChange, onOpenAccessibility }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    // Single row at every width: stardust → nav buttons → accessibility. No wrap;
+    // sizing shrinks on mobile so the whole bar stays on one line.
+    <div className="flex flex-nowrap items-center justify-between gap-1.5 sm:gap-3">
+      <button
+        type="button"
+        onClick={() => onTabChange?.('home')}
+        title="back to home"
+        aria-label="Go to home page"
+        className="flex shrink-0 scale-[0.7] sm:scale-100 origin-left -mr-3 sm:mr-0"
+        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+      >
         <PegasusSprite scale={3} />
-      </div>
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+      </button>
+      <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5 min-w-0">
         {NAV_LINKS.map((l, i) => {
           const swatch = NAV_PALETTE[i % NAV_PALETTE.length];
           const isActive = active === l;
@@ -297,10 +310,8 @@ export function NavBar({ accent = 'var(--d-plum)', active = 'home', onTabChange,
               key={l}
               type="button"
               onClick={() => onTabChange?.(l)}
-              className="font-pixel nav-btn"
+              className="font-pixel nav-btn shrink-0 whitespace-nowrap lowercase text-[8px] sm:text-[11px] px-1.5 py-1 sm:px-2.5 sm:py-1.5"
               style={{
-                fontSize: 11,
-                padding: '6px 10px',
                 background: swatch.bg,
                 color: swatch.fg,
                 border: 'none',
@@ -309,7 +320,6 @@ export function NavBar({ accent = 'var(--d-plum)', active = 'home', onTabChange,
                 letterSpacing: '0.04em',
                 fontWeight: isActive ? 700 : 400,
                 transform: isActive ? 'translate(-1px, -1px)' : 'none',
-                textTransform: 'lowercase',
               }}
             >
               {l}
@@ -321,19 +331,13 @@ export function NavBar({ accent = 'var(--d-plum)', active = 'home', onTabChange,
           title="accessibility settings"
           aria-label="Open accessibility settings"
           onClick={onOpenAccessibility}
-          className="font-pixel"
+          className="font-pixel shrink-0 grid place-items-center w-6 h-6 sm:w-7 sm:h-7 text-[11px] sm:text-xs ml-0.5"
           style={{
-            fontSize: 12,
-            width: 28,
-            height: 28,
             background: '#fff',
             color: accent,
             border: 'none',
             cursor: 'pointer',
             boxShadow: `inset 0 0 0 2px ${accent}`,
-            display: 'grid',
-            placeItems: 'center',
-            marginLeft: 4,
           }}
         >
           ♿

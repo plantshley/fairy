@@ -190,7 +190,7 @@ const CategoryBox = ({ category, isHovered, currentTheme, onMouseEnter, onMouseL
       )}
 
       <div
-        className="rounded-3xl overflow-hidden shadow-2xl cursor-pointer relative"
+        className={`rounded-3xl overflow-hidden cursor-pointer relative ${isMobile ? '' : 'shadow-2xl'}`}
         style={{
           width: '100%',
           height: '100%',

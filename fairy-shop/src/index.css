@@ -129,6 +129,14 @@ body {
 
 * {
   box-sizing: border-box;
+  scrollbar-width: none; /* Firefox: hide scrollbars (scrolling still works) */
+  -ms-overflow-style: none; /* legacy Edge/IE */
+}
+
+/* Hide scrollbars in Chromium/Safari while keeping scroll ability — applies to
+   the page and every inner scroll container (sheet, panels, gallery, etc.). */
+*::-webkit-scrollbar {
+  display: none;
 }
 
 @layer utilities {

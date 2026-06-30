@@ -147,7 +147,7 @@ export const themes = {
       bgGradientMid: '#f87bf2',
       bgGradientEnd: '#a8e0ff',
       accentPrimary: '#ff5aaf',
-      accentSecondary: '#9ef5f5',
+      accentSecondary: '#71d1d1',
       textPrimary: '#5a1f6b',
       textSecondary: '#8a4dc8',
       sparkleColor: '#ffe85c',

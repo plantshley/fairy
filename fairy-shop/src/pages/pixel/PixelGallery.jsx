@@ -39,12 +39,12 @@ export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
         <NavBar accent={ACCENT} active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
 
         <div className="text-center my-4">
-          <div className="flex items-center justify-center gap-3 sm:gap-5">
-            <img src={px('icons/uba-hearts.gif')} alt="" className="pixel-img pixel-deco w-10 sm:w-[60px]" />
-            <div className="deco-title deco-title--d deco-title--d-purple font-rainy" style={{ fontSize: 'clamp(40px, 9vw, 80px)' }}>
+          <div className="flex flex-nowrap items-center justify-center gap-2 sm:gap-5">
+            <img src={px('icons/uba-hearts.gif')} alt="" className="pixel-img pixel-deco w-10 sm:w-[60px] flex-shrink-0" />
+            <div className="deco-title deco-title--d deco-title--d-purple font-rainy whitespace-nowrap" style={{ fontSize: 'clamp(26px, 8vw, 80px)' }}>
               ✿ gallery ✿
             </div>
-            <img src={px('icons/uba-hearts.gif')} alt="" className="pixel-img pixel-deco w-10 sm:w-[60px]" />
+            <img src={px('icons/uba-hearts.gif')} alt="" className="pixel-img pixel-deco w-10 sm:w-[60px] flex-shrink-0" />
           </div>
           <div className="font-pixel" style={{ fontSize: 10, color: ACCENT, opacity: 0.85, marginTop: 8 }}>
             a scrapbook of plushies, cards &amp; doodles

@@ -32,12 +32,12 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
         <NavBar accent={ACCENT} active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
 
         <div className="text-center my-5">
-          <div className="flex items-center justify-center gap-3 sm:gap-5">
-            <img src={px('icons/twinkle-shop.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12" />
-            <div className="deco-title deco-title--d deco-title--d-neon font-rainy" style={{ fontSize: 'clamp(40px, 9vw, 80px)' }}>
+          <div className="flex flex-nowrap items-center justify-center gap-2 sm:gap-5">
+            <img src={px('icons/twinkle-shop.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12 flex-shrink-0" />
+            <div className="deco-title deco-title--d deco-title--d-neon font-rainy whitespace-nowrap" style={{ fontSize: 'clamp(26px, 8vw, 80px)' }}>
               ♡ shop ♡
             </div>
-            <img src={px('icons/twinkle-shop.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12" />
+            <img src={px('icons/twinkle-shop.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12 flex-shrink-0" />
           </div>
         </div>
 
@@ -54,7 +54,7 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
         >
           <Marquee speed={28}>
             <span className="font-pixel" style={{ fontSize: 12, color: '#fff', textShadow: `1px 1px 0 ${ACCENT}`, padding: '0 8px', display: 'inline-block' }}>
-              ✦ holo drop tonight ✦ &nbsp; ♡ free stardust charm on $30+ ♡ &nbsp; ★ commissions open ★ &nbsp; ✧ new pegasus plush ✧ &nbsp;
+              ✦ page under maintenance ✦ &nbsp; ♡ see my ko-fi page link to shop ♡ &nbsp; ★ commissions open ★ &nbsp; 
             </span>
           </Marquee>
         </div>

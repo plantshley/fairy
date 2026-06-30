@@ -120,15 +120,14 @@ function StardustPet() {
 
   return (
     <div
-      className="pixel-scene relative grid items-center gap-5 p-5"
+      className="pixel-scene relative grid items-center gap-4 p-4 sm:gap-5 sm:p-5 grid-cols-1 justify-items-center sm:justify-items-stretch sm:grid-cols-[auto_1fr]"
       style={{
-        gridTemplateColumns: 'auto 1fr',
         background: `url(${px('scenes/scene-oasis.gif')}) center/cover`,
         imageRendering: 'pixelated',
         minHeight: 290,
       }}
     >
-      <img src={px('icons/sparkles.gif')} alt="" className="pixel-img pixel-deco pointer-events-none absolute inset-0 w-full h-full" style={{ opacity: 0.45, mixBlendMode: 'screen' }} />
+      <img src={px('icons/sparkles.gif')} alt="" className="pixel-img pixel-deco pointer-events-none absolute inset-0 w-full h-full object-cover" style={{ opacity: 0.45, mixBlendMode: 'screen' }} />
 
       <div className="relative grid place-items-center p-2.5">
         <img src={px('icons/twinkle-1.gif')} alt="" className="pixel-img pixel-deco absolute" style={{ top: -8, left: -10, width: 28 }} />
@@ -167,11 +166,22 @@ function StardustPet() {
   );
 }
 
+// Real web-friends — rendered as blinkies that link out. Each gets a staggered
+// blink delay (see usage) so they don't all flash in unison.
+const WEB_FRIENDS = [
+  { label: <>roobz<br />makes stuff</>, url: 'https://roobzmakesstuff.carrd.co/', title: 'roobzmakesstuff', variant: 1 },
+  { label: <>wemlis<br />bemlis</>, url: 'https://wemlisbemlis.carrd.co/', title: 'wemlisbemlis', variant: 4 },
+  { label: <>phoebe<br />moon art</>, url: 'https://phoebemoonportfolio.webador.com/', title: 'phoebemoonart', variant: 7 },
+  { label: <>cinnamon<br />squid</>, url: 'https://ko-fi.com/cinnamonsquidcrochet/shop', title: 'cinnamon squid crochet', variant: 6 },
+  { label: <>catnip<br />cuddles</>, url: 'https://www.instagram.com/catnip.cuddles/', title: 'catnip cuddles', variant: 5 },
+  { label: <>your<br />link?</>, url: null, title: 'placeholder2', variant: 2 },
+];
+
 const ACTIONS = [
-  { label: 'build a plushie', sub: 'design your own ♡', bg: 'var(--d-pink-3)', icon: '★', tab: 'build' },
-  { label: 'visit the shop', sub: 'plushies & charms', bg: 'var(--d-lilac-2)', icon: '♡', tab: 'shop' },
-  { label: 'see the gallery', sub: 'cards, art, doodles', bg: 'var(--b-yellow)', icon: '✿', tab: 'gallery' },
-  { label: 'follow links', sub: 'where else i live', bg: 'var(--b-cyan)', icon: '✦', tab: 'links' },
+  { label: 'build a plushie', sub: 'design your own ♡', bg: 'var(--d-pink-3)', icon: 'wand2.gif', tab: 'build' },
+  { label: 'visit the shop', sub: 'plushies & charms', bg: 'var(--d-lilac-2)', icon: 'sparkle-bun.gif', tab: 'shop' },
+  { label: 'see the gallery', sub: 'cards, art, doodles', bg: 'var(--b-yellow)', icon: 'frog.gif', tab: 'gallery' },
+  { label: 'follow links', sub: 'where else i live', bg: 'var(--b-cyan)', icon: 'shooting-stars.gif', tab: 'links' },
 ];
 
 // Theme-picker chips, generated from the real theme registry so every theme is
@@ -189,19 +199,24 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
     <div
       className="bgD relative w-full min-h-dvh overflow-hidden px-4 pt-5 pb-safe sm:px-10 lg:px-20"
     >
-      <img src={px('icons/sparkles.gif')} alt="" className="pixel-img pixel-deco pointer-events-none absolute inset-0 w-full h-full" style={{ opacity: 0.35, mixBlendMode: 'screen' }} />
+      {/* Ambient sparkle field — tiled at native size (756×443) so it keeps its
+          aspect ratio (no stretch/warp) and the GIF animates. */}
+      <div
+        className="pixel-deco pointer-events-none absolute inset-0"
+        style={{ backgroundImage: `url(${px('icons/sparkles.gif')})`, backgroundRepeat: 'repeat', backgroundSize: '420px auto', opacity: 0.35, mixBlendMode: 'screen' }}
+      />
 
       <div className="relative z-[2]">
         <NavBar accent={ACCENT} active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
 
-        {/* hero */}
+        {/* hero — always a single row (3d star → title → 3d star) */}
         <div className="text-center mt-1 mb-3">
-          <div className="flex items-center justify-center gap-3 sm:gap-6">
-            <img src={px('icons/3dstar.gif')} alt="" className="pixel-img pixel-deco w-12 sm:w-[70px]" style={{ animation: 'float-y 3s ease-in-out infinite' }} />
-            <div className="deco-title deco-title--d deco-title--d-rainbow font-rainy" style={{ fontSize: 'clamp(36px, 8vw, 80px)' }}>
+          <div className="flex flex-nowrap items-center justify-center gap-1.5 sm:gap-6">
+            <img src={px('icons/3dstar.gif')} alt="" className="pixel-img pixel-deco w-7 sm:w-[70px] flex-shrink-0" style={{ animation: 'float-y 3s ease-in-out infinite' }} />
+            <div className="deco-title deco-title--d deco-title--d-rainbow font-rainy min-w-0 whitespace-nowrap" style={{ fontSize: 'clamp(15px, 4.6vw, 80px)' }}>
               kirametki ♡ fairykun
             </div>
-            <img src={px('icons/3dstar.gif')} alt="" className="pixel-img pixel-deco w-12 sm:w-[70px]" style={{ animation: 'float-y 3s ease-in-out infinite', animationDelay: '1.5s' }} />
+            <img src={px('icons/3dstar.gif')} alt="" className="pixel-img pixel-deco w-7 sm:w-[70px] flex-shrink-0" style={{ animation: 'float-y 3s ease-in-out infinite', animationDelay: '1.5s' }} />
           </div>
         </div>
 
@@ -214,7 +229,7 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
             <PxWindow title="✿ about me" border={ACCENT} bar="var(--d-pink-3)" barFg="var(--d-plum)" bg="rgba(255,255,255,0.9)">
               <div className="font-mono" style={{ fontSize: 11, color: ACCENT, lineHeight: 1.6 }}>
                 hi! i'm <b style={{ color: 'var(--d-pink-3)' }}>fairy</b> ｡ﾟ✧
-                <br />i make crochet plushies, lift heavy weights, & run this corner of the holo-web.
+                <br />i make crochet plushies, lift heavy weights, & am the gaurdian of this web realm.
                 <br /><br />
                 <span style={{ opacity: 0.7 }}>currently:</span> <b>making gainz</b>
               </div>
@@ -242,7 +257,7 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
               <StardustPet />
             </PxWindow>
 
-            <Divider src="heart-glow.gif" height={30} />
+            <Divider src="heart-glow-teal.gif" height={30} />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {ACTIONS.map((b) => (
@@ -253,10 +268,10 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
                   className="flex items-center gap-2.5 text-left border-none cursor-pointer"
                   style={{ background: b.bg, boxShadow: `inset 0 0 0 3px ${ACCENT}, 4px 4px 0 0 ${ACCENT}`, padding: '8px 12px' }}
                 >
-                  <div className="grid place-items-center flex-shrink-0" style={{ width: 38, height: 38, background: '#fff', boxShadow: `inset 0 0 0 2px ${ACCENT}`, fontSize: 20, color: ACCENT }}>
-                    {b.icon}
+                  <div className="grid place-items-center flex-shrink-0" style={{ width: 38, height: 38, background: '#fff', boxShadow: `inset 0 0 0 2px ${ACCENT}` }}>
+                    <img src={px(`icons/${b.icon}`)} alt="" className="pixel-img" style={{ width: 28, height: 28, objectFit: 'contain' }} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <div className="font-rainy" style={{ fontSize: 26, color: '#fff', lineHeight: 1, textShadow: `1px 1px 0 ${ACCENT}` }}>{b.label}</div>
                     <div className="font-pixel" style={{ fontSize: 10, color: '#fff', marginTop: 3, opacity: 0.95, textShadow: `1px 1px 0 ${ACCENT}` }}>{b.sub}</div>
                   </div>
@@ -269,12 +284,27 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
           <div className="flex flex-col gap-3">
             <PxWindow title="♡ web friends" border={ACCENT} bar="var(--d-lilac-2)" barFg="var(--d-plum)" bg="rgba(255,255,255,0.9)">
               <div className="flex flex-wrap gap-1">
-                <Blinkie variant={1} blink>holo★web</Blinkie>
-                <Blinkie variant={4}>kawaii<br />club</Blinkie>
-                <Blinkie variant={7} blink>plush guild</Blinkie>
-                <Blinkie variant={6}>pink dream</Blinkie>
-                <Blinkie variant={5} blink>pixel cult</Blinkie>
-                <Blinkie variant={2}>tea lounge</Blinkie>
+                {WEB_FRIENDS.map((f, i) => {
+                  const blinkie = (
+                    <Blinkie variant={f.variant} blink delay={`${i * 0.21}s`}>
+                      {f.label}
+                    </Blinkie>
+                  );
+                  return f.url ? (
+                    <a
+                      key={f.title}
+                      href={f.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={f.title}
+                      className="no-underline inline-flex"
+                    >
+                      {blinkie}
+                    </a>
+                  ) : (
+                    <span key={f.title} className="inline-flex">{blinkie}</span>
+                  );
+                })}
               </div>
             </PxWindow>
 

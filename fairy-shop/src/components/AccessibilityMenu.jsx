@@ -47,6 +47,9 @@ export const AccessibilityMenu = ({
   const setIsOpen = onOpenChange;
   const isDarkTheme = currentTheme?.id === 'midnightVelvetMeadow';
   const isBuild = activeTab === 'build';
+  // The pixel theme's in-page NavBar (and the build hamburger) carry their own
+  // ♿ trigger, so the standalone floating buttons are suppressed there.
+  const isPixel = currentTheme?.layout === 'pixel';
   const panelRef = useRef(null);
 
   // While the panel is open: focus it, trap Tab inside it, close on Escape, and
@@ -123,21 +126,23 @@ export const AccessibilityMenu = ({
   return (
     <>
       {/* Desktop - aligns with left navigation (where the fonts pill used to be) */}
-      <motion.button
-        className="fixed bottom-6 left-2 z-50 w-12 h-12 rounded-full backdrop-blur-sm hidden lg:flex items-center justify-center focus:outline-none focus:ring-2"
-        style={buttonStyle}
-        onClick={() => setIsOpen(true)}
-        whileHover={{ opacity: 0.85 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Accessibility settings"
-        aria-expanded={isOpen}
-      >
-        <img src={getAssetPath('/icons/acc-icon.png')} alt="" className="w-7 h-7 object-contain" />
-      </motion.button>
+      {!isPixel && (
+        <motion.button
+          className="fixed bottom-6 left-2 z-50 w-12 h-12 rounded-full backdrop-blur-sm hidden lg:flex items-center justify-center focus:outline-none focus:ring-2"
+          style={buttonStyle}
+          onClick={() => setIsOpen(true)}
+          whileHover={{ opacity: 0.85 }}
+          whileTap={{ scale: 0.95 }}
+          aria-label="Accessibility settings"
+          aria-expanded={isOpen}
+        >
+          <img src={getAssetPath('/icons/acc-icon.png')} alt="" className="w-7 h-7 object-contain" />
+        </motion.button>
+      )}
 
       {/* Mobile & Landscape - above nav. On the build page this floating button is
           hidden; the accessibility option lives inside the hamburger menu instead. */}
-      {!isBuild && (
+      {!isBuild && !isPixel && (
         <motion.button
           className="fixed z-50 w-10 h-10 rounded-full backdrop-blur-sm lg:hidden flex items-center justify-center focus:outline-none focus:ring-2 bottom-20 left-2 landscape:left-3 landscape:bottom-auto landscape:top-2"
           style={buttonStyle}

@@ -42,12 +42,12 @@ export function PixelLinks({ activeTab, onTabChange, onOpenAccessibility }) {
         <NavBar accent={ACCENT} active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
 
         <div className="text-center my-6">
-          <div className="flex items-center justify-center gap-3 sm:gap-5">
-            <img src={px('icons/strawberry-flowers.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12" />
-            <div className="deco-title deco-title--d deco-title--d-yellow font-rainy" style={{ fontSize: 'clamp(40px, 9vw, 80px)' }}>
+          <div className="flex flex-nowrap items-center justify-center gap-2 sm:gap-5">
+            <img src={px('icons/strawberry-flowers.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12 flex-shrink-0" />
+            <div className="deco-title deco-title--d deco-title--d-yellow font-rainy whitespace-nowrap" style={{ fontSize: 'clamp(26px, 8vw, 80px)' }}>
               ✦ links ✦
             </div>
-            <img src={px('icons/strawberry-flowers.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12" />
+            <img src={px('icons/strawberry-flowers.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12 flex-shrink-0" />
           </div>
         </div>
 
@@ -88,10 +88,14 @@ export function PixelLinks({ activeTab, onTabChange, onOpenAccessibility }) {
                 </div>
                 <div className="relative z-[1] flex flex-1 items-center gap-3 px-3.5 pb-3 pt-3.5">
                   <div
-                    className="grid place-items-center text-xl flex-shrink-0"
+                    className="grid place-items-center flex-shrink-0"
                     style={{ width: 42, height: 42, background: warm.tile, boxShadow: `inset 0 0 0 2px ${ACCENT}` }}
                   >
-                    {link.emoji}
+                    {link.pixelIcon ? (
+                      <img src={px(`icons/${link.pixelIcon}`)} alt="" className="pixel-img" style={{ width: 30, height: 30, objectFit: 'contain' }} />
+                    ) : (
+                      <span className="text-xl">{link.emoji}</span>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-rainy" style={{ fontSize: 26, color: ACCENT, lineHeight: 1, textTransform: 'lowercase' }}>

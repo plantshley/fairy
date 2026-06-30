@@ -46,9 +46,15 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMo
     }
   };
 
+  // On the pixel home page the in-page theme picker handles theme switching, so
+  // the floating creature + speech bubble are hidden there. It stays on the other
+  // pixel pages as the escape hatch back to the standard themes.
+  const hideCreature = currentTheme?.layout === 'pixel' && activeTab === 'home';
+
   return (
     <>
       {/* Corner creature button with speech bubble */}
+      {!hideCreature && (
       <div className={`fixed z-50 ${
         (activeTab === 'build' || activeTab === 'build-v2')
           ? 'top-2 left-2 lg:top-auto lg:left-auto lg:bottom-8 lg:right-8'
@@ -108,6 +114,7 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMo
           />
         </motion.button>
       </div>
+      )}
 
       {/* Theme selection modal */}
       <AnimatePresence>

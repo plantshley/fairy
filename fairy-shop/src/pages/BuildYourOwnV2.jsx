@@ -874,6 +874,10 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
     const updateSize = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
+        // Under the pixel theme the canvas container has a 3px inset frame + small
+        // padding; subtract it so the Konva canvas sits inside the box outline
+        // instead of overflowing it.
+        const frameInset = currentTheme?.layout === 'pixel' ? 12 : 0;
 
         // Store initial height on first load to prevent changes from mobile address bar
         if (initialHeight === null) {
@@ -881,7 +885,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
         }
 
         setStageSize({
-          width: Math.min(containerWidth, 800),
+          width: Math.min(containerWidth - frameInset, 800),
           height: Math.max(initialHeight, 400),
         });
       }
@@ -1782,7 +1786,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
 
   return (
     <motion.div
-      className={`w-full min-h-dvh flex flex-col items-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-4 overflow-hidden relative z-10 ${pixel ? 'bgD pixel-build' : ''}`}
+      className={`w-full min-h-dvh flex flex-col items-center ${pixel ? 'px-2 pt-4' : 'p-4'} sm:p-6 lg:p-8 pb-20 lg:pb-4 overflow-hidden relative z-10 ${pixel ? 'bgD pixel-build' : ''}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -1797,12 +1801,12 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
       )}
 
       {pixel ? (
-        <h1 className="deco-title deco-title--d deco-title--d-pink font-rainy text-center relative z-10 mb-2 sm:mb-4" style={{ fontSize: 'clamp(28px, 6vw, 64px)' }}>
+        <h1 className={`deco-title deco-title--d deco-title--d-pink font-rainy text-center whitespace-nowrap relative z-10 ${isMobileLayout ? 'mb-1' : 'mb-2 sm:mb-4'}`} style={{ fontSize: isMobileLayout ? 'clamp(16px, 4.6vw, 64px)' : 'clamp(28px, 6vw, 64px)' }}>
           ✦ kirametki designer ✦
         </h1>
       ) : (
         <motion.h1
-          className="font-kalnia text-xl sm:text-3xl md:text-4xl mb-2 sm:mb-4 gradient-text text-center relative z-10"
+          className={`font-kalnia sm:text-3xl md:text-4xl gradient-text text-center relative z-10 ${isMobileLayout ? 'text-base mb-1' : 'text-xl mb-2 sm:mb-4'}`}
           style={{ overflow: 'visible' }}
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
@@ -1813,9 +1817,12 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
         </motion.h1>
       )}
 
-      <p className={`text-center mb-2 sm:mb-4 text-sm sm:text-base md:text-lg lg:text-xl tracking-wider px-4 ${pixel ? 'font-pixel' : 'font-bonbon'}`} style={{ color: 'var(--text-primary)' }}>
-        ⋆｡°✩ build your own kirametki creature ✩°｡⋆
-      </p>
+      {/* Subtitle hidden in the mobile bottom-sheet layout so the canvas can sit higher. */}
+      {!isMobileLayout && (
+        <p className={`text-center mb-2 sm:mb-4 text-sm sm:text-base md:text-lg lg:text-xl tracking-wider px-4 ${pixel ? 'font-pixel' : 'font-bonbon'}`} style={{ color: 'var(--text-primary)' }}>
+          ⋆｡°✩ build your own kirametki creature ✩°｡⋆
+        </p>
+      )}
 
       <div className="flex flex-col landscape:flex-row lg:flex-row landscape:items-stretch lg:items-stretch gap-4 w-full max-w-7xl flex-1 min-h-0">
         {/* Left Control Panel - hidden on mobile when using bottom sheet */}
@@ -2283,7 +2290,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
         {/* Canvas Area */}
         <motion.div
           ref={containerRef}
-          className="backdrop-blur-md rounded-3xl shadow-xl p-4 overflow-hidden"
+          className={`relative backdrop-blur-md rounded-3xl shadow-xl overflow-hidden ${pixel ? 'p-1.5' : 'p-4'}`}
           style={{
             backgroundColor: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
             minHeight: isMobileLayout ? 'calc(50dvh - 80px)' : '500px',
@@ -2702,7 +2709,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                   <Group>
                     <Rect
                       id="freedraw-toggle"
-                      width={stageSize.width < 600 ? 110 : 125}
+                      width={stageSize.width < 600 ? (pixel ? 132 : 110) : (pixel ? 148 : 125)}
                       height={stageSize.width < 600 ? 28 : 35}
                       fill={freeDrawMode
                         ? currentTheme?.colors?.accentPrimary || '#ff9dda'
@@ -2750,10 +2757,11 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                       fontFamily={currentFont}
                       fontStyle="500"
                       fill="white"
-                      width={stageSize.width < 600 ? 110 : 125}
+                      width={stageSize.width < 600 ? (pixel ? 132 : 110) : (pixel ? 148 : 125)}
                       height={stageSize.width < 600 ? 28 : 35}
                       align="center"
                       verticalAlign="middle"
+                      wrap="none"
                       listening={false}
                     />
                   </Group>
