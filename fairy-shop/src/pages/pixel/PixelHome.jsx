@@ -220,7 +220,7 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
           </div>
         </div>
 
-        <Divider src="heart-line2.gif" height={30} style={{ margin: '4px 0 18px' }} />
+        <Divider src="cutie-stars.gif" height={30} style={{ margin: '4px 0 18px' }} />
 
         {/* 3-col → single col */}
         <div className="grid gap-4 items-start lg:grid-cols-[250px_1fr_220px]">
@@ -257,7 +257,7 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
               <StardustPet />
             </PxWindow>
 
-            <Divider src="heart-glow-teal.gif" height={30} />
+            <Divider src="jumprope.gif" height={30} />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {ACTIONS.map((b) => (
