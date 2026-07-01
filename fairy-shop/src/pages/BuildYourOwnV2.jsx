@@ -1103,7 +1103,10 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
       newZ = max + 1;
     } else if (direction === 'back') {
       const min = otherZs.length ? Math.min(...otherZs) : 0;
-      newZ = min - 1;
+      // Clamp to <= -1 so the object always lands behind the body (which only
+      // happens for zIndex < 0). Without this, objects can bottom out at 0 —
+      // still in front of the body — since new objects now start at zIndex >= 1.
+      newZ = Math.min(-1, min - 1);
     }
 
     const newObjects = [...placedObjects];
