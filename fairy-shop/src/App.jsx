@@ -48,7 +48,10 @@ function App() {
     navigate(tabToPath[tab] || '/');
   };
 
-  const [currentTheme, setCurrentTheme] = useState(themes.twinkleFairyDream);
+  const [currentTheme, setCurrentTheme] = useState(() => {
+    const savedId = localStorage.getItem('fairy-theme');
+    return (savedId && themes[savedId]) || themes.twinkleFairyDream;
+  });
   const a11y = useAccessibilitySettings();
   const [a11yMenuOpen, setA11yMenuOpen] = useState(false);
   const sessionStartRef = useRef(null);
@@ -57,6 +60,7 @@ function App() {
 
   useEffect(() => {
     applyTheme(currentTheme);
+    localStorage.setItem('fairy-theme', currentTheme.id);
   }, [currentTheme]);
 
   // Track session start time on mount

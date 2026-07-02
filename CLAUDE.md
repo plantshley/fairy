@@ -29,7 +29,7 @@ The build page renders `BuildYourOwnV2` (not `BuildYourOwn` — V1 is kept aroun
 ### Theming
 [src/themes.js](fairy-shop/src/themes.js) exports a `themes` object plus an `applyTheme` helper that writes CSS custom properties to `:root`. Components consume theme values both via the `currentTheme` prop (passed down from `App`) and via the CSS variables (used by Tailwind classes / inline `var(--...)` styles). Adding a new theme requires keeping the same color/font/emoji/decorations shape so `applyTheme` doesn't leave stale variables.
 
-The accessible-fonts toggle adds a `accessible-fonts` class on `<body>` and persists to `localStorage`; theme choice itself is **not** persisted.
+The accessible-fonts toggle adds a `accessible-fonts` class on `<body>` and persists to `localStorage`. Theme choice also persists to `localStorage` under the `fairy-theme` key (stored by `currentTheme.id`); `App.jsx` restores it on load, falling back to `twinkleFairyDream` if the key is missing or names an unknown theme.
 
 ### Asset paths (GitHub Pages base path)
 [vite.config.js](fairy-shop/vite.config.js) sets `base: '/fairy/'` in production. **Always** route public-folder asset URLs through `getAssetPath()` from [src/utils/assetPath.js](fairy-shop/src/utils/assetPath.js) — it prepends `import.meta.env.BASE_URL`. Hardcoding `/foo.png` will 404 on the deployed site. This applies to every SVG/image/audio path referenced from JS (the build page references hundreds of SVGs this way).
