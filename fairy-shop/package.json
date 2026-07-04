@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "update-gallery": "node scripts/generateGalleryManifest.js",
+    "compress-shop": "node scripts/compressShopImages.mjs",
     "deploy": "vite build && gh-pages -d dist"
   },
   "dependencies": {

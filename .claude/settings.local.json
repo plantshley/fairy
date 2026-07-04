@@ -18,7 +18,22 @@
       "Bash(node -e ' *)",
       "Bash(set -e)",
       "Bash(git branch *)",
-      "Bash(git tag *)"
+      "Bash(git tag *)",
+      "Bash(command -v magick)",
+      "Bash(command -v convert)",
+      "Bash(command -v cwebp)",
+      "Bash(command -v ffmpeg)",
+      "Bash(cd /c/Users/ashle/Documents/GitHub/fairy/fairy-shop/public/shop 2>/dev/null && ls -la product-transparents/ product-photos/ 2>/dev/null | head -80; echo \"---TOTALS---\"; du -sh product-transparents product-photos 2>/dev/null)",
+      "Read(//c/c/Users/ashle/Documents/GitHub/fairy/fairy-shop/public/shop/**)",
+      "Bash(node -e \"console.log\\('sharp', require\\('sharp'\\).versions.vips ? 'OK' : 'OK'\\)\")",
+      "Bash(mkdir -p /tmp/galtest)",
+      "Bash(cp \"public/gallery/digital works/lio trade1.png\" \"public/gallery/digital works/preview.png\" \"public/gallery/crochet/pictures/$\\(ls -S public/gallery/crochet/pictures)",
+      "Bash(which magick *)",
+      "Bash(node -e \"require.resolve\\('sharp'\\); console.log\\('sharp available'\\)\")",
+      "Bash(node scripts/optimizeGallery.js)",
+      "Bash(node scripts/compressShopImages.mjs)",
+      "Bash(node -e \"const sharp=require\\('sharp'\\); \\(async\\(\\)=>{for\\(const f of ['public/shop/product-transparents/coasters.png','public/shop/product-transparents/vampire-rock-harpy.png','public/shop/product-photos/midnight-sun-lovely.jpg']\\){const m=await sharp\\(f\\).metadata\\(\\);console.log\\(f.split\\('/'\\).pop\\(\\), m.width+'x'+m.height, m.format, 'alpha='+\\(m.hasAlpha||false\\)\\);}}\\)\\(\\)\")",
+      "Bash(node fairy-shop/scripts/compressShopImages.mjs)"
     ]
   }
 }

@@ -1,10 +1,14 @@
-// One-off: compress the Shop product images in place. Targets ONLY files whose
-// name matches a product slug (or a "-N" variant of one) so we don't touch the
-// orphan source photos / unused art sitting in the same folders. Balanced preset:
+// Compress the Shop product images in place. Targets ONLY files whose name
+// matches a product slug (or a "-N" variant of one) so we don't touch the orphan
+// source photos / unused art sitting in the same folders. Balanced preset:
 // downscale the longest edge to <=1400px (never upscale), palette-compress PNGs
 // (keeps alpha), re-encode JPGs at mozjpeg q80. Originals are recoverable via git.
 //
-// Run from fairy-shop/:  node scripts/compressShopImages.mjs
+// SAFE TO RE-RUN: files already within 1400px AND under the size budget are
+// skipped, so dropping in a new big photo and re-running only compresses the new
+// one — it won't re-encode (and slowly degrade) images that are already optimized.
+//
+// Run from fairy-shop/:  npm run compress-shop   (or: node scripts/compressShopImages.mjs)
 import { readFile, readdir, rename, stat } from 'node:fs/promises';
 import { join, dirname, extname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,10 +36,25 @@ const matchesProduct = (name) => {
   return m ? slugSet.has(m[1]) : false;
 };
 
+// A file is considered "already optimized" (skip it on re-runs) when it's within
+// the max edge AND under a generous size budget. Freshly dropped camera exports /
+// full-res art blow past these, so only genuinely-new large files get processed.
+const SIZE_BUDGET = { '.png': 1.2 * 1024 * 1024, '.jpg': 0.7 * 1024 * 1024, '.jpeg': 0.7 * 1024 * 1024 };
+const isAlreadyOptimized = async (filePath, ext, size) => {
+  if (size >= (SIZE_BUDGET[ext] ?? Infinity)) return false;
+  try {
+    const { width, height } = await sharp(filePath).metadata();
+    return (width ?? 0) <= MAX_EDGE && (height ?? 0) <= MAX_EDGE;
+  } catch {
+    return false;
+  }
+};
+
 const fmtMB = (b) => (b / 1024 / 1024).toFixed(2);
 let totalBefore = 0;
 let totalAfter = 0;
 let count = 0;
+let skipped = 0;
 
 for (const folder of FOLDERS) {
   let entries;
@@ -53,6 +72,11 @@ for (const folder of FOLDERS) {
 
     const filePath = join(folder, name);
     const before = (await stat(filePath)).size;
+
+    if (await isAlreadyOptimized(filePath, ext, before)) {
+      skipped += 1;
+      continue;
+    }
 
     let pipeline = sharp(filePath).rotate().resize({
       width: MAX_EDGE,
@@ -88,5 +112,5 @@ for (const folder of FOLDERS) {
 
 console.log(
   `\n${count} files compressed: ${fmtMB(totalBefore)}MB -> ${fmtMB(totalAfter)}MB ` +
-    `(saved ${fmtMB(totalBefore - totalAfter)}MB)`
+    `(saved ${fmtMB(totalBefore - totalAfter)}MB) · ${skipped} already optimized (skipped)`
 );
