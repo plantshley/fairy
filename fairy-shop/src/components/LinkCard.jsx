@@ -1,96 +1,10 @@
 import { motion } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
-import { loadFull } from 'tsparticles';
-import Particles, { initParticlesEngine } from '@tsparticles/react';
+import { useState } from 'react';
+import { HoverSparkles } from './HoverSparkles';
 import { trackEvent } from '../utils/analytics';
 
-const PARTICLE_THEMES = [
-  'twinkleFairyDream',
-  'celestialAngelicClouds',
-  'crystalSeasideGarden',
-  'midnightVelvetMeadow',
-  'sweetCherryLove',
-];
-
 export const LinkCard = ({ link, index, currentTheme, className = '', allowSubtitleWrap = false }) => {
-  const [particleState, setParticlesReady] = useState();
   const [isHovering, setIsHovering] = useState(false);
-
-  useEffect(() => {
-    // Only initialize particles for themes that use them (all non-rainbow themes)
-    if (!PARTICLE_THEMES.includes(currentTheme?.id)) return;
-
-    initParticlesEngine(async (engine) => {
-      await loadFull(engine);
-    }).then(() => {
-      setParticlesReady("loaded");
-    });
-  }, [currentTheme?.id, index]);
-
-  const particleOptions = useMemo(() => ({
-    key: `star-${link.url}`,
-    name: "Star",
-    particles: {
-      number: {
-        value: 30,
-        density: { enable: false },
-      },
-      color: {
-        value: [
-          currentTheme?.colors.bgGradientStart,
-          currentTheme?.colors.bgGradientMid,
-          currentTheme?.colors.bgGradientEnd,
-          currentTheme?.colors.accentPrimary,
-          currentTheme?.colors.accentSecondary,
-        ],
-      },
-      shape: {
-        type: "star",
-        options: { star: { sides: 4 } },
-      },
-      opacity: { value: 0.9 },
-      size: { value: { min: 2, max: 5 } },
-      rotate: {
-        value: { min: 0, max: 360 },
-        enable: true,
-        direction: "clockwise",
-        animation: { enable: true, speed: 10, sync: false },
-      },
-      links: { enable: false },
-      reduceDuplicates: true,
-      move: {
-        enable: true,
-        center: { x: 50, y: 50 },
-      },
-    },
-    interactivity: { events: {} },
-    smooth: true,
-    fpsLimit: 120,
-    background: { color: "transparent", size: "cover" },
-    fullScreen: { enable: false },
-    detectRetina: true,
-    absorbers: [
-      {
-        enable: true,
-        opacity: 0,
-        size: { value: 1, density: 1, limit: { radius: 5, mass: 5 } },
-        position: { x: 50, y: 50 },
-      },
-    ],
-    emitters: [
-      {
-        autoPlay: true,
-        fill: true,
-        life: { wait: true },
-        rate: { quantity: 8, delay: 0.4 },
-        position: { x: 50, y: 50 },
-      },
-    ],
-  }), [link.url, currentTheme]);
-
-  const modifiedOptions = useMemo(() => {
-    return { ...particleOptions, autoPlay: isHovering };
-  }, [isHovering, particleOptions]);
 
   const getCardClassName = () => {
     const baseClass = 'relative group';
@@ -99,8 +13,6 @@ export const LinkCard = ({ link, index, currentTheme, className = '', allowSubti
     }
     return baseClass;
   };
-
-  const shouldShowParticles = PARTICLE_THEMES.includes(currentTheme?.id);
 
   return (
     <motion.a
@@ -122,16 +34,7 @@ export const LinkCard = ({ link, index, currentTheme, className = '', allowSubti
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      {shouldShowParticles && !!particleState && (
-        <Particles
-          id={`particles-${index}`}
-          className={`pointer-events-none absolute -bottom-8 -left-8 -right-8 -top-8 z-10 opacity-0 transition-opacity ${particleState === "ready" ? "group-hover:opacity-100" : ""}`}
-          particlesLoaded={async () => {
-            setParticlesReady("ready");
-          }}
-          options={modifiedOptions}
-        />
-      )}
+      <HoverSparkles currentTheme={currentTheme} index={index} isHovering={isHovering} idKey={link.url} />
 
       <motion.div
         className={`link-card relative p-3 ${allowSubtitleWrap ? 'min-h-[6rem]' : 'h-24'} w-full${currentTheme?.id === 'midnightVelvetMeadow' ? ' midnight-theme' : ''}`}

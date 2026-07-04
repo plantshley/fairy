@@ -125,7 +125,7 @@ function App() {
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={pixel ? <PixelHome {...pixelPageProps} onThemeChange={setCurrentTheme} /> : <Home currentTheme={currentTheme} />} />
-            <Route path="/shop" element={pixel ? <PixelShop {...pixelPageProps} /> : <Shop currentTheme={currentTheme} />} />
+            <Route path="/shop" element={pixel ? <PixelShop {...pixelPageProps} /> : <Shop currentTheme={currentTheme} reduceMotion={a11y.reduceMotion} />} />
             <Route path="/links" element={pixel ? <PixelLinks {...pixelPageProps} /> : <Links currentTheme={currentTheme} />} />
             <Route path="/gallery" element={pixel ? <PixelGallery {...pixelPageProps} /> : <Gallery currentTheme={currentTheme} />} />
             <Route path="/build" element={<BuildYourOwnV2 currentTheme={currentTheme} activeTab={activeTab} onTabChange={setActiveTab} onOpenAccessibility={openAccessibility} />} />

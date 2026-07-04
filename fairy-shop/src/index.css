@@ -334,6 +334,43 @@ body {
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* Compact "adopt" button for the shop grid — reuses the Links-page gradient,
+   scale-on-hover and the shine-slide sweep (see .link-card-shine above). */
+.adopt-btn {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: #fff;
+  transition: transform 0.2s ease-out;
+  will-change: transform;
+}
+
+.adopt-btn:hover {
+  transform: scale(1.05);
+}
+
+.adopt-btn:active {
+  transform: scale(0.98);
+}
+
+.adopt-btn::after {
+  content: '';
+  position: absolute;
+  left: -6rem;
+  top: -50%;
+  height: 200%;
+  width: 1.5rem;
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(30deg);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.adopt-btn:hover::after {
+  visibility: visible;
+  animation: shine-slide 1s ease-out forwards;
+}
+
 @keyframes fairy-sparkle {
   0% {
     transform: translate(0, 0) scale(0) rotate(0deg);
