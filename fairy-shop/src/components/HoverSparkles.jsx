@@ -92,7 +92,11 @@ export function HoverSparkles({ currentTheme, index, isHovering, idKey }) {
     [isHovering, particleOptions]
   );
 
-  if (!enabled || !particleState) return null;
+  // Only mount the (expensive) particle canvas for the card actually being
+  // hovered. A grid of 25 cards each keeping a live tsparticles canvas mounted
+  // is what trips Firefox's "slowing down your browser" warning — this keeps at
+  // most one canvas alive at a time. The engine init above stays global.
+  if (!enabled || !particleState || !isHovering) return null;
 
   return (
     <Particles

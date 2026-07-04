@@ -31,6 +31,20 @@ export function ShopProductCard({ product, index, currentTheme, reduceMotion = f
         transition={reduceMotion ? undefined : { duration: 2.6, repeat: Infinity, ease: 'easeInOut', delay: (index % 5) * 0.4 }}
         aria-label={`View ${product.title}`}
       >
+        {/* Soft themed halo behind the transparent — brightens a touch on hover */}
+        {current && (
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none transition-opacity duration-300"
+            style={{
+              width: '88%',
+              height: '88%',
+              background:
+                'radial-gradient(circle, var(--accent-primary) 0%, var(--accent-secondary) 45%, transparent 72%)',
+              filter: 'blur(22px)',
+              opacity: isHovering ? 0.5 : 0.32,
+            }}
+          />
+        )}
         <AnimatePresence>
           {current && (
             <motion.img

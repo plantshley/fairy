@@ -12,7 +12,7 @@ export const BackgroundMusic = () => {
       aria-label={muted ? 'Unmute background music' : 'Mute background music'}
       title={muted ? 'Unmute music' : 'Mute music'}
       onClick={toggle}
-      className="fixed z-50 top-[calc(0.75rem+env(safe-area-inset-top))] right-3 w-7 h-7 flex items-center justify-center text-lg opacity-90 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1"
+      className="fixed z-50 top-[calc(0.75rem+env(safe-area-inset-top))] left-3 w-7 h-7 flex items-center justify-center text-lg opacity-90 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1"
       style={{ background: 'transparent' }}
     >
       <span aria-hidden="true" className="leading-none select-none">{muted ? '🔇' : '🎶'}</span>
