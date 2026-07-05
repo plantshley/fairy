@@ -229,9 +229,9 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
             <PxWindow title="✿ about me" border={ACCENT} bar="var(--d-pink-3)" barFg="var(--d-plum)" bg="rgba(255,255,255,0.9)">
               <div className="font-mono" style={{ fontSize: 11, color: ACCENT, lineHeight: 1.6 }}>
                 hi! i'm <b style={{ color: 'var(--d-pink-3)' }}>fairy</b> ｡ﾟ✧
-                <br />i make crochet plushies, lift heavy weights, & am the gaurdian of this web realm.
+                <br />i make crochet plushies, lift heavy weights, & am the gaurdian of this web realm ઇଓ✧˖*°࿐ੈ ♡˳⋆｡ﾟ☁︎｡⋆｡ ﾟ☾ ﾟ｡⋆
                 <br /><br />
-                <span style={{ opacity: 0.7 }}>currently:</span> <b>making gainz</b>
+                <span style={{ opacity: 0.7 }}>currently:</span> <b>making gainz ♡</b>
               </div>
             </PxWindow>
 

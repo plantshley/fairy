@@ -2,6 +2,31 @@
 
 This folder contains all gallery images organized by category.
 
+## Important: Optimize New Images First (keeps the deploy under GitHub Pages' 1 GB limit)
+
+GitHub Pages rejects a build artifact larger than **1 GB**. Full-resolution art
+(multi-MB PNG/JPG) blows past that fast, and the deploy fails with
+`Uploaded artifact size ... exceeds the allowed size of 1 GB`.
+
+**Before adding large images to the gallery, run the optimizer.** From `fairy-shop`:
+
+```bash
+node scripts/optimizeGallery.js
+```
+
+What it does (see [scripts/optimizeGallery.js](../../scripts/optimizeGallery.js)):
+- Downscales anything larger than **1800px** on its longest edge (never upscales).
+- Re-encodes to **WebP** at quality 82 — near-invisible quality loss, ~90% smaller.
+- Preserves each file's original **mtime**, so gallery ordering stays the same.
+- Drops non-displayable files (e.g. `.tif`) and skips files that are already WebP.
+
+It rewrites files **in place**, so keep your master originals backed up elsewhere.
+After optimizing, regenerate the manifest (next section). Then `npm run build` and
+check `dist/` is comfortably under 1 GB before pushing.
+
+> Tune `MAX_DIM` (max pixels) and `WEBP_QUALITY` at the top of the script if you
+> want higher fidelity or smaller files.
+
 ## Important: After Adding/Removing Images
 
 Whenever you add or remove images from any gallery folder, you **MUST** run:

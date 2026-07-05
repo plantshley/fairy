@@ -19,11 +19,94 @@ const SLOT_TINTS = ['var(--d-pink)', 'var(--d-lilac)', 'var(--d-pink-2)', 'var(-
 // pixel-canvas shimmer colors — warm pink/lilac sparks to match the shop accent.
 const SHIMMER = '#ff85c8,#ffd166,#c08aff,#ffb3e6,#ffe85c';
 
+// Favorite-heart icons (from public/pixel/icons/). When a card is favorited the
+// outline ♡ swaps to one of these pixel GIFs. Icons are handed out to products via
+// a shuffle bag (every icon is used once before any repeats), randomised per
+// install but persisted so a given plushie keeps its charm across reloads.
+const FAV_ICONS = ['heart', 'angel-heart', 'clover', 'strawb4', 'rainbow-star', 'spooky3', 'rainbow2-left', "wand2"];
+const favKey = (slug) => `fairy-shop-fav:${slug}`;
+
+// Small seeded PRNG so the (random) icon assignment is reproducible from one stored
+// seed — same seed + same product/icon lists => same map, stable across reloads.
+const mulberry32 = (a) => () => {
+  a |= 0;
+  a = (a + 0x6d2b79f5) | 0;
+  let t = Math.imul(a ^ (a >>> 15), 1 | a);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+
+// One persisted random seed per install (falls back to a fixed value if storage is
+// unavailable, so the map is still stable within the session).
+const getFavSeed = () => {
+  try {
+    let s = localStorage.getItem('fairy-shop-fav-seed');
+    if (s == null) {
+      s = String((Math.random() * 0xffffffff) >>> 0);
+      localStorage.setItem('fairy-shop-fav-seed', s);
+    }
+    return Number(s) >>> 0;
+  } catch {
+    return 0x9e3779b9;
+  }
+};
+
+// Walk the products in order, drawing from a reshuffled bag of all icons so each is
+// used once before any repeat (with no repeat straddling a bag boundary either).
+const buildIconMap = (slugs) => {
+  const rand = mulberry32(getFavSeed());
+  const shuffle = (arr) => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(rand() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const map = {};
+  let bag = [];
+  let last = null;
+  for (const slug of slugs) {
+    if (bag.length === 0) {
+      bag = shuffle(FAV_ICONS);
+      // We pop from the end; if that would repeat the previous card's icon, swap it
+      // to the front so the boundary doesn't land on a duplicate.
+      if (bag.length > 1 && bag[bag.length - 1] === last) {
+        [bag[bag.length - 1], bag[0]] = [bag[0], bag[bag.length - 1]];
+      }
+    }
+    last = bag.pop();
+    map[slug] = last;
+  }
+  return map;
+};
+
+const ICON_MAP = buildIconMap(shopProducts.map((p) => p.slug));
+const iconForSlug = (slug) => ICON_MAP[slug] || FAV_ICONS[0];
+
 function PixelProductCard({ product, index, onOpenLightbox }) {
   const { gridImages, photoImages } = useProductImages(product.slug, true);
   const cycleIndex = useImageCycle(gridImages.length, index);
   const current = gridImages[cycleIndex];
   const lightboxImages = photoImages.length ? photoImages : gridImages;
+  const [liked, setLiked] = useState(() => {
+    try {
+      return localStorage.getItem(favKey(product.slug)) === '1';
+    } catch {
+      return false;
+    }
+  });
+  const toggleLike = () =>
+    setLiked((v) => {
+      const next = !v;
+      try {
+        if (next) localStorage.setItem(favKey(product.slug), '1');
+        else localStorage.removeItem(favKey(product.slug));
+      } catch {
+        /* localStorage unavailable (private mode) — favorite is session-only */
+      }
+      return next;
+    });
 
   return (
     <div
@@ -64,8 +147,38 @@ function PixelProductCard({ product, index, onOpenLightbox }) {
         ) : (
           <Slot label={product.title} w="100%" h="100%" bg={SLOT_TINTS[index % SLOT_TINTS.length]} fg={ACCENT} />
         )}
-        <span style={{ position: 'absolute', top: 6, right: 6, fontSize: 14, color: 'var(--d-pink-3)', zIndex: 2 }}>♡</span>
       </button>
+      {/* Favorite heart — its own button (not nested in the image button) so a tap
+          toggles it without opening the lightbox. When favorited the outline ♡ swaps
+          to this product's pixel charm; state persists in localStorage. */}
+      <motion.button
+        type="button"
+        onClick={toggleLike}
+        aria-label={liked ? `Remove ${product.title} from favorites` : `Add ${product.title} to favorites`}
+        aria-pressed={liked}
+        whileTap={{ scale: 1.4 }}
+        transition={{ type: 'spring', stiffness: 600, damping: 15 }}
+        className="absolute z-[3] flex items-center justify-center p-0 bg-transparent leading-none"
+        style={{
+          top: 12,
+          right: 12,
+          width: 26,
+          height: 26,
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        {liked ? (
+          <img
+            src={px(`icons/${iconForSlug(product.slug)}.gif`)}
+            alt=""
+            className="pixel-img block w-full h-full"
+            draggable={false}
+          />
+        ) : (
+          <span style={{ fontSize: 20, lineHeight: 1, color: 'var(--d-pink-3)' }}>♡</span>
+        )}
+      </motion.button>
       <div className="relative z-[1] font-rainy" style={{ fontSize: 22, color: ACCENT, lineHeight: 1, marginBottom: 4 }}>{product.title}</div>
       <div className="relative z-[1] flex justify-between items-center mt-auto">
         <span className="font-pixel" style={{ fontSize: 12, color: 'var(--d-pink-3)' }}>{product.price}</span>
