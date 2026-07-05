@@ -12,7 +12,12 @@ export function ShopProductCard({ product, index, currentTheme, reduceMotion = f
   const { gridImages, photoImages } = useProductImages(product.slug, false);
   const cycleIndex = useImageCycle(gridImages.length, index);
   const current = gridImages[cycleIndex];
-  const lightboxImages = photoImages.length ? photoImages : gridImages;
+  // Open fullscreen on the transparent currently shown, then let the arrows page
+  // through the photos. (When a product has no transparent, `current` is already
+  // a photo, so this just starts the photo set at the clicked frame.)
+  const lightboxImages = current
+    ? [current, ...photoImages.filter((img) => img !== current)]
+    : photoImages;
   const [isHovering, setIsHovering] = useState(false);
 
   return (
