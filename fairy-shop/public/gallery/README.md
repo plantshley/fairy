@@ -8,11 +8,21 @@ GitHub Pages rejects a build artifact larger than **1 GB**. Full-resolution art
 (multi-MB PNG/JPG) blows past that fast, and the deploy fails with
 `Uploaded artifact size ... exceeds the allowed size of 1 GB`.
 
-**Before adding large images to the gallery, run the optimizer.** From `fairy-shop`:
+**Before adding large images to the gallery, run the optimizer.** The script
+lives in `fairy-shop/scripts/`, so run it from the `fairy-shop` folder (not the
+repo root, or `node` will fail with `Cannot find module ...\scripts\optimizeGallery.js`):
 
-```bash
+```powershell
+# Change into the folder and run:
+cd .\fairy-shop
 node scripts/optimizeGallery.js
+
+# Or, from the repo root, point node at the full path:
+node .\fairy-shop\scripts\optimizeGallery.js
 ```
+
+(The script always targets `fairy-shop/public/gallery/` regardless of where you
+run it — the path is resolved relative to the script's own location.)
 
 What it does (see [scripts/optimizeGallery.js](../../scripts/optimizeGallery.js)):
 - Downscales anything larger than **1800px** on its longest edge (never upscales).
