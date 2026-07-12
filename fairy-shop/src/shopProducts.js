@@ -35,7 +35,6 @@ export const SHOP_CATEGORIES = [
 
 export const shopProducts = [
   { slug: 'star-bee',                   title: 'Bee a Star Frootie',         price: '$35',  category: 'toodie',    kofiUrl: 'https://ko-fi.com/s/8e7ba8f0ea' },
-  { slug: 'buggo',     title: 'Clover Meadow Buggo',     price: '$20', category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/5382317b86' },
   { slug: 'vampire-rock-harpy',         title: 'Vampire Rock Harpy',         price: '$55',   category: 'harpy',    kofiUrl: 'https://ko-fi.com/s/58b54f21fa' },
   { slug: 'blip',                       title: 'Blip',                       price: '$55',   category: 'impy',         kofiUrl: 'https://ko-fi.com/s/8831030034' },
   { slug: 'midnight-sun-lovely',        title: 'Midnight Sun Lovely',        price: '$50',   category: 'lovely',   kofiUrl: 'https://ko-fi.com/s/4dbbfc064d' },
