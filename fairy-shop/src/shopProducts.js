@@ -34,8 +34,9 @@ export const SHOP_CATEGORIES = [
 ];
 
 export const shopProducts = [
+  { slug: 'hibiscus-ribbon',            title: 'Hibiscus Ribbon Kirarin',    price: '$40',   category: 'kirarin',   kofiUrl: 'https://ko-fi.com/s/63843f0724' },
+  { slug: 'glittering-glorp',           title: 'Glittering Glorp Harpy',     price: '$65',   category: 'harpy',     kofiUrl: 'https://ko-fi.com/s/4d26b702a0' },
   { slug: 'lil-macaron',                title: 'Lil Macaron',                price: '$20',   category: 'kirarin',   kofiUrl: 'https://ko-fi.com/s/8225780d32' },
-  { slug: 'elephante',                  title: 'Elephanté',                  price: '$30',   category: 'kirarin',   kofiUrl: 'https://ko-fi.com/s/32654b1c4a' },
   { slug: 'star-bee',                   title: 'Bee a Star Frootie',         price: '$35',  category: 'toodie',    kofiUrl: 'https://ko-fi.com/s/8e7ba8f0ea' },
   { slug: 'vampire-rock-harpy',         title: 'Vampire Rock Harpy',         price: '$55',   category: 'harpy',    kofiUrl: 'https://ko-fi.com/s/58b54f21fa' },
   { slug: 'blip',                       title: 'Blip',                       price: '$55',   category: 'impy',         kofiUrl: 'https://ko-fi.com/s/8831030034' },
