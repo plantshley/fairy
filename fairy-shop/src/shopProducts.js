@@ -34,6 +34,9 @@ export const SHOP_CATEGORIES = [
 ];
 
 export const shopProducts = [
+  { slug: 'rosy-satin-fawn',            title: 'Rosy Satin Fawn',            price: '$30',   category: 'kirarin',   kofiUrl: 'https://ko-fi.com/s/622631f92e' },
+  { slug: 'blushing-quartzite-reindeer', title: 'Blushing Quartzite Reindeer', price: '$35', category: 'impy',      kofiUrl: 'https://ko-fi.com/s/0973c11e51' },
+  { slug: 'raspberry-mocha',            title: 'Raspberry Mocha',            price: '$45',   category: 'lovely',    kofiUrl: 'https://ko-fi.com/s/9373bfe096' },
   { slug: 'hibiscus-ribbon',            title: 'Hibiscus Ribbon Kirarin',    price: '$40',   category: 'kirarin',   kofiUrl: 'https://ko-fi.com/s/63843f0724' },
   { slug: 'glittering-glorp',           title: 'Glittering Glorp Harpy',     price: '$65',   category: 'harpy',     kofiUrl: 'https://ko-fi.com/s/4d26b702a0' },
   { slug: 'lil-macaron',                title: 'Lil Macaron',                price: '$20',   category: 'kirarin',   kofiUrl: 'https://ko-fi.com/s/8225780d32' },
