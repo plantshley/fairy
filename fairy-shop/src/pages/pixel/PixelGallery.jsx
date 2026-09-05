@@ -58,6 +58,7 @@ export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
             return (
               <PxButton
                 key={c.id}
+                className="pxbtn--filter"
                 bg={active ? 'var(--d-pink-3)' : '#fff'}
                 border={ACCENT}
                 fg={active ? '#fff' : ACCENT}

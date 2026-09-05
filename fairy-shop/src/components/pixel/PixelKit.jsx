@@ -53,12 +53,12 @@ export function PxWindow({
 // ---------------------------------------------------------------
 //  Pixel button
 // ---------------------------------------------------------------
-export function PxButton({ children, bg, fg, border, style, onClick, wide, type = 'button', title }) {
+export function PxButton({ children, bg, fg, border, style, onClick, wide, type = 'button', title, className = '' }) {
   return (
     <button
       type={type}
       title={title}
-      className={`pxbtn ${wide ? 'pxbtn--wide' : ''}`}
+      className={`pxbtn ${wide ? 'pxbtn--wide' : ''} ${className}`}
       style={{ '--btn-bg': bg, '--btn-fg': fg, '--btn-border': border, ...style }}
       onClick={onClick}
     >

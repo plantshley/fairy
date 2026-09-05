@@ -16,8 +16,8 @@ const ACCENT = 'var(--d-plum)';
 // ---------------------------------------------------------------
 const GUESTBOOK_KEY = 'pixelGuestbook';
 const SEED_ENTRIES = [
-  { name: 'moonjelly', message: 'twinkle got me crying ♡' },
-  { name: 'tulip', message: 'wish i live in your world!' },
+  { name: 'moonjelly', message: 'twinkle is the cutest ♡' },
+  { name: 'tulip', message: 'wish i lived in your world!' },
   { name: 'strawbz', message: 'i pet twinkle 3x today teehee ~' },
 ];
 

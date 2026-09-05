@@ -279,6 +279,7 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
             return (
               <PxButton
                 key={c.id}
+                className="pxbtn--filter"
                 onClick={() => setSelectedCategory(c.id)}
                 bg={active ? 'var(--d-pink-3)' : '#fff'}
                 border={ACCENT}
