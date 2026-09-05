@@ -2,6 +2,32 @@ import { motion } from 'framer-motion';
 import { Sparkle } from '../components/Sparkle';
 import { getAssetPath } from '../utils/assetPath';
 
+// Theme-specific header art. The middle image (Scootaloo) is constant; the
+// outer two swap per theme. Any theme not listed here keeps the defaults below.
+// `size` is optional and overrides the slot's default width/height classes for
+// art that reads too small at the shared size.
+const PUPPER_SIZE = 'w-20 h-20 sm:w-24 sm:h-24 md:w-36 md:h-36';
+
+const HEADER_ART = {
+  glitterGroovyRainbow: { left: { src: '/pupper1.png', alt: 'Pupper', size: PUPPER_SIZE }, right: { src: '/sparkle bun2.png', alt: 'Sparkle bunny' } },
+  celestialAngelicClouds: { left: { src: '/cutie-wizard1.png', alt: 'Cutie Wizard' } },
+  sweetCherryLove: {
+    left: { src: '/cutie-wizard1.png', alt: 'Cutie Wizard' },
+    right: { src: '/lil demon.png', alt: 'Lil demon' },
+  },
+  // crystalSeasideGarden: { right: { src: '/lil kitty1.png', alt: 'Lil kitty' } },
+  midnightVelvetMeadow: {
+    left: { src: '/lil spooky2.png', alt: 'Lil spooky' },
+    right: { src: '/sparkle bun2.png', alt: 'Sparkle bunny' },
+  },
+};
+
+const LEFT_SIZE = 'w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28';
+const RIGHT_SIZE = 'w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24';
+
+const DEFAULT_LEFT_ART = { src: '/cutie-wizard-star1.png', alt: 'Cutie Wizard Star' };
+const DEFAULT_RIGHT_ART = { src: '/sparkle-bun1.png', alt: 'Sparkle bunny' };
+
 export const Home = ({ currentTheme }) => {
   const getThemeEmojis = () => {
     switch (currentTheme?.id) {
@@ -22,6 +48,10 @@ export const Home = ({ currentTheme }) => {
 
   const themeEmojis = getThemeEmojis();
 
+  const headerArt = HEADER_ART[currentTheme?.id] || {};
+  const leftArt = headerArt.left || DEFAULT_LEFT_ART;
+  const rightArt = headerArt.right || DEFAULT_RIGHT_ART;
+
   return (
     <motion.div
       className="w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8"
@@ -39,9 +69,9 @@ export const Home = ({ currentTheme }) => {
         {/* Animated image header */}
         <div className="flex justify-center gap-4 sm:gap-6 md:gap-8 items-center">
           <motion.img
-            src={getAssetPath('/cutie-wizard-star1.png')}
-            alt="Cutie Wizard Star"
-            className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 object-contain"
+            src={getAssetPath(leftArt.src)}
+            alt={leftArt.alt}
+            className={`${leftArt.size || LEFT_SIZE} object-contain`}
             style={{ willChange: 'transform' }}
             animate={{
               y: [0, -12, 0],
@@ -68,9 +98,9 @@ export const Home = ({ currentTheme }) => {
             }}
           />
           <motion.img
-            src={getAssetPath('/sparkle-bun1.png')}
-            alt="Sparkle bunny"
-            className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain"
+            src={getAssetPath(rightArt.src)}
+            alt={rightArt.alt}
+            className={`${rightArt.size || RIGHT_SIZE} object-contain`}
             style={{ willChange: 'transform' }}
             animate={{
               y: [0, -12, 0],
