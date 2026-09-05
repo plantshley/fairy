@@ -294,8 +294,12 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
           })}
         </motion.div>
 
-        {/* product grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-fr gap-3 sm:gap-4 max-w-5xl mx-auto">
+        {/* Product grid. Keyed by category so changing the filter remounts the
+            whole grid and every card replays its entrance together. Keying only
+            the cards by slug would leave the products common to both categories
+            mounted and static while the newly-matched ones faded in around
+            them — half the grid animating, half not. */}
+        <div key={selectedCategory} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-fr gap-3 sm:gap-4 max-w-5xl mx-auto">
           {filtered.map((product, i) => (
             <PixelProductCard key={product.slug} product={product} index={i} onOpenLightbox={openLightbox} />
           ))}

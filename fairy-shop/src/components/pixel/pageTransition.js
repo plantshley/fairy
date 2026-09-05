@@ -1,3 +1,5 @@
+import { staggerDelay } from '../../utils/staggerDelay';
+
 // Spread onto each pixel page's root <motion.div>. Deliberately identical to the
 // values the standard-theme pages use (Home/Shop/Links), so switching tabs feels
 // the same whichever theme is active instead of cutting instantly.
@@ -28,23 +30,13 @@ export const pixelTitle = (delay = 0) => ({
   transition: { delay, duration: 0.7, ease: 'easeOut' },
 });
 
-// Longest the stagger itself may run, regardless of how many cells there are.
-// Without this the delay grows without bound: the gallery's crochet category
-// holds 183 images, which at 0.02/cell would leave the last one starting 3.8s
-// after mount. The cap keeps the sense of cells arriving in sequence while
-// guaranteeing the grid is settled quickly.
-const MAX_STAGGER = 0.3;
-
 // Entrance for one cell of a grid. `index` staggers the cells, `base` offsets
 // the whole grid so it lands after the blocks above it, and `step` tunes the
 // gap between cells — small for dense image grids, larger for a handful of
 // cards, the same way Gallery and LinkCard differ in the standard theme.
+// The delay is capped (see staggerDelay) so large grids stay responsive.
 export const pixelCell = (index, base = 0, step = 0.02) => ({
   initial: { opacity: 0, scale: 0.97 },
   animate: { opacity: 1, scale: 1 },
-  transition: {
-    delay: base + Math.min(index * step, MAX_STAGGER),
-    duration: 0.4,
-    ease: 'easeOut',
-  },
+  transition: { delay: staggerDelay(index, base, step), duration: 0.4, ease: 'easeOut' },
 });

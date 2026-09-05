@@ -5,6 +5,7 @@ import { Particles, initParticlesEngine } from '@tsparticles/react';
 import { loadFull } from 'tsparticles';
 import galleryManifest from '../galleryManifest.json';
 import { getAssetPath } from '../utils/assetPath';
+import { staggerDelay } from '../utils/staggerDelay';
 import { trackEvent } from '../utils/analytics';
 import { GalleryLightbox } from '../components/GalleryLightbox';
 import { categories } from '../galleryCategories';
@@ -347,7 +348,7 @@ export const Gallery = ({ currentTheme }) => {
                 }}
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.02, duration: 0.4, ease: 'easeOut' }}
+                transition={{ delay: staggerDelay(index), duration: 0.4, ease: 'easeOut' }}
                 whileHover={{ scale: 1.05, zIndex: 10 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
