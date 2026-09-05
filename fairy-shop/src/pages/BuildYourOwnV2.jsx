@@ -1795,10 +1795,15 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Desktop pixel nav — matches the other pixel pages (replaces the
-          hamburger, which stays for mobile via MobileNavigationMenu). */}
+      {/* Desktop pixel nav — replaces the hamburger, which stays for mobile via
+          MobileNavigationMenu. The other pixel pages inset this bar by lg:px-20;
+          here the parent only supplies lg:p-8, so lg:px-12 makes up the missing
+          3rem and the pegasus/nav buttons land in the same place as every other
+          tab. No max-width for the same reason — NavBar is justify-between, so
+          capping the width would pull the two ends inward. lg:-mt-2 trims the
+          parent's 2rem top back to the 1.5rem the other pixel pages use. */}
       {pixel && (
-        <div className="hidden lg:block w-full max-w-7xl relative z-10 mb-3">
+        <div className="hidden lg:block w-full lg:px-12 lg:-mt-2 relative z-10 mb-3">
           <NavBar accent="var(--d-plum)" active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
         </div>
       )}

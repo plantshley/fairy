@@ -1,3 +1,5 @@
+import { getAssetPath } from './utils/assetPath';
+
 export const themes = {
   twinkleFairyDream: {
     id: 'twinkleFairyDream',
@@ -20,6 +22,7 @@ export const themes = {
     },
     emojis: ['🦋', '🌸', '✨', '🌷', '💖', '🪻'],
     decorations: ['˚ ༘♡ ⋆', '✧˖°', '⋆˚✿˖°', '˗ˏˋ ★ ˎˊ˗'],
+    cursor: 'pixel/icons/butterfly.gif',
   },
   glitterGroovyRainbow: {
     id: 'glitterGroovyRainbow',
@@ -43,6 +46,7 @@ export const themes = {
     },
     emojis: ['🌈', '✨', '💫', '⭐', '🎉', '🦄'],
     decorations: ['★', '☆', '✦', '✧', '❈', '✪'],
+    cursor: 'pixel/icons/music.gif',
   },
   celestialAngelicClouds: {
     id: 'celestialAngelicClouds',
@@ -65,6 +69,7 @@ export const themes = {
     },
     emojis: ['☁️', '🤍', '✨', '🕊️', '🌟', '💫'],
     decorations: ['⋆｡°✩', '｡ﾟ☁︎｡ﾟ', '✧･ﾟ', '⋆⁺₊⋆'],
+    cursor: 'pixel/icons/moon.gif',
   },
   crystalSeasideGarden: {
     id: 'crystalSeasideGarden',
@@ -87,6 +92,7 @@ export const themes = {
     },
     emojis: ['🐚', '💎', '🌊', '🫧', '🪸', '💠'],
     decorations: ['～ ♡', '⋆｡°✩', '｡ﾟ･ ✧', '･ﾟ･｡'],
+    cursor: 'pixel/icons/fish.gif',
   },
   midnightVelvetMeadow: {
     id: 'midnightVelvetMeadow',
@@ -110,6 +116,7 @@ export const themes = {
     },
     emojis: ['🔮', '🥀', '🦇', '🌒', '🌙', '🖤'],
     decorations: ['✧˖°', '⋆｡°✩', '･ﾟ✧', '˗ˏˋ ★ ˎˊ˗'],
+    cursor: 'pixel/icons/spooky3.gif',
   },
   sweetCherryLove: {
     id: 'sweetCherryLove',
@@ -132,6 +139,7 @@ export const themes = {
     },
     emojis: ['🍒', '🍰', '🌹', '💗', '🍓', '🎀'],
     decorations: ['♡₊˚', '⋆˚🪽˖°', '𓊆ྀི‧₊♡˚₊‧𓊇ྀི', '˚₊‧꒰ა ♡ ໒꒱ ‧₊˚'],
+    cursor: 'pixel/icons/cake.gif',
   },
   // Alternate-skin theme. Unlike the others, `layout: 'pixel'` swaps the whole
   // page rendering (pixel/Y2K layout) — see App.jsx's layout branch and
@@ -160,6 +168,7 @@ export const themes = {
     },
     emojis: ['🦄', '✦', '♡', '✿', '★', '✧'],
     decorations: ['⋆˚｡⋆', '⊹˚. ♡ .˚⊹', '✦°｡⋆', '｡°✩'],
+    cursor: 'pixel/icons/kuromi.gif',
   },
 };
 
@@ -184,6 +193,16 @@ export const applyTheme = (theme) => {
   } else {
     // Clear rainbow gradient for non-rainbow themes
     root.style.removeProperty('--rainbow-gradient');
+  }
+
+  // Per-theme mouse cursor. The URL is resolved through getAssetPath so it picks
+  // up the GitHub Pages base path; index.css consumes --theme-cursor on body.
+  // Hotspot is centred on the 20x20 icons. This is purely the CSS cursor — the
+  // sparkle trail is a separate canvas overlay (CursorSparkles) and is untouched.
+  if (theme.cursor) {
+    root.style.setProperty('--theme-cursor', `url("${getAssetPath(theme.cursor)}") 10 10, auto`);
+  } else {
+    root.style.removeProperty('--theme-cursor');
   }
 
   Object.entries(theme.colors).forEach(([key, value]) => {

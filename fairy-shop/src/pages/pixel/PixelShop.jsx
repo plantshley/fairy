@@ -5,6 +5,7 @@
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NavBar, PxButton, Marquee, Slot } from '../../components/pixel/PixelKit';
+import { pixelPageTransition, pixelItem, pixelTitle, pixelCell } from '../../components/pixel/pageTransition';
 import { px } from '../../components/pixel/asset';
 import { GalleryLightbox } from '../../components/GalleryLightbox';
 import { getAssetPath } from '../../utils/assetPath';
@@ -109,9 +110,10 @@ function PixelProductCard({ product, index, onOpenLightbox }) {
     });
 
   return (
-    <div
+    <motion.div
       className="relative flex flex-col h-full overflow-hidden"
       style={{ background: 'rgba(255,255,255,0.96)', boxShadow: `inset 0 0 0 3px ${ACCENT}, 4px 4px 0 0 ${ACCENT}`, padding: 10 }}
+      {...pixelCell(index, 0.24, 0.03)}
     >
       {/* hover shimmer (pixel-canvas) — decorative; dropped by high-contrast /
           reduce-motion via .pixel-deco */}
@@ -192,7 +194,7 @@ function PixelProductCard({ product, index, onOpenLightbox }) {
           + adopt
         </a>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -223,7 +225,7 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
   };
 
   return (
-    <div className="bgD relative w-full min-h-dvh overflow-hidden">
+    <motion.div className="bgD relative w-full min-h-dvh overflow-hidden" {...pixelPageTransition}>
       <img
         src={px('icons/sparkles.gif')}
         alt=""
@@ -244,7 +246,7 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
       <div className="relative z-[2] px-4 py-6 sm:px-10 lg:px-20">
         <NavBar accent={ACCENT} active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
 
-        <div className="text-center my-5">
+        <motion.div className="text-center my-5" {...pixelTitle(0.05)}>
           <div className="flex flex-nowrap items-center justify-center gap-2 sm:gap-5">
             <img src={px('icons/twinkle-shop.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12 flex-shrink-0" />
             <div className="deco-title deco-title--d deco-title--d-neon font-rainy whitespace-nowrap" style={{ fontSize: 'clamp(26px, 8vw, 80px)' }}>
@@ -252,11 +254,12 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
             </div>
             <img src={px('icons/twinkle-shop.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12 flex-shrink-0" />
           </div>
-        </div>
+        </motion.div>
 
         {/* animated marquee banner */}
-        <div
+        <motion.div
           className="my-4"
+          {...pixelItem(0.12)}
           style={{
             background: 'linear-gradient(90deg, var(--d-pink-3), var(--b-yellow), var(--d-lilac-2), var(--d-pink-3))',
             backgroundSize: '300% 100%',
@@ -270,10 +273,10 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
               ♡ tap a plushie to see it up close ♡ &nbsp; ★ commissions open ★ &nbsp; ♡ + adopt visits my ko-fi ♡ &nbsp; ✦ DM me for 5% off ✦ &nbsp;
             </span>
           </Marquee>
-        </div>
+        </motion.div>
 
         {/* category strip */}
-        <div className="flex flex-wrap justify-center gap-1.5 mb-4">
+        <motion.div className="flex flex-wrap justify-center gap-1.5 mb-4" {...pixelItem(0.18)}>
           {pills.map((c) => {
             const active = selectedCategory === c.id;
             return (
@@ -289,7 +292,7 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
               </PxButton>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* product grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 auto-rows-fr gap-3 sm:gap-4 max-w-5xl mx-auto">
@@ -304,9 +307,13 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
           </p>
         )}
 
-        <p className="font-pixel text-center mt-6" style={{ fontSize: 10, color: ACCENT, opacity: 0.8 }}>
-          ⋆⁺₊⋆ handmade with love &amp; care · tap a plushie to see it up close ⋆⁺₊⋆
-        </p>
+        {/* Wrapped rather than animated directly: framer writes inline opacity,
+            which would clobber this line's deliberate 0.8. */}
+        <motion.div {...pixelItem(0.3)}>
+          <p className="font-pixel text-center mt-6" style={{ fontSize: 10, color: ACCENT, opacity: 0.8 }}>
+            ⋆⁺₊⋆ handmade with love &amp; care · tap a plushie to see it up close ⋆⁺₊⋆
+          </p>
+        </motion.div>
       </div>
 
       <GalleryLightbox
@@ -315,6 +322,6 @@ export function PixelShop({ activeTab, onTabChange, onOpenAccessibility }) {
         onClose={() => setLightboxImage(null)}
         onSelect={setLightboxImage}
       />
-    </div>
+    </motion.div>
   );
 }

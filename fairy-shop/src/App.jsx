@@ -7,6 +7,7 @@ import { MobileNavigationMenu } from './components/MobileNavigationMenu';
 import { ThemeSelector } from './components/ThemeSelector';
 import { AccessibilityMenu } from './components/AccessibilityMenu';
 import { CursorSparkles } from './components/CursorSparkles';
+import { ThemeCursor } from './components/ThemeCursor';
 import BackgroundMusic from './components/BackgroundMusic';
 import { Home } from './pages/Home';
 import { Shop } from './pages/Shop';
@@ -118,6 +119,14 @@ function App() {
     <div className="min-h-dvh overflow-hidden">
       {!pixel && <AnimatedBackground themeEmojis={currentTheme.emojis} reduceMotion={a11y.reduceMotion} />}
       {activeTab !== 'build' && !a11y.reduceMotion && <CursorSparkles currentTheme={currentTheme} />}
+
+      {/* Animated theme cursor. Suppressed on the build page (Konva sets its own
+          resize/move cursors), under reduced motion, and under high contrast —
+          in each of those cases index.css falls back to the static url() cursor
+          or the system one. */}
+      {activeTab !== 'build' && !a11y.reduceMotion && !a11y.highContrast && (
+        <ThemeCursor currentTheme={currentTheme} />
+      )}
 
       {!pixel && <Navigation activeTab={activeTab} onTabChange={setActiveTab} currentTheme={currentTheme} />}
 

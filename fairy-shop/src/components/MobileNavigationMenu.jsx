@@ -13,23 +13,27 @@ const tabs = [
 export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, onOpenAccessibility }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isDarkTheme = currentTheme?.id === 'midnightVelvetMeadow';
-  // The pixel theme hides the floating music toggle, so nothing sits to the
-  // hamburger's right — pull it into the top-right corner instead of leaving a gap.
-  const pixel = currentTheme?.layout === 'pixel';
 
   return (
     <>
-      {/* Hamburger button - only show on mobile build-v2 */}
+      {/* Menu button - only shown on the build page. Sits in the top-right
+          corner, mirroring the BackgroundMusic toggle's left-3 inset. The image
+          is decorative: the accessible name stays "Open navigation menu" so the
+          house art never reads as a home link to assistive tech. */}
       <button
         aria-label="Open navigation menu"
+        aria-expanded={isOpen}
         title="Navigation"
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed z-50 top-[calc(0.75rem+env(safe-area-inset-top))] ${pixel ? 'right-4' : 'right-12'} w-7 h-7 flex flex-col items-center justify-center gap-1 opacity-90 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1`}
+        className="fixed z-50 top-[calc(0.75rem+env(safe-area-inset-top))] right-3 w-7 h-7 flex items-center justify-center opacity-90 hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-offset-1"
         style={{ background: 'transparent' }}
       >
-        <span className="w-4 h-0.5 rounded-full" style={{ backgroundColor: 'var(--text-primary)' }} />
-        <span className="w-4 h-0.5 rounded-full" style={{ backgroundColor: 'var(--text-primary)' }} />
-        <span className="w-4 h-0.5 rounded-full" style={{ backgroundColor: 'var(--text-primary)' }} />
+        <img
+          src={getAssetPath('/house.png')}
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-contain"
+        />
       </button>
 
       {/* Navigation Modal */}

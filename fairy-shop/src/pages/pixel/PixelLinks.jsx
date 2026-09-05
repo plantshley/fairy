@@ -1,6 +1,8 @@
 // Pixel-theme Links page. Reuses the shared links list (src/linksData.js) so it
 // stays in sync with the standard Links page; only the chrome differs.
+import { motion } from 'framer-motion';
 import { NavBar, Divider } from '../../components/pixel/PixelKit';
+import { pixelPageTransition, pixelItem, pixelTitle, pixelCell } from '../../components/pixel/pageTransition';
 import { px } from '../../components/pixel/asset';
 import { links } from '../../linksData';
 // Side-effect import: registers the <pixel-canvas> web component (hover shimmer).
@@ -23,8 +25,9 @@ const SHIMMER = '#ff9f45,#ffd166,#ff85c8,#c08aff,#ffe85c';
 
 export function PixelLinks({ activeTab, onTabChange, onOpenAccessibility }) {
   return (
-    <div
+    <motion.div
       className="pixel-scene relative w-full min-h-dvh overflow-hidden"
+      {...pixelPageTransition}
       style={{
         backgroundImage: `url(${px('scenes/scene-links.gif')})`,
         backgroundSize: 'cover',
@@ -41,7 +44,7 @@ export function PixelLinks({ activeTab, onTabChange, onOpenAccessibility }) {
       <div className="relative z-[2] px-4 py-6 sm:px-10 lg:px-20">
         <NavBar accent={ACCENT} active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
 
-        <div className="text-center my-6">
+        <motion.div className="text-center my-6" {...pixelTitle(0.05)}>
           <div className="flex flex-nowrap items-center justify-center gap-2 sm:gap-5">
             <img src={px('icons/strawberry-flowers.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12 flex-shrink-0" />
             <div className="deco-title deco-title--d deco-title--d-yellow font-rainy whitespace-nowrap" style={{ fontSize: 'clamp(26px, 8vw, 80px)' }}>
@@ -49,16 +52,19 @@ export function PixelLinks({ activeTab, onTabChange, onOpenAccessibility }) {
             </div>
             <img src={px('icons/strawberry-flowers.gif')} alt="" className="pixel-img pixel-deco w-9 sm:w-12 flex-shrink-0" />
           </div>
-        </div>
+        </motion.div>
 
-        <Divider src="hibiscus.gif" height={40} style={{ margin: '0 0 18px' }} />
+        <motion.div {...pixelItem(0.12)}>
+          <Divider src="hibiscus.gif" height={40} style={{ margin: '0 0 18px' }} />
+        </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr gap-5 sm:gap-6 max-w-6xl mx-auto">
           {links.map((link, i) => {
             const warm = WARM[i % WARM.length];
             return (
-              <a
+              <motion.a
                 key={link.url + link.label}
+                {...pixelCell(i, 0.18, 0.05)}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -109,11 +115,11 @@ export function PixelLinks({ activeTab, onTabChange, onOpenAccessibility }) {
                   </div>
                   <span className="font-pixel" style={{ fontSize: 14, color: 'var(--d-pink-3)' }}>→</span>
                 </div>
-              </a>
+              </motion.a>
             );
           })}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

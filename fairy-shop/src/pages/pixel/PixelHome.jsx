@@ -1,10 +1,12 @@
 // Pixel-theme Home page. Decorative personal-site hub (about / pet / guestbook /
 // web-friends) plus action buttons that route via the pixel nav and a theme
 // picker wired to real theme switching.
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import {
   NavBar, Divider, PxWindow, PxButton, Blinkie, MusicPlayer, ThemeChip, PegasusSprite,
 } from '../../components/pixel/PixelKit';
+import { pixelPageTransition, pixelItem, pixelTitle } from '../../components/pixel/pageTransition';
 import { px } from '../../components/pixel/asset';
 import { themes } from '../../themes';
 import { trackEvent } from '../../utils/analytics';
@@ -196,8 +198,9 @@ const PICKER = Object.values(themes).map((t) => ({
 
 export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange, onOpenAccessibility }) {
   return (
-    <div
+    <motion.div
       className="bgD relative w-full min-h-dvh overflow-hidden px-4 pt-5 pb-safe sm:px-10 lg:px-20"
+      {...pixelPageTransition}
     >
       {/* Ambient sparkle field — tiled at native size (756×443) so it keeps its
           aspect ratio (no stretch/warp) and the GIF animates. */}
@@ -210,7 +213,7 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
         <NavBar accent={ACCENT} active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
 
         {/* hero — always a single row (3d star → title → 3d star) */}
-        <div className="text-center mt-1 mb-3">
+        <motion.div className="text-center mt-1 mb-3" {...pixelTitle(0.05)}>
           <div className="flex flex-nowrap items-center justify-center gap-1.5 sm:gap-6">
             <img src={px('icons/3dstar.gif')} alt="" className="pixel-img pixel-deco w-7 sm:w-[70px] flex-shrink-0" style={{ animation: 'float-y 3s ease-in-out infinite' }} />
             <div className="deco-title deco-title--d deco-title--d-rainbow font-rainy min-w-0 whitespace-nowrap" style={{ fontSize: 'clamp(15px, 4.6vw, 80px)' }}>
@@ -218,14 +221,16 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
             </div>
             <img src={px('icons/3dstar.gif')} alt="" className="pixel-img pixel-deco w-7 sm:w-[70px] flex-shrink-0" style={{ animation: 'float-y 3s ease-in-out infinite', animationDelay: '1.5s' }} />
           </div>
-        </div>
+        </motion.div>
 
-        <Divider src="cutie-stars.gif" height={30} style={{ margin: '4px 0 18px' }} />
+        <motion.div {...pixelItem(0.12)}>
+          <Divider src="cutie-stars.gif" height={30} style={{ margin: '4px 0 18px' }} />
+        </motion.div>
 
         {/* 3-col → single col */}
         <div className="grid gap-4 items-start lg:grid-cols-[250px_1fr_220px]">
           {/* LEFT */}
-          <div className="flex flex-col gap-3.5">
+          <motion.div className="flex flex-col gap-3.5" {...pixelItem(0.18)}>
             <PxWindow title="✿ about me" border={ACCENT} bar="var(--d-pink-3)" barFg="var(--d-plum)" bg="rgba(255,255,255,0.9)">
               <div className="font-mono" style={{ fontSize: 11, color: ACCENT, lineHeight: 1.6 }}>
                 hi! i'm <b style={{ color: 'var(--d-pink-3)' }}>fairy</b> ｡ﾟ✧
@@ -249,10 +254,10 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
                 ))}
               </div>
             </PxWindow>
-          </div>
+          </motion.div>
 
           {/* CENTER */}
-          <div className="flex flex-col gap-3.5">
+          <motion.div className="flex flex-col gap-3.5" {...pixelItem(0.24)}>
             <PxWindow title="✿ home.html" border={ACCENT} bar="var(--d-pink-3)" barFg="var(--d-plum)" bg="#fff" bodyStyle={{ padding: 0 }}>
               <StardustPet />
             </PxWindow>
@@ -278,10 +283,10 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* RIGHT */}
-          <div className="flex flex-col gap-3">
+          <motion.div className="flex flex-col gap-3" {...pixelItem(0.3)}>
             <PxWindow title="♡ web friends" border={ACCENT} bar="var(--d-lilac-2)" barFg="var(--d-plum)" bg="rgba(255,255,255,0.9)">
               <div className="flex flex-wrap gap-1">
                 {WEB_FRIENDS.map((f, i) => {
@@ -313,9 +318,9 @@ export function PixelHome({ currentTheme, activeTab, onTabChange, onThemeChange,
             <PxWindow title="✿ guestbook" border={ACCENT} bar="var(--b-cyan)" barFg="var(--d-plum)" bg="rgba(255,255,255,0.9)">
               <Guestbook />
             </PxWindow>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

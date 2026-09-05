@@ -1,7 +1,9 @@
 // Pixel-theme Gallery page. Reuses the real galleryManifest.json + shared
 // categories and the shared GalleryLightbox; only the grid chrome is reskinned.
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { NavBar, PxButton, Divider } from '../../components/pixel/PixelKit';
+import { pixelPageTransition, pixelItem, pixelTitle, pixelCell } from '../../components/pixel/pageTransition';
 import { px } from '../../components/pixel/asset';
 import { GalleryLightbox } from '../../components/GalleryLightbox';
 import { categories } from '../../galleryCategories';
@@ -18,8 +20,9 @@ export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
   const images = galleryManifest[selectedCategory.key] || [];
 
   return (
-    <div
+    <motion.div
       className="pixel-scene relative w-full min-h-dvh overflow-hidden px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-10 lg:px-20"
+      {...pixelPageTransition}
       style={{
         backgroundImage: `url(${px('scenes/scene-gallery.gif')})`,
         backgroundSize: '100% auto',
@@ -38,7 +41,7 @@ export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
       <div className="relative z-[2]">
         <NavBar accent={ACCENT} active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
 
-        <div className="text-center my-4">
+        <motion.div className="text-center my-4" {...pixelTitle(0.05)}>
           <div className="flex flex-nowrap items-center justify-center gap-2 sm:gap-5">
             <img src={px('icons/uba-hearts.gif')} alt="" className="pixel-img pixel-deco w-10 sm:w-[60px] flex-shrink-0" />
             <div className="deco-title deco-title--d deco-title--d-purple font-rainy whitespace-nowrap" style={{ fontSize: 'clamp(26px, 8vw, 80px)' }}>
@@ -49,10 +52,10 @@ export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
           <div className="font-pixel" style={{ fontSize: 10, color: ACCENT, opacity: 0.85, marginTop: 8 }}>
             a scrapbook of plushies, cards &amp; doodles
           </div>
-        </div>
+        </motion.div>
 
         {/* category filter */}
-        <div className="flex flex-wrap gap-1.5 justify-center my-3.5">
+        <motion.div className="flex flex-wrap gap-1.5 justify-center my-3.5" {...pixelItem(0.12)}>
           {categories.map((c) => {
             const active = c.id === selectedCategory.id;
             return (
@@ -72,15 +75,16 @@ export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
               </PxButton>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* image grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 max-w-6xl mx-auto">
           {images.map((imagePath, i) => {
             const src = getAssetPath(`/${imagePath.replace(/ /g, '%20')}`);
             return (
-              <button
+              <motion.button
                 key={imagePath}
+                {...pixelCell(i, 0.18)}
                 type="button"
                 onClick={() => {
                   setSelectedImage(imagePath);
@@ -92,12 +96,14 @@ export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
                 <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden' }}>
                   <img src={src} alt="" loading="lazy" className="pixel-img w-full h-full" style={{ objectFit: 'cover' }} />
                 </div>
-              </button>
+              </motion.button>
             );
           })}
         </div>
 
-        <Divider src="uba08-heart-line.gif" height={30} style={{ margin: '20px 0 0' }} />
+        <motion.div {...pixelItem(0.24)}>
+          <Divider src="uba08-heart-line.gif" height={30} style={{ margin: '20px 0 0' }} />
+        </motion.div>
       </div>
 
       <GalleryLightbox
@@ -106,6 +112,6 @@ export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
         onClose={() => setSelectedImage(null)}
         onSelect={setSelectedImage}
       />
-    </div>
+    </motion.div>
   );
 }

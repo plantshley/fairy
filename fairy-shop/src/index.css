@@ -516,3 +516,44 @@ body {
 .pcr-app .pcr-interaction button {
   cursor: pointer !important;
 }
+
+/* ---------------------------------------------------------------
+   Per-theme mouse cursor
+   ---------------------------------------------------------------
+   --theme-cursor is written by applyTheme() in src/themes.js from the active
+   theme's `cursor` icon (public/pixel/icons/*), routed through getAssetPath()
+   so it resolves under the GitHub Pages base path. Falls back to `auto` when
+   the variable is unset.
+
+   This is only the CSS cursor. The sparkle trail is a separate <canvas>
+   overlay (src/components/CursorSparkles.jsx) and is unaffected.
+
+   Suppressed under high-contrast, where the system cursor is easier to track.
+   Text fields keep the I-beam and the Konva build canvas keeps its own
+   resize/move cursors, since those shapes carry meaning. */
+body:not(.high-contrast),
+body:not(.high-contrast) * {
+  cursor: var(--theme-cursor, auto);
+}
+
+body:not(.high-contrast) input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]):not([type="button"]):not([type="submit"]),
+body:not(.high-contrast) textarea,
+body:not(.high-contrast) [contenteditable="true"] {
+  cursor: text;
+}
+
+body:not(.high-contrast) .konvajs-content,
+body:not(.high-contrast) .konvajs-content * {
+  cursor: auto;
+}
+
+/* When ThemeCursor is mounted it replaces the pointer with a real <img> so the
+   GIF can animate (CSS url() cursors only ever render frame one). The class is
+   added by that component and removed on unmount, so the native cursor is only
+   hidden while a replacement is actually on screen. Everything is hidden,
+   including text fields — a native I-beam showing alongside the icon reads as a
+   rendering bug. !important is needed to beat the text/pointer rules above. */
+body.theme-cursor-active,
+body.theme-cursor-active * {
+  cursor: none !important;
+}
