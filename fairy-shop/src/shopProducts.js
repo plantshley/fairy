@@ -35,6 +35,7 @@ export const SHOP_CATEGORIES = [
 ];
 
 export const shopProducts = [
+  { slug: 'country-star-kitten',        title: 'Country Star Kitten',        price: '$70',   category: 'sylph',      kofiUrl: 'https://ko-fi.com/s/be62389c4c' },
   { slug: 'ruby-blaze-crab',            title: 'Ruby Blaze Crab',            price: '$25',   category: 'griffon',    kofiUrl: 'https://ko-fi.com/s/4a372deb54' },
   { slug: 'rainbow-at-dusk',            title: 'Rainbow at Dusk',            price: '$70',   category: 'kirapillar', kofiUrl: 'https://ko-fi.com/s/16a8897ec5' },
   { slug: 'rainbow-at-dawn',            title: 'Rainbow at Dawn',            price: '$70',   category: 'kirapillar', kofiUrl: 'https://ko-fi.com/s/de4e0a68b4' },
