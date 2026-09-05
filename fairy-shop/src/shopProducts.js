@@ -43,7 +43,6 @@ export const shopProducts = [
   { slug: 'choco-banana-bee',           title: 'Choco Banana Bee',           price: '$25',   category: 'kirarin',   kofiUrl: 'https://ko-fi.com/s/1ba0b0b64e' },
   { slug: 'blushing-quartzite-reindeer', title: 'Blushing Quartzite Reindeer', price: '$35', category: 'impy',      kofiUrl: 'https://ko-fi.com/s/0973c11e51' },
   { slug: 'raspberry-mocha',            title: 'Raspberry Mocha',            price: '$45',   category: 'lovely',    kofiUrl: 'https://ko-fi.com/s/9373bfe096' },
-  { slug: 'lil-macaron',                title: 'Lil Macaron',                price: '$20',   category: 'kirarin',   kofiUrl: 'https://ko-fi.com/s/8225780d32' },
   { slug: 'star-bee',                   title: 'Bee a Star Frootie',         price: '$35',  category: 'toodie',    kofiUrl: 'https://ko-fi.com/s/8e7ba8f0ea' },
   { slug: 'vampire-rock-harpy',         title: 'Vampire Rock Harpy',         price: '$55',   category: 'harpy',    kofiUrl: 'https://ko-fi.com/s/58b54f21fa' },
   { slug: 'blip',                       title: 'Blip',                       price: '$55',   category: 'impy',         kofiUrl: 'https://ko-fi.com/s/8831030034' },
