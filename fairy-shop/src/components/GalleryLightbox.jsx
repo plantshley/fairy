@@ -49,7 +49,7 @@ export function GalleryLightbox({ images, currentImage, onClose, onSelect }) {
           }}
         >
           <motion.button
-            className="absolute top-4 right-4 text-white text-4xl font-bold hover:opacity-70"
+            className="lightbox-close absolute top-4 right-4 text-white text-4xl font-bold hover:opacity-70"
             style={{ zIndex: 100 }}
             onClick={(e) => {
               e.stopPropagation();

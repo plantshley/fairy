@@ -52,6 +52,10 @@
   --font-pixel: 'Silkscreen', 'Pixelify Sans', monospace;
   --font-rainy: 'Rainyhearts', 'Pixelify Sans', 'Silkscreen', monospace;
   --font-deco: 'Rainyhearts', 'Bagel Fat One', 'Silkscreen', cursive;
+  /* For single large glyphs in overlay chrome. Silkscreen is an 8px bitmap
+     face: scaled up to a 36px "×" it reads as a few thin strokes. Pixelify
+     Sans keeps the pixel look with much heavier, clearer letterforms. */
+  --font-ui: 'Pixelify Sans', 'Silkscreen', monospace;
 }
 
 /* Readable-fonts a11y override: swap pixel display fonts for a legible stack.
@@ -60,6 +64,7 @@
   --font-pixel: 'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif;
   --font-rainy: 'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif;
   --font-deco: 'Comic Sans MS', 'Arial', sans-serif;
+  --font-ui: 'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif;
 }
 
 /* ---------- Type ---------- */
@@ -405,4 +410,13 @@
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: inset 0 0 0 3px var(--d-plum), 4px 4px 0 0 var(--d-plum) !important;
+}
+
+/* Gallery/shop lightbox close button. The lightbox is shared with the standard
+   themes, so this only overrides the inherited Silkscreen under .theme-pixel;
+   every other theme keeps its own body font. */
+.theme-pixel .lightbox-close {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  line-height: 1;
 }

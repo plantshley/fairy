@@ -13,6 +13,12 @@ import { trackEvent } from '../../utils/analytics';
 
 const ACCENT = 'var(--d-plum)';
 
+// Thumbnail backing. #1e0556 is the darkest violet in scene-gallery.gif's own
+// color table — the shade under the stage. Semi-transparent so the sparkles
+// behind still show through art that has a transparent background, instead of
+// the flat white card those used to sit on.
+const THUMB_BG = 'rgba(69, 11, 75, 0.59)';
+
 export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
   const [selectedCategory, setSelectedCategory] = useState(categories[0]);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -78,7 +84,7 @@ export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
         </motion.div>
 
         {/* image grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
           {images.map((imagePath, i) => {
             const src = getAssetPath(`/${imagePath.replace(/ /g, '%20')}`);
             return (
@@ -91,7 +97,7 @@ export function PixelGallery({ activeTab, onTabChange, onOpenAccessibility }) {
                   trackEvent('gallery_image_clicked', { category_id: selectedCategory.id, image_path: imagePath, image_index: i });
                 }}
                 className="text-left border-none cursor-pointer"
-                style={{ background: 'rgba(255,255,255,0.94)', boxShadow: `inset 0 0 0 2px ${ACCENT}, 3px 3px 0 0 var(--d-pink-3)`, padding: 6 }}
+                style={{ background: THUMB_BG, boxShadow: `inset 0 0 0 3px ${ACCENT}, 5px 5px 0 0 var(--b-lilac)`, padding: 4 }}
               >
                 <div style={{ width: '100%', aspectRatio: '1 / 1', overflow: 'hidden' }}>
                   <img src={src} alt="" loading="lazy" className="pixel-img w-full h-full" style={{ objectFit: 'cover' }} />
