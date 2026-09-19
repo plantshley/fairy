@@ -35,6 +35,8 @@ export const SHOP_CATEGORIES = [
 ];
 
 export const shopProducts = [
+  { slug: 'moonlight-blossom-alfenique', title: 'Moonlight Blossom Alfeñique Griffon', price: '$40', category: 'griffon',    kofiUrl: 'https://ko-fi.com/s/cbf1290596' },
+  { slug: 'choco-mint-macaron',         title: 'Choco Mint Macaron',         price: '$55',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/bdeec0cc25' },
   { slug: 'twinkle-pumpkin-ghost',      title: 'Twinkle Pumpkin Ghost',      price: '$25',   category: 'tenshi',     kofiUrl: 'https://ko-fi.com/s/8a68444e47' },
   { slug: 'country-star-kitten',        title: 'Country Star Kitten',        price: '$70',   category: 'sylph',      kofiUrl: 'https://ko-fi.com/s/be62389c4c' },
   { slug: 'ruby-blaze-crab',            title: 'Ruby Blaze Crab',            price: '$25',   category: 'griffon',    kofiUrl: 'https://ko-fi.com/s/4a372deb54' },
