@@ -35,11 +35,12 @@ export const SHOP_CATEGORIES = [
 ];
 
 export const shopProducts = [
+  { slug: 'sunset-candy-spider',        title: 'Sunset Candy Spider',        price: '$40',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/44caf8c860' },
+  { slug: 'wizard-ghostie',             title: 'Wizard Ghostie',             price: '$10',   category: 'tenshi',     kofiUrl: 'https://ko-fi.com/s/ecaa9fe096' },
+  { slug: 'taro-berry-cream-cake',      title: 'Taro Berry Cream Cake',      price: '$30',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/6f1351c909' },
   { slug: 'moonlight-blossom-alfenique', title: 'Moonlight Blossom Alfeñique Griffon', price: '$40', category: 'griffon',    kofiUrl: 'https://ko-fi.com/s/cbf1290596' },
   { slug: 'choco-mint-macaron',         title: 'Choco Mint Macaron',         price: '$55',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/bdeec0cc25' },
   { slug: 'ruby-blaze-crab',            title: 'Ruby Blaze Crab',            price: '$25',   category: 'griffon',    kofiUrl: 'https://ko-fi.com/s/4a372deb54' },
-  { slug: 'rainbow-at-dusk',            title: 'Rainbow at Dusk',            price: '$70',   category: 'kirapillar', kofiUrl: 'https://ko-fi.com/s/16a8897ec5' },
-  { slug: 'rainbow-at-dawn',            title: 'Rainbow at Dawn',            price: '$70',   category: 'kirapillar', kofiUrl: 'https://ko-fi.com/s/de4e0a68b4' },
   { slug: 'lullaby-starlight-wizard',   title: 'Lullaby Starlight Wizard',   price: '$50',   category: 'sylph',     kofiUrl: 'https://ko-fi.com/s/d05bd6cfaa' },
   { slug: 'blushing-quartzite-reindeer', title: 'Blushing Quartzite Reindeer', price: '$35', category: 'impy',      kofiUrl: 'https://ko-fi.com/s/0973c11e51' },
   { slug: 'raspberry-mocha',            title: 'Raspberry Mocha',            price: '$45',   category: 'lovely',    kofiUrl: 'https://ko-fi.com/s/9373bfe096' },
