@@ -35,6 +35,7 @@ export const SHOP_CATEGORIES = [
 ];
 
 export const shopProducts = [
+  { slug: 'garnet-starlight-witch',     title: 'Garnet Starlight Witch',     price: '$70',   category: 'lovely',    kofiUrl: 'https://ko-fi.com/s/8c3edc4c85' },
   { slug: 'sunset-candy-spider',        title: 'Sunset Candy Spider',        price: '$40',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/44caf8c860' },
   { slug: 'wizard-ghostie',             title: 'Wizard Ghostie',             price: '$10',   category: 'tenshi',     kofiUrl: 'https://ko-fi.com/s/ecaa9fe096' },
   { slug: 'taro-berry-cream-cake',      title: 'Taro Berry Cream Cake',      price: '$30',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/6f1351c909' },
