@@ -35,6 +35,7 @@ export const SHOP_CATEGORIES = [
 ];
 
 export const shopProducts = [
+  { slug: 'franken-frootie',     title: 'Franken-Frootie',     price: '$30',   category: 'toodie',    kofiUrl: 'https://ko-fi.com/s/ca78e28068' },
   { slug: 'garnet-starlight-witch',     title: 'Garnet Starlight Witch',     price: '$70',   category: 'lovely',    kofiUrl: 'https://ko-fi.com/s/8c3edc4c85' },
   { slug: 'sunset-candy-spider',        title: 'Sunset Candy Spider',        price: '$40',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/44caf8c860' },
   { slug: 'wizard-ghostie',             title: 'Wizard Ghostie',             price: '$10',   category: 'tenshi',     kofiUrl: 'https://ko-fi.com/s/ecaa9fe096' },
@@ -49,7 +50,6 @@ export const shopProducts = [
   { slug: 'vampire-rock-harpy',         title: 'Vampire Rock Harpy',         price: '$55',   category: 'harpy',    kofiUrl: 'https://ko-fi.com/s/58b54f21fa' },
   { slug: 'blip',                       title: 'Blip',                       price: '$55',   category: 'impy',         kofiUrl: 'https://ko-fi.com/s/8831030034' },
   { slug: 'midnight-sun-lovely',        title: 'Midnight Sun Lovely',        price: '$50',   category: 'lovely',   kofiUrl: 'https://ko-fi.com/s/4dbbfc064d' },
-  { slug: 'funky-bun-keychain',         title: 'Funky Bun Keychain',         price: '$7.50', category: 'yosei',         kofiUrl: 'https://ko-fi.com/s/4b9512719f' },
   { slug: 'coasters',                   title: 'Coasters',                   price: '$5',    category: '',         kofiUrl: 'https://ko-fi.com/s/01b13d856f' },
   { slug: 'mini-magnets',               title: 'Mini Magnets',               price: '$5',    category: 'yosei',         kofiUrl: 'https://ko-fi.com/s/95112971d4' },
   { slug: 'pan-pride-party',            title: 'Pan Party Kirarin',          price: '$40',   category: 'kirarin',  kofiUrl: 'https://ko-fi.com/s/ef6280c1df' },
