@@ -2231,7 +2231,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
           parent's 2rem top back to the 1.5rem the other pixel pages use. */}
       {pixel && (
         <div className="hidden lg:block w-full lg:px-12 lg:-mt-2 relative z-10 mb-3">
-          <NavBar accent="var(--d-plum)" active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} />
+          <NavBar accent="var(--d-plum)" active={activeTab} onTabChange={onTabChange} onOpenAccessibility={onOpenAccessibility} showPegasus={false} />
         </div>
       )}
 

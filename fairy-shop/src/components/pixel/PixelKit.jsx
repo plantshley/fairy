@@ -286,21 +286,27 @@ const NAV_PALETTE = [
 ];
 const NAV_LINKS = ['home', 'shop', 'links', 'gallery', 'build'];
 
-export function NavBar({ accent = 'var(--d-plum)', active = 'home', onTabChange, onOpenAccessibility }) {
+// showPegasus=false leaves an empty spacer so the nav buttons stay right-aligned
+// (the build page puts the theme creature in that corner instead).
+export function NavBar({ accent = 'var(--d-plum)', active = 'home', onTabChange, onOpenAccessibility, showPegasus = true }) {
   return (
     // Single row at every width: stardust → nav buttons → accessibility. No wrap;
     // sizing shrinks on mobile so the whole bar stays on one line.
     <div className="flex flex-nowrap items-center justify-between gap-1.5 sm:gap-3">
-      <button
-        type="button"
-        onClick={() => onTabChange?.('home')}
-        title="back to home"
-        aria-label="Go to home page"
-        className="flex shrink-0 scale-[0.7] sm:scale-100 origin-left -mr-3 sm:mr-0"
-        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-      >
-        <PegasusSprite scale={3} />
-      </button>
+      {showPegasus ? (
+        <button
+          type="button"
+          onClick={() => onTabChange?.('home')}
+          title="back to home"
+          aria-label="Go to home page"
+          className="flex shrink-0 scale-[0.7] sm:scale-100 origin-left -mr-3 sm:mr-0"
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+        >
+          <PegasusSprite scale={3} />
+        </button>
+      ) : (
+        <div aria-hidden="true" />
+      )}
       <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5 min-w-0">
         {NAV_LINKS.map((l, i) => {
           const swatch = NAV_PALETTE[i % NAV_PALETTE.length];
