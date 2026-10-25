@@ -4,8 +4,18 @@ import { themes } from '../themes';
 import { getAssetPath } from '../utils/assetPath';
 import { trackEvent } from '../utils/analytics';
 
+// How long the "choose your theme" bubble stays up after the site loads. The
+// timer runs once per page load, so switching tabs does not bring it back.
+const BUBBLE_DURATION_MS = 8000;
+
 export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMotion = false }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showBubble, setShowBubble] = useState(true);
+
+  useEffect(() => {
+    const id = setTimeout(() => setShowBubble(false), BUBBLE_DURATION_MS);
+    return () => clearTimeout(id);
+  }, []);
 
   // Preload all creature images on mount
   useEffect(() => {
@@ -60,10 +70,17 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMo
           ? 'top-2 left-2 lg:top-auto lg:left-auto lg:bottom-8 lg:right-8'
           : 'bottom-20 right-2 landscape:bottom-2 landscape:right-2 lg:bottom-8 lg:right-8'
       }`}>
-        {/* Speech bubble - only show on home page */}
-        {activeTab === 'home' && (
-          <div
-            className={`absolute ${activeTab === 'build' ? 'portrait:max-md:-right-4 portrait:max-md:top-2' : ''} -left-4 top-2 landscape:-left-4 landscape:top-4 sm:-left-6 sm:top-4 lg:-left-4 lg:top-8 w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-full backdrop-blur-sm text-[7px] sm:text-[8px] lg:text-xs text-center flex flex-col items-center relative overflow-visible`}
+        {/* Speech bubble - every tab except build, fades out after BUBBLE_DURATION_MS
+            or as soon as the theme picker is opened */}
+        <AnimatePresence>
+        {showBubble && activeTab !== 'build' && (
+          <motion.div
+            key="theme-bubble"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="absolute -left-4 top-2 landscape:-left-4 landscape:top-4 sm:-left-6 sm:top-4 lg:-left-4 lg:top-8 w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-full backdrop-blur-sm text-[7px] sm:text-[8px] lg:text-xs text-center flex flex-col items-center relative overflow-visible"
             style={{
               background: currentTheme?.id === 'midnightVelvetMeadow' ? 'rgba(42, 16, 53, 0.9)' : 'rgba(255, 255, 255, 0.9)',
               color: 'var(--text-primary)',
@@ -74,12 +91,12 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMo
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
               <div>choose</div>
               <div>your</div>
-              <div>magic</div>
+              <div>theme</div>
               <div>♡⋆｡°✩</div>
             </div>
-            {/* Speech bubble tail - triangular (mobile portrait on build page: points left, all others: points right) */}
+            {/* Speech bubble tail - triangular, points right toward the creature */}
             <div
-              className={`absolute ${activeTab === 'build' ? 'portrait:max-md:bottom-2.5 portrait:max-md:left-0 portrait:max-md:rotate-[-45deg]' : ''} bottom-2.5 right-0 rotate-45 landscape:bottom-2.5 landscape:right-0 landscape:rotate-45`}
+              className="absolute bottom-2.5 right-0 rotate-45"
               style={{
                 width: 0,
                 height: 0,
@@ -88,12 +105,16 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMo
                 borderTop: currentTheme?.id === 'midnightVelvetMeadow' ? '6px solid rgba(42, 16, 53, 0.9)' : '6px solid rgba(255, 255, 255, 0.9)',
               }}
             />
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
 
         <motion.button
           className="cursor-pointer bg-transparent border-none p-0"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            setIsOpen(!isOpen);
+            setShowBubble(false);
+          }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           title="Change theme"

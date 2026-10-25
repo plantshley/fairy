@@ -164,8 +164,13 @@ function App() {
       )}
 
       {/* Background music control. Hidden under the pixel theme, where the
-          in-page "now playing" widget on PixelHome controls the same audio. */}
-      {!pixel && <BackgroundMusic />}
+          in-page "now playing" widget on PixelHome controls the same audio, and
+          on the mobile build page, where it lives in MobileNavigationMenu. */}
+      {!pixel && (
+        <div className={activeTab === 'build' ? 'max-lg:hidden' : undefined}>
+          <BackgroundMusic />
+        </div>
+      )}
 
       <AccessibilityMenu
         currentTheme={currentTheme}

@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { getAssetPath } from '../utils/assetPath';
+import { useBackgroundMusic } from '../hooks/useBackgroundMusic';
 
 const tabs = [
   { id: 'home', label: 'home', icon: getAssetPath('/house.png') },
@@ -13,6 +14,7 @@ const tabs = [
 export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, onOpenAccessibility }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isDarkTheme = currentTheme?.id === 'midnightVelvetMeadow';
+  const { muted, toggle: toggleMusic } = useBackgroundMusic();
 
   return (
     <>
@@ -82,12 +84,29 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, onO
                   </motion.button>
                 ))}
 
-                {onOpenAccessibility && (
-                  <div className="lg:hidden">
-                    <div
-                      className="my-1 h-px"
-                      style={{ backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
-                    />
+                {/* Mobile-only extras. The floating music toggle is hidden on
+                    the mobile build page (see App.jsx), so it moves in here. The
+                    menu stays open on toggle so the new state is visible. */}
+                <div className="lg:hidden">
+                  <div
+                    className="my-1 h-px"
+                    style={{ backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
+                  />
+                  <motion.button
+                    className="w-full px-3 py-2 rounded-xl font-bonbon text-sm transition-all text-left flex items-center gap-2"
+                    style={{ color: 'var(--text-primary)' }}
+                    aria-pressed={!muted}
+                    aria-label={muted ? 'Unmute background music' : 'Mute background music'}
+                    onClick={toggleMusic}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span aria-hidden="true" className="w-5 h-5 flex items-center justify-center text-base leading-none">
+                      {muted ? '🔇' : '🎶'}
+                    </span>
+                    <span className="whitespace-nowrap">{muted ? 'music off' : 'music on'}</span>
+                  </motion.button>
+
+                  {onOpenAccessibility && (
                     <motion.button
                       className="w-full px-3 py-2 rounded-xl font-bonbon text-sm transition-all text-left flex items-center gap-2"
                       style={{ color: 'var(--text-primary)' }}
@@ -104,8 +123,8 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, onO
                       />
                       <span className="whitespace-nowrap">accessibility</span>
                     </motion.button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </motion.div>
           </>

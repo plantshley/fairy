@@ -38,8 +38,6 @@ export const shopProducts = [
   { slug: 'franken-frootie',     title: 'Franken-Frootie',     price: '$30',   category: 'toodie',    kofiUrl: 'https://ko-fi.com/s/ca78e28068' },
   { slug: 'garnet-starlight-witch',     title: 'Garnet Starlight Witch',     price: '$70',   category: 'lovely',    kofiUrl: 'https://ko-fi.com/s/8c3edc4c85' },
   { slug: 'sunset-candy-spider',        title: 'Sunset Candy Spider',        price: '$40',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/44caf8c860' },
-  { slug: 'wizard-ghostie',             title: 'Wizard Ghostie',             price: '$10',   category: 'tenshi',     kofiUrl: 'https://ko-fi.com/s/ecaa9fe096' },
-  { slug: 'taro-berry-cream-cake',      title: 'Taro Berry Cream Cake',      price: '$30',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/6f1351c909' },
   { slug: 'moonlight-blossom-alfenique', title: 'Moonlight Blossom Alfeñique Griffon', price: '$40', category: 'griffon',    kofiUrl: 'https://ko-fi.com/s/cbf1290596' },
   { slug: 'choco-mint-macaron',         title: 'Choco Mint Macaron',         price: '$55',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/bdeec0cc25' },
   { slug: 'ruby-blaze-crab',            title: 'Ruby Blaze Crab',            price: '$25',   category: 'griffon',    kofiUrl: 'https://ko-fi.com/s/4a372deb54' },

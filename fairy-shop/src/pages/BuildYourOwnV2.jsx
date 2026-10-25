@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { useState, useRef, useEffect } from 'react';
-import { Stage, Layer, Image as KonvaImage, Line, Transformer, Rect, Text, Group, Circle } from 'react-konva';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { Stage, Layer, Image as KonvaImage, Line, Transformer, Rect, Text, Group, Circle, Shape } from 'react-konva';
 import useImage from 'use-image';
 import { Sparkle } from '../components/Sparkle';
 import { ColorPicker } from '../components/ColorPicker';
@@ -18,6 +18,7 @@ import { FaceTabContent } from '../components/mobile/FaceTabContent';
 import { BodyPartsTabContent } from '../components/mobile/BodyPartsTabContent';
 import { ColorsTabContent } from '../components/mobile/ColorsTabContent';
 import { EditTabContent } from '../components/mobile/EditTabContent';
+import { ExportOptions } from '../components/ExportOptions';
 
 // Body types with SVG files (using versions with "2" in filename for canvas)
 const bodyTypes = [
@@ -218,8 +219,177 @@ const parts = {
   ],
 };
 
+// ─── Attached ("stay inside the lines") drawing helpers ─────────────────────
+// A stroke drawn with "Stay inside lines" on is attached to the object (or the
+// body) it starts on: its points are stored in that target's local space
+// (origin at the image center, before scale/rotation/flip) under
+// `attachedTo: <object id | 'body'>`, so it moves with the target and is
+// clipped to the target's opaque pixels. A target descriptor is
+// { x, y, sx, sy, rotation, width, height, mask, outline } in content coords.
+
+const EMPTY_LINES = [];
+
+// Lines that belong to a free-floating drawing instance (layer). Attached
+// strokes live inside their target, and eraseAll strokes apply to every layer.
+const isGroupLine = (l) => !l.attachedTo && !l.eraseAll;
+
+// Body-attached points are stored in "body units" so they scale with the body
+// when the canvas or body size changes.
+const BODY_UNITS = 1000;
+
+const toLocal = (t, wx, wy) => {
+  const dx = wx - t.x;
+  const dy = wy - t.y;
+  const r = (t.rotation || 0) * Math.PI / 180;
+  const c = Math.cos(r);
+  const s = Math.sin(r);
+  return [(dx * c + dy * s) / t.sx, (-dx * s + dy * c) / t.sy];
+};
+
+const toWorld = (t, lx, ly) => {
+  const ax = lx * t.sx;
+  const ay = ly * t.sy;
+  const r = (t.rotation || 0) * Math.PI / 180;
+  const c = Math.cos(r);
+  const s = Math.sin(r);
+  return [t.x + ax * c - ay * s, t.y + ax * s + ay * c];
+};
+
+const targetScale = (t) => Math.sqrt(Math.abs(t.sx * t.sy)) || 1;
+
+// Cached alpha channel per mask image, for "which target is under the pointer".
+const alphaCache = new WeakMap();
+const getAlphaData = (img) => {
+  let cached = alphaCache.get(img);
+  if (!cached) {
+    const w = img.width;
+    const h = img.height;
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    cached = { w, h, data: ctx.getImageData(0, 0, w, h).data };
+    alphaCache.set(img, cached);
+  }
+  return cached;
+};
+
+const isOpaqueAt = (t, wx, wy) => {
+  if (!t.mask || !t.mask.width) return false;
+  const [lx, ly] = toLocal(t, wx, wy);
+  const { w, h, data } = getAlphaData(t.mask);
+  const ix = Math.floor((lx + t.width / 2) / t.width * w);
+  const iy = Math.floor((ly + t.height / 2) / t.height * h);
+  if (ix < 0 || iy < 0 || ix >= w || iy >= h) return false;
+  return data[(iy * w + ix) * 4 + 3] > 10;
+};
+
+// Outline-only copy of a part image (the dark pixels, recolored to the outline
+// color), drawn over attached strokes so the line art stays on top.
+const makeOutlineCanvas = (image, crop, outlineHex) => {
+  const canvas = document.createElement('canvas');
+  canvas.width = crop.w;
+  canvas.height = crop.h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
+  const imageData = ctx.getImageData(0, 0, crop.w, crop.h);
+  const data = imageData.data;
+  const m = outlineHex && /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(outlineHex);
+  for (let i = 0; i < data.length; i += 4) {
+    // Same light/dark threshold as the colorizing passes.
+    if (data[i] > 100 || data[i + 1] > 100 || data[i + 2] > 100) {
+      data[i + 3] = 0;
+    } else if (m) {
+      data[i] = parseInt(m[1], 16);
+      data[i + 1] = parseInt(m[2], 16);
+      data[i + 2] = parseInt(m[3], 16);
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+  return canvas;
+};
+
+// Strokes are composited on a scratch canvas (eraser = destination-out, then
+// destination-in against the mask) and the result is drawn into the scene.
+// Rendering synchronously means one shared scratch canvas is safe.
+let scratchCanvas = null;
+const drawAttachedLines = (ctx, lines, mask, width, height) => {
+  if (!mask.width || !mask.height) return;
+  const m = ctx.getTransform();
+  // Match the scene's device scale (zoom, devicePixelRatio, export pixelRatio).
+  const scale = Math.max(Math.hypot(m.a, m.b), Math.hypot(m.c, m.d), 0.25);
+  const cw = Math.max(1, Math.min(4096, Math.ceil(width * scale)));
+  const ch = Math.max(1, Math.min(4096, Math.ceil(height * scale)));
+  if (!scratchCanvas) scratchCanvas = document.createElement('canvas');
+  const o = scratchCanvas.getContext('2d');
+  if (scratchCanvas.width !== cw || scratchCanvas.height !== ch) {
+    scratchCanvas.width = cw; // resizing also clears
+    scratchCanvas.height = ch;
+  } else {
+    o.setTransform(1, 0, 0, 1, 0, 0);
+    o.clearRect(0, 0, cw, ch);
+  }
+  const kx = cw / width;
+  const ky = ch / height;
+  o.setTransform(kx, 0, 0, ky, (width / 2) * kx, (height / 2) * ky);
+  o.lineCap = 'round';
+  o.lineJoin = 'round';
+  for (const line of lines) {
+    const pts = line.points;
+    o.globalCompositeOperation = line.eraser ? 'destination-out' : 'source-over';
+    o.strokeStyle = line.color;
+    o.fillStyle = line.color;
+    o.lineWidth = line.size;
+    o.beginPath();
+    if (pts.length === 2) {
+      o.arc(pts[0], pts[1], line.size / 2, 0, Math.PI * 2);
+      o.fill();
+    } else {
+      o.moveTo(pts[0], pts[1]);
+      for (let i = 2; i + 1 < pts.length; i += 2) o.lineTo(pts[i], pts[i + 1]);
+      o.stroke();
+    }
+  }
+  o.setTransform(1, 0, 0, 1, 0, 0);
+  o.globalCompositeOperation = 'destination-in';
+  o.drawImage(mask, 0, 0, cw, ch);
+  o.globalCompositeOperation = 'source-over';
+  ctx.drawImage(scratchCanvas, 0, 0, width, height);
+};
+
+// Attached strokes for one target, clipped to its mask, with the outline on top.
+// Rendered inside the target's own transform, sized to its image.
+const AttachedDrawing = ({ lines, mask, outline, width, height, ...transform }) => {
+  if (!lines.length || !mask) return null;
+  return (
+    <>
+      <Shape
+        {...transform}
+        width={width}
+        height={height}
+        offsetX={width / 2}
+        offsetY={height / 2}
+        listening={false}
+        sceneFunc={(context) => drawAttachedLines(context._context, lines, mask, width, height)}
+      />
+      {outline && (
+        <KonvaImage
+          {...transform}
+          image={outline}
+          width={width}
+          height={height}
+          offsetX={width / 2}
+          offsetY={height / 2}
+          listening={false}
+        />
+      )}
+    </>
+  );
+};
+
 // Body SVG component with color filter
-const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
+const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier, attachedLines = EMPTY_LINES, onTargetChange }) => {
   const [image] = useImage(body.svgPath);
   const [filterImage, setFilterImage] = useState(null);
 
@@ -301,11 +471,35 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
     }
   }, [image, body.color, body.outlineColor]);
 
+  const needsOutline = attachedLines.length > 0;
+  const outlineCanvas = useMemo(() => (
+    image && needsOutline
+      ? makeOutlineCanvas(image, { x: 0, y: 0, w: image.width, h: image.height }, body.outlineColor)
+      : null
+  ), [image, body.outlineColor, needsOutline]);
+
   // Adjust y position for toodie frootie - move it higher (scale adjustment with body size)
   const yAdjustment = body.id === 'frootie' ? bodySize * 0.2 : 0;
   const bodyY = y - yAdjustment;
 
+  // Body units -> content pixels, so attached strokes follow body resizes.
+  const unitScale = bodySize / BODY_UNITS;
+  const localWidth = bodyWidth / unitScale;
+  const localHeight = bodyHeight / unitScale;
+  const mask = filterImage || image;
+
+  useEffect(() => {
+    if (!onTargetChange) return;
+    onTargetChange('body', mask ? {
+      x, y: bodyY, sx: unitScale, sy: unitScale, rotation: 0,
+      width: localWidth, height: localHeight, mask,
+    } : null);
+  }, [onTargetChange, mask, x, bodyY, unitScale, localWidth, localHeight]);
+
+  useEffect(() => () => onTargetChange?.('body', null), [onTargetChange]);
+
   return (
+    <>
     <KonvaImage
       image={filterImage || image}
       x={x}
@@ -360,16 +554,30 @@ const BodyImage = ({ body, x, y, onClick, stageSize, bodySizeMultiplier }) => {
         }
       }}
     />
+    <AttachedDrawing
+      lines={attachedLines}
+      mask={mask}
+      outline={outlineCanvas}
+      width={localWidth}
+      height={localHeight}
+      x={x}
+      y={bodyY}
+      scaleX={unitScale}
+      scaleY={unitScale}
+    />
+    </>
   );
 };
 
 // Individual draggable SVG image component with color filter
-const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stageSize, stageScale, stagePosition, currentTheme, onTransformStart, onDragStart, freeDrawMode }) => {
+const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stageSize, stageScale, stagePosition, currentTheme, onTransformStart, onDragStart, freeDrawMode, attachedLines = EMPTY_LINES, onTargetChange }) => {
   const shapeRef = useRef();
   const trRef = useRef();
   const [image] = useImage(object.svgPath);
   const [filterImage, setFilterImage] = useState(null);
   const [croppedDimensions, setCroppedDimensions] = useState({ width: object.width || 100, height: object.height || 100 });
+  // Source-image rect of the cropped content, for the attached-drawing outline.
+  const [cropRect, setCropRect] = useState(null);
   const dragStartPos = useRef(null);
   const isDragging = useRef(false);
 
@@ -470,6 +678,7 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
       coloredImage.src = croppedCanvas.toDataURL();
       coloredImage.onload = () => {
         setFilterImage(coloredImage);
+        setCropRect({ x: minX, y: minY, w: croppedWidth, h: croppedHeight });
         // Scale the cropped dimensions to match the desired initial size
         const aspectRatio = croppedWidth / croppedHeight;
         const targetWidth = object.width || 100;
@@ -521,6 +730,7 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
       croppedImage.src = croppedCanvas.toDataURL();
       croppedImage.onload = () => {
         setFilterImage(croppedImage);
+        setCropRect({ x: minX, y: minY, w: croppedWidth, h: croppedHeight });
         // Scale the cropped dimensions to match the desired initial size
         const aspectRatio = croppedWidth / croppedHeight;
         const targetWidth = object.width || 100;
@@ -529,6 +739,25 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
       };
     }
   }, [image, object.color, object.outlineColor]);
+
+  const needsOutline = attachedLines.length > 0;
+  const outlineCanvas = useMemo(() => (
+    image && cropRect && needsOutline ? makeOutlineCanvas(image, cropRect, object.outlineColor) : null
+  ), [image, cropRect, object.outlineColor, needsOutline]);
+
+  // Must match the Group's scaleX below so attached strokes land where drawn.
+  const groupScaleX = (object.scaleX || 1) * (object.flipped ? -1 : 1);
+  const groupScaleY = object.scaleY || 1;
+
+  useEffect(() => {
+    if (!onTargetChange) return;
+    onTargetChange(object.id, filterImage ? {
+      x: object.x, y: object.y, sx: groupScaleX, sy: groupScaleY, rotation: object.rotation || 0,
+      width: croppedDimensions.width, height: croppedDimensions.height, mask: filterImage,
+    } : null);
+  }, [onTargetChange, object.id, object.x, object.y, groupScaleX, groupScaleY, object.rotation, croppedDimensions, filterImage]);
+
+  useEffect(() => () => onTargetChange?.(object.id, null), [onTargetChange, object.id]);
 
   const checkIfInTrash = (x, y, scale = 1) => {
     // Convert object position from world space (content layer) to screen space (UI layer)
@@ -554,8 +783,8 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
         ref={shapeRef}
         x={object.x}
         y={object.y}
-        scaleX={(object.scaleX || 1) * (object.flipped ? -1 : 1)}
-        scaleY={object.scaleY || 1}
+        scaleX={groupScaleX}
+        scaleY={groupScaleY}
         rotation={object.rotation || 0}
         draggable={!freeDrawMode}
         onClick={freeDrawMode ? undefined : onSelect}
@@ -650,6 +879,13 @@ const DraggableImage = ({ object, isSelected, onSelect, onChange, onDelete, stag
           offsetY={croppedDimensions.height / 2}
           listening={false}
         />
+        <AttachedDrawing
+          lines={attachedLines}
+          mask={filterImage}
+          outline={outlineCanvas}
+          width={croppedDimensions.width}
+          height={croppedDimensions.height}
+        />
       </Group>
       {isSelected && !freeDrawMode && (
         <Transformer
@@ -697,15 +933,30 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
   const [activeColorTarget, setActiveColorTarget] = useState('drawing'); // 'bodyColor' | 'bodyOutline' | 'objectColor' | 'objectOutline' | 'drawing'
   const [freeDrawMode, setFreeDrawMode] = useState(false);
   const [eraserMode, setEraserMode] = useState(false);
-  // Fill tool: when active, clicking a drawn stroke recolors every stroke of
-  // that same color within the same drawing instance. Mutually exclusive with
-  // the pen and eraser.
+  // Fill tool: when active, clicking a drawn stroke recolors it and every
+  // touching stroke of the same color, across all drawing instances. Mutually
+  // exclusive with the pen and eraser.
   const [fillMode, setFillMode] = useState(false);
+  // "Stay inside lines": pen strokes attach to the object/body they start on
+  // and are clipped to its shape. See the attached-drawing helpers above.
+  const [stayInside, setStayInside] = useState(false);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  // id ('body' or object id) -> target descriptor, kept current by BodyImage
+  // and DraggableImage. A ref because it is only read inside event handlers.
+  const attachTargetsRef = useRef(new Map());
+  const handleTargetChange = useCallback((id, target) => {
+    if (target) attachTargetsRef.current.set(id, target);
+    else attachTargetsRef.current.delete(id);
+  }, []);
+  // strokeId of the stroke being drawn; an eraser stroke spans several lines.
+  const activeStrokeRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  // lines: each entry has { points, color, size, eraser, groupId, zIndex }.
+  // lines: each entry has { points, color, size, eraser, groupId, zIndex, strokeId }.
   // groupId identifies a "drawing instance" — strokes made between enabling
   // and disabling free-draw mode. Each group has its own zIndex so it can be
-  // layered independently of other drawings and objects.
+  // layered independently of other drawings and objects. Two other kinds have
+  // no group: attached strokes ({ attachedTo }, in the target's local space)
+  // and eraser strokes ({ eraseAll }), which erase every instance drawn before them.
   const [lines, setLines] = useState([]);
   // Tracks the drawing group currently being built. Cleared when free-draw is
   // disabled so the next session starts a fresh group.
@@ -975,6 +1226,10 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
       selectedBody: selectedBody ? { ...selectedBody } : null,
     }]);
     setSelectedBody({ ...body, color: body.color || '#ffffff' });
+    // Strokes stuck to the old body would be clipped to the new silhouette.
+    if (body.id !== selectedBody?.id) {
+      setLines(prev => (prev.some(l => l.attachedTo === 'body') ? prev.filter(l => l.attachedTo !== 'body') : prev));
+    }
 
     // Track body selection
     trackEvent('body_selected', {
@@ -1030,7 +1285,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
     // added object never lands behind something previously sent to front.
     const allZ = [
       ...placedObjects.map(o => o.zIndex || 0),
-      ...lines.map(l => (l.zIndex !== undefined ? l.zIndex : 0)),
+      ...lines.filter(isGroupLine).map(l => (l.zIndex !== undefined ? l.zIndex : 0)),
     ];
     // Clamp to >= 0 so that even if everything was sent behind the body
     // (negative zIndex), the new object still lands in front of the body.
@@ -1079,7 +1334,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
     // can move past whichever item happens to be the next neighbor in zIndex
     // order — including drawings.
     const drawingGroupZs = new Map();
-    for (const line of lines) {
+    for (const line of lines.filter(isGroupLine)) {
       const z = line.zIndex !== undefined ? line.zIndex : 0;
       const id = line.groupId || 'legacy';
       if (!drawingGroupZs.has(id)) drawingGroupZs.set(id, z);
@@ -1112,6 +1367,12 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
     const newObjects = [...placedObjects];
     newObjects[index] = { ...newObjects[index], zIndex: newZ };
     setPlacedObjects(newObjects);
+  };
+
+  // Deleting an object also drops the strokes attached to it.
+  const removeObject = (id) => {
+    setPlacedObjects(prev => prev.filter(o => o.id !== id));
+    setLines(prev => (prev.some(l => l.attachedTo === id) ? prev.filter(l => l.attachedTo !== id) : prev));
   };
 
   const handleObjectChange = (id, newAttrs) => {
@@ -1476,10 +1737,25 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
   // scrolling on the control panel and clicking buttons on mobile.
   // The canvas handles touch events properly through Konva's touch handlers.
 
-  // Fill tool: given a point in canvas (content) coordinates, find the closest
-  // drawn stroke under the cursor and recolor every stroke that shares its
-  // color within the same drawing instance (groupId) to the current color.
+  // Fill tool: recolor the drawn stroke under (px, py) plus every stroke of
+  // the same color that touches it, directly or through other same-colored
+  // strokes, across all drawing instances and attached drawings. Everything is
+  // compared in content (world) coordinates.
   const handleFillAt = (px, py) => {
+    const targets = attachTargetsRef.current;
+    // World-space geometry per line; null for erasers and orphaned attachments.
+    const geo = lines.map((l) => {
+      if (l.eraser) return null;
+      if (!l.attachedTo) return { points: l.points, size: l.size || 1 };
+      const t = targets.get(l.attachedTo);
+      if (!t) return null;
+      const points = [];
+      for (let i = 0; i + 1 < l.points.length; i += 2) {
+        points.push(...toWorld(t, l.points[i], l.points[i + 1]));
+      }
+      return { points, size: (l.size || 1) * targetScale(t) };
+    });
+
     // Shortest distance from point (px,py) to line segment (x1,y1)-(x2,y2).
     const distToSegment = (x1, y1, x2, y2) => {
       const dx = x2 - x1;
@@ -1492,36 +1768,109 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
       return Math.hypot(px - cx, py - cy);
     };
 
-    let target = null;
+    let targetIdx = -1;
     let targetDist = Infinity;
-    for (const line of lines) {
-      if (line.eraser) continue; // eraser strokes have no fillable color
-      const pts = line.points;
+    geo.forEach((g, idx) => {
+      if (!g) return;
+      const pts = g.points;
       // Click tolerance scales with the stroke so thin lines stay clickable.
-      const threshold = (line.size || 1) / 2 + 8;
+      // Distances are measured to the stroke's edge, so a thick stroke under
+      // the cursor beats a thin one whose center line happens to be closer.
+      const half = g.size / 2;
+      const threshold = 8;
       if (pts.length === 2) {
-        const d = Math.hypot(px - pts[0], py - pts[1]);
-        if (d < threshold && d < targetDist) { targetDist = d; target = line; }
-        continue;
+        const d = Math.hypot(px - pts[0], py - pts[1]) - half;
+        if (d < threshold && d < targetDist) { targetDist = d; targetIdx = idx; }
+        return;
       }
       for (let i = 0; i + 3 < pts.length; i += 2) {
-        const d = distToSegment(pts[i], pts[i + 1], pts[i + 2], pts[i + 3]);
-        if (d < threshold && d < targetDist) { targetDist = d; target = line; }
+        const d = distToSegment(pts[i], pts[i + 1], pts[i + 2], pts[i + 3]) - half;
+        if (d < threshold && d < targetDist) { targetDist = d; targetIdx = idx; }
+      }
+    });
+
+    if (targetIdx === -1) return; // clicked empty space — nothing to fill
+
+    // Stamp each same-colored stroke onto a coarse grid; strokes that share a
+    // cell touch. Union-find then collects everything connected to the target.
+    const colorOf = (l) => (l.color || '').toLowerCase();
+    const color = colorOf(lines[targetIdx]);
+    const candidates = [];
+    geo.forEach((g, idx) => {
+      if (g && colorOf(lines[idx]) === color) candidates.push(idx);
+    });
+
+    const CELL = 4;
+    const cellOwners = new Map();
+    for (const idx of candidates) {
+      const { points, size } = geo[idx];
+      const r = size / 2;
+      const reach = r + CELL * 0.71; // cell half-diagonal
+      // Stamps every half radius still cover the stroke without gaps.
+      const step = Math.max(CELL / 2, r / 2);
+      const stamp = (x, y) => {
+        for (let cx = Math.floor((x - r) / CELL); cx <= Math.floor((x + r) / CELL); cx++) {
+          for (let cy = Math.floor((y - r) / CELL); cy <= Math.floor((y + r) / CELL); cy++) {
+            const ddx = (cx + 0.5) * CELL - x;
+            const ddy = (cy + 0.5) * CELL - y;
+            if (ddx * ddx + ddy * ddy > reach * reach) continue;
+            const key = (cx + 32768) * 65536 + (cy + 32768);
+            const owners = cellOwners.get(key);
+            // Strokes are stamped one at a time, so a repeat stamp by this
+            // stroke always shows up as the last owner.
+            if (!owners) cellOwners.set(key, [idx]);
+            else if (owners[owners.length - 1] !== idx) owners.push(idx);
+          }
+        }
+      };
+      stamp(points[0], points[1]);
+      for (let i = 0; i + 3 < points.length; i += 2) {
+        const x1 = points[i], y1 = points[i + 1], x2 = points[i + 2], y2 = points[i + 3];
+        const steps = Math.max(1, Math.ceil(Math.hypot(x2 - x1, y2 - y1) / step));
+        for (let k = 1; k <= steps; k++) {
+          stamp(x1 + (x2 - x1) * k / steps, y1 + (y2 - y1) * k / steps);
+        }
       }
     }
 
-    if (!target) return; // clicked empty space — nothing to fill
-
-    const targetColor = target.color;
-    const targetGroup = target.groupId || 'legacy';
-    saveToHistory();
-    setLines(prev => prev.map(l => {
-      const g = l.groupId || 'legacy';
-      if (!l.eraser && g === targetGroup && l.color === targetColor) {
-        return { ...l, color: currentColor };
+    const parent = new Map(candidates.map(i => [i, i]));
+    const find = (i) => {
+      while (parent.get(i) !== i) {
+        parent.set(i, parent.get(parent.get(i)));
+        i = parent.get(i);
       }
-      return l;
-    }));
+      return i;
+    };
+    for (const owners of cellOwners.values()) {
+      for (let k = 1; k < owners.length; k++) {
+        const a = find(owners[0]);
+        const b = find(owners[k]);
+        if (a !== b) parent.set(a, b);
+      }
+    }
+    const root = find(targetIdx);
+    const fillSet = new Set(candidates.filter(i => find(i) === root));
+    if (color === currentColor.toLowerCase()) return; // already this color
+
+    saveToHistory();
+    setLines(prev => prev.map((l, i) => (fillSet.has(i) ? { ...l, color: currentColor } : l)));
+  };
+
+  // Topmost object (or the body) with an opaque pixel at content point (x, y),
+  // in render order: front objects, body, then objects sent behind the body.
+  const findTargetAt = (x, y) => {
+    const targets = attachTargetsRef.current;
+    // Equal zIndex: the later object renders on top, so check it first.
+    const ordered = placedObjects.map((o, i) => ({ o, i }))
+      .sort((a, b) => ((b.o.zIndex || 0) - (a.o.zIndex || 0)) || (b.i - a.i))
+      .map(({ o }) => o);
+    const front = ordered.filter(o => (o.zIndex || 0) >= 0);
+    const back = ordered.filter(o => (o.zIndex || 0) < 0);
+    for (const id of [...front.map(o => o.id), 'body', ...back.map(o => o.id)]) {
+      const t = targets.get(id);
+      if (t && isOpaqueAt(t, x, y)) return id;
+    }
+    return null;
   };
 
   const handleMouseDown = (e) => {
@@ -1577,36 +1926,74 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
         return;
       }
 
-      saveToHistory();
-      setIsDrawing(true);
       // Transform pointer position to account for zoom and pan
-      const transformedX = (pos.x - stagePosition.x) / stageScale;
-      const transformedY = (pos.y - stagePosition.y) / stageScale;
+      const x = (pos.x - stagePosition.x) / stageScale;
+      const y = (pos.y - stagePosition.y) / stageScale;
+      const strokeId = `stroke-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      const targets = attachTargetsRef.current;
+      let newLines;
 
-      // Start a new drawing instance (group) on the first stroke after
-      // entering free-draw mode. Its zIndex sits above everything currently
-      // on the canvas so the new drawing renders on top.
-      if (!currentDrawGroupRef.current) {
-        const allZ = [
-          ...placedObjects.map(o => o.zIndex || 0),
-          ...lines.map(l => (l.zIndex !== undefined ? l.zIndex : 0)),
-        ];
-        const maxZ = allZ.length ? Math.max(...allZ) : 0;
-        currentDrawGroupRef.current = {
-          id: `draw-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-          zIndex: maxZ + 1,
-        };
+      if (eraserMode) {
+        // One world-space stroke erases every drawing instance drawn before
+        // it, plus a local copy per attached drawing so strokes stuck to parts
+        // are erased too (and the erased spot moves with the part).
+        newLines = [{ points: [x, y], color: currentColor, size: brushSize, eraser: true, eraseAll: true, strokeId }];
+        const attachedIds = new Set(lines.filter(l => l.attachedTo && !l.eraser).map(l => l.attachedTo));
+        for (const id of attachedIds) {
+          const t = targets.get(id);
+          if (!t) continue;
+          newLines.push({
+            points: toLocal(t, x, y),
+            color: currentColor,
+            size: brushSize / targetScale(t),
+            eraser: true,
+            attachedTo: id,
+            strokeId,
+          });
+        }
+      } else if (stayInside) {
+        const id = findTargetAt(x, y);
+        if (!id) return; // Started outside every part: nothing to stay inside.
+        const t = targets.get(id);
+        newLines = [{
+          points: toLocal(t, x, y),
+          color: currentColor,
+          size: brushSize / targetScale(t),
+          eraser: false,
+          attachedTo: id,
+          strokeId,
+        }];
+      } else {
+        // Start a new drawing instance (group) on the first stroke after
+        // entering free-draw mode. Its zIndex sits above everything currently
+        // on the canvas so the new drawing renders on top.
+        if (!currentDrawGroupRef.current) {
+          const allZ = [
+            ...placedObjects.map(o => o.zIndex || 0),
+            ...lines.filter(isGroupLine).map(l => (l.zIndex !== undefined ? l.zIndex : 0)),
+          ];
+          const maxZ = allZ.length ? Math.max(...allZ) : 0;
+          currentDrawGroupRef.current = {
+            id: `draw-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            zIndex: maxZ + 1,
+          };
+        }
+        const { id: groupId, zIndex } = currentDrawGroupRef.current;
+        newLines = [{
+          points: [x, y],
+          color: currentColor,
+          size: brushSize,
+          eraser: false,
+          groupId,
+          zIndex,
+          strokeId,
+        }];
       }
-      const { id: groupId, zIndex } = currentDrawGroupRef.current;
 
-      setLines([...lines, {
-        points: [transformedX, transformedY],
-        color: currentColor,
-        size: brushSize,
-        eraser: eraserMode,
-        groupId,
-        zIndex,
-      }]);
+      saveToHistory();
+      activeStrokeRef.current = strokeId;
+      setIsDrawing(true);
+      setLines(prev => [...prev, ...newLines]);
     }, 50); // 50ms delay to detect multi-touch
 
     // Store timeout so we can cancel it if needed
@@ -1631,8 +2018,10 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
       // Stop drawing if already started
       if (isDrawing) {
         setIsDrawing(false);
-        // Remove the line that was just started
-        setLines(lines.slice(0, -1));
+        // Remove the stroke that was just started (all of its lines)
+        const strokeId = activeStrokeRef.current;
+        activeStrokeRef.current = null;
+        setLines(prev => prev.filter(l => l.strokeId !== strokeId));
       }
       return;
     }
@@ -1642,11 +2031,16 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
     // Transform pointer position to account for zoom and pan
-    const transformedX = (point.x - stagePosition.x) / stageScale;
-    const transformedY = (point.y - stagePosition.y) / stageScale;
-    let lastLine = lines[lines.length - 1];
-    lastLine.points = lastLine.points.concat([transformedX, transformedY]);
-    setLines([...lines.slice(0, -1), lastLine]);
+    const x = (point.x - stagePosition.x) / stageScale;
+    const y = (point.y - stagePosition.y) / stageScale;
+    const strokeId = activeStrokeRef.current;
+    const targets = attachTargetsRef.current;
+    setLines(prev => prev.map((l) => {
+      if (l.strokeId !== strokeId) return l;
+      if (!l.attachedTo) return { ...l, points: l.points.concat([x, y]) };
+      const t = targets.get(l.attachedTo);
+      return t ? { ...l, points: l.points.concat(toLocal(t, x, y)) } : l;
+    }));
   };
 
   const handleMouseUp = (e) => {
@@ -1660,16 +2054,16 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
       clearTimeout(mouseDownPos.current.touchTimeout);
     }
 
-    // Smooth the last line if we were drawing
-    if (isDrawing && lines.length > 0) {
-      const lastLine = lines[lines.length - 1];
-      if (lastLine.points.length >= 6) {
-        // Apply smoothing to the completed stroke
-        const smoothedPoints = smoothDrawingStroke(lastLine.points);
-        const smoothedLine = { ...lastLine, points: smoothedPoints };
-        setLines([...lines.slice(0, -1), smoothedLine]);
-      }
+    // Smooth the completed stroke (every line it spans) if we were drawing
+    if (isDrawing) {
+      const strokeId = activeStrokeRef.current;
+      setLines(prev => prev.map(l => (
+        l.strokeId === strokeId && l.points.length >= 6
+          ? { ...l, points: smoothDrawingStroke(l.points) }
+          : l
+      )));
     }
+    activeStrokeRef.current = null;
 
     setIsDrawing(false);
 
@@ -1714,12 +2108,25 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
     }
   };
 
-  const handleExport = () => {
+  // Attached strokes per target, in drawing order.
+  const attachedLinesByTarget = new Map();
+  for (const line of lines) {
+    if (!line.attachedTo) continue;
+    const list = attachedLinesByTarget.get(line.attachedTo);
+    if (list) list.push(line);
+    else attachedLinesByTarget.set(line.attachedTo, [line]);
+  }
+
+  // background: 'transparent' | 'white' | 'black'
+  const handleExport = (background = 'transparent') => {
+    setExportMenuOpen(false);
+
     // Track export event
     trackEvent('creature_exported', {
       object_count: placedObjects.length,
       has_drawing: lines.length > 0,
       has_body: !!selectedBody,
+      background,
     });
 
     // The number of layers is dynamic: every drawing group renders in its own
@@ -1764,23 +2171,41 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
       uiLayer.hide();
     }
 
-    // Export with tight crop around actual content
-    const uri = stage.toDataURL({
-      pixelRatio: 3, // 3x resolution for crisp, high-quality export
-      mimeType: 'image/png', // PNG for lossless quality
-      x: exportX,
-      y: exportY,
-      width: exportWidth,
-      height: exportHeight,
-    });
+    // 3x resolution for crisp, high-quality export, reduced when zoomed in
+    // far enough that the canvas would pass browser size limits.
+    const pixelRatio = Math.min(3, 8000 / Math.max(exportWidth, exportHeight));
 
-    // Show UI layer again after export
-    if (uiLayer) {
-      uiLayer.show();
+    // Render with tight crop around actual content
+    let content;
+    try {
+      content = stage.toCanvas({
+        pixelRatio,
+        x: exportX,
+        y: exportY,
+        width: exportWidth,
+        height: exportHeight,
+      });
+    } finally {
+      // Show UI layer again after export
+      if (uiLayer) {
+        uiLayer.show();
+      }
     }
 
+    let output = content;
+    if (background !== 'transparent') {
+      output = document.createElement('canvas');
+      output.width = content.width;
+      output.height = content.height;
+      const ctx = output.getContext('2d');
+      ctx.fillStyle = background === 'black' ? '#000000' : '#ffffff';
+      ctx.fillRect(0, 0, output.width, output.height);
+      ctx.drawImage(content, 0, 0);
+    }
+    const uri = output.toDataURL('image/png'); // PNG for lossless quality
+
     const link = document.createElement('a');
-    link.download = 'my-creature.png';
+    link.download = background === 'transparent' ? 'my-creature.png' : `my-creature-${background}.png`;
     link.href = uri;
     document.body.appendChild(link);
     link.click();
@@ -2097,7 +2522,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                   }}
                   onClick={() => {
                     saveToHistory();
-                    setPlacedObjects(prev => prev.filter(o => o.id !== selectedId));
+                    removeObject(selectedId);
                     setSelectedId(null);
                   }}
                 >
@@ -2267,10 +2692,12 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                 background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
                 color: 'white',
               }}
-              onClick={handleExport}
+              onClick={() => setExportMenuOpen(open => !open)}
+              aria-expanded={exportMenuOpen}
             >
               💾 Export Image
             </button>
+            {exportMenuOpen && !isMobileLayout && <ExportOptions onExport={handleExport} />}
             <button
               className="w-full py-2 px-4 rounded-xl font-medium transition-all hover:scale-105"
               style={{
@@ -2348,10 +2775,12 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                       isSelected={obj.id === selectedId}
                       onSelect={() => setSelectedId(obj.id)}
                       onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
-                      onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
+                      onDelete={() => removeObject(obj.id)}
                       onTransformStart={handleTransformStart}
                       onDragStart={handleDragStart}
                       freeDrawMode={freeDrawMode}
+                      attachedLines={attachedLinesByTarget.get(obj.id)}
+                      onTargetChange={handleTargetChange}
                       stageSize={stageSize}
                       stageScale={stageScale}
                       stagePosition={stagePosition}
@@ -2368,20 +2797,30 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                     onClick={() => setSelectedId(null)}
                     stageSize={stageSize}
                     bodySizeMultiplier={bodySizeMultiplier}
+                    attachedLines={attachedLinesByTarget.get('body')}
+                    onTargetChange={handleTargetChange}
                   />
                 )}
               </Layer>
 
               {/* Above the body: objects (zIndex >= 0) and drawing groups
                   interleaved by zIndex. Each drawing group renders in its own
-                  Konva Layer (so the eraser scoping via destination-out only
-                  affects strokes within that group), with listening={false}
+                  Konva Layer (so destination-out erasing only affects drawn
+                  strokes, never objects), with listening={false}
                   so taps pass through to objects underneath. Consecutive
                   objects share a single layer for performance. */}
               {(() => {
-                // Collect drawing groups from the lines array.
+                // Collect drawing groups from the lines array, in drawing
+                // order. An eraseAll stroke joins every group that exists at
+                // that point, so it erases earlier strokes in every instance
+                // but not anything drawn after it.
                 const groupMap = new Map();
                 for (const line of lines) {
+                  if (line.attachedTo) continue;
+                  if (line.eraseAll) {
+                    for (const g of groupMap.values()) g.lines.push(line);
+                    continue;
+                  }
                   const id = line.groupId || 'legacy';
                   if (!groupMap.has(id)) {
                     groupMap.set(id, {
@@ -2449,10 +2888,12 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                           isSelected={obj.id === selectedId}
                           onSelect={() => setSelectedId(obj.id)}
                           onChange={(newAttrs) => handleObjectChange(obj.id, newAttrs)}
-                          onDelete={() => setPlacedObjects(placedObjects.filter(o => o.id !== obj.id))}
+                          onDelete={() => removeObject(obj.id)}
                           onTransformStart={handleTransformStart}
                           onDragStart={handleDragStart}
                           freeDrawMode={freeDrawMode}
+                          attachedLines={attachedLinesByTarget.get(obj.id)}
+                          onTargetChange={handleTargetChange}
                           stageSize={stageSize}
                           stageScale={stageScale}
                           stagePosition={stagePosition}
@@ -2918,8 +3359,55 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                         </Group>
                       </Group>
 
+                      {/* Stay inside lines toggle (pen only) */}
+                      <Group y={stageSize.width < 600 ? 30 : 34}>
+                        <Rect
+                          id="freedraw-inside"
+                          width={stageSize.width < 600 ? 110 : 125}
+                          height={stageSize.width < 600 ? 24 : 26}
+                          fill={stayInside
+                            ? currentTheme?.colors?.accentPrimary || '#ff9dda'
+                            : '#e5e7eb'}
+                          cornerRadius={8}
+                          onClick={() => { setStayInside(v => !v); setEraserMode(false); setFillMode(false); }}
+                          onTap={() => { setStayInside(v => !v); setEraserMode(false); setFillMode(false); }}
+                          onMouseEnter={(e) => {
+                            const container = e.target.getStage().container();
+                            container.style.cursor = 'pointer';
+                            e.target.to({
+                              shadowColor: stayInside ? (currentTheme?.colors?.accentPrimary || '#ff9dda') : '#9ca3af',
+                              shadowBlur: 15,
+                              shadowOpacity: 0.6,
+                              duration: 0.2
+                            });
+                          }}
+                          onMouseLeave={(e) => {
+                            const container = e.target.getStage().container();
+                            container.style.cursor = 'default';
+                            e.target.to({
+                              shadowBlur: 0,
+                              shadowOpacity: 0,
+                              duration: 0.2
+                            });
+                          }}
+                        />
+                        <Text
+                          text={stayInside ? '✓ Stay inside lines' : 'Stay inside lines'}
+                          fontSize={stageSize.width < 600 ? 9 : 10}
+                          fontFamily={currentFont}
+                          fontStyle="500"
+                          fill={stayInside ? 'white' : '#6b7280'}
+                          width={stageSize.width < 600 ? 110 : 125}
+                          height={stageSize.width < 600 ? 24 : 26}
+                          align="center"
+                          verticalAlign="middle"
+                          wrap="none"
+                          listening={false}
+                        />
+                      </Group>
+
                       {/* Brush size label and preview */}
-                      <Group y={stageSize.width < 600 ? 34 : 38}>
+                      <Group y={stageSize.width < 600 ? 62 : 68}>
                         <Text
                           text={`${eraserMode ? 'Eraser' : 'Brush'} Size: ${brushSize}px`}
                           fontSize={stageSize.width < 600 ? 9 : 10}
@@ -3106,7 +3594,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
         <MobileBottomSheet theme={currentTheme}>
           {/* Quick Actions now inside sheet header */}
           <MobileQuickActions
-            onExport={handleExport}
+            onExport={() => setExportMenuOpen(true)}
             onSave={handleSaveDesign}
             onUndo={handleUndo}
             onRedo={handleRedo}
@@ -3190,7 +3678,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                   onMoveToFront={() => handleMoveLayer('front')}
                   onMoveToBack={() => handleMoveLayer('back')}
                   onDelete={() => {
-                    setPlacedObjects(placedObjects.filter((o) => o.id !== selectedId));
+                    removeObject(selectedId);
                     setSelectedId(null);
                   }}
                   theme={currentTheme}
@@ -3198,6 +3686,15 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
               )}
             </div>
           </MobileBottomSheet>
+      )}
+
+      {isMobileLayout && exportMenuOpen && (
+        <ExportOptions
+          variant="modal"
+          theme={currentTheme}
+          onExport={handleExport}
+          onClose={() => setExportMenuOpen(false)}
+        />
       )}
     </motion.div>
   );
