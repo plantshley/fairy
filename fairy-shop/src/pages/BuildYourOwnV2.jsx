@@ -937,8 +937,8 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
   // touching stroke of the same color, across all drawing instances. Mutually
   // exclusive with the pen and eraser.
   const [fillMode, setFillMode] = useState(false);
-  // "Stay inside lines": pen strokes attach to the object/body they start on
-  // and are clipped to its shape. See the attached-drawing helpers above.
+  // "Stay inside lines": pen and eraser strokes attach to the object/body
+  // they start on and are clipped to its shape. See the attached-drawing helpers above.
   const [stayInside, setStayInside] = useState(false);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   // id ('body' or object id) -> target descriptor, kept current by BodyImage
@@ -1933,7 +1933,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
       const targets = attachTargetsRef.current;
       let newLines;
 
-      if (eraserMode) {
+      if (eraserMode && !stayInside) {
         // One world-space stroke erases every drawing instance drawn before
         // it, plus a local copy per attached drawing so strokes stuck to parts
         // are erased too (and the erased spot moves with the part).
@@ -1952,6 +1952,8 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
           });
         }
       } else if (stayInside) {
+        // Pen or eraser stroke confined to the part it starts on. An attached
+        // eraser only affects that part's attached drawing.
         const id = findTargetAt(x, y);
         if (!id) return; // Started outside every part: nothing to stay inside.
         const t = targets.get(id);
@@ -1959,7 +1961,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
           points: toLocal(t, x, y),
           color: currentColor,
           size: brushSize / targetScale(t),
-          eraser: false,
+          eraser: eraserMode,
           attachedTo: id,
           strokeId,
         }];
@@ -3359,7 +3361,7 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                         </Group>
                       </Group>
 
-                      {/* Stay inside lines toggle (pen only) */}
+                      {/* Stay inside lines toggle (pen and eraser) */}
                       <Group y={stageSize.width < 600 ? 30 : 34}>
                         <Rect
                           id="freedraw-inside"
@@ -3369,8 +3371,8 @@ export const BuildYourOwnV2 = ({ currentTheme, activeTab = 'build', onTabChange,
                             ? currentTheme?.colors?.accentPrimary || '#ff9dda'
                             : '#e5e7eb'}
                           cornerRadius={8}
-                          onClick={() => { setStayInside(v => !v); setEraserMode(false); setFillMode(false); }}
-                          onTap={() => { setStayInside(v => !v); setEraserMode(false); setFillMode(false); }}
+                          onClick={() => setStayInside(v => !v)}
+                          onTap={() => setStayInside(v => !v)}
                           onMouseEnter={(e) => {
                             const container = e.target.getStage().container();
                             container.style.cursor = 'pointer';

@@ -61,13 +61,21 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMo
   // pixel pages as the escape hatch back to the standard themes.
   const hideCreature = currentTheme?.layout === 'pixel' && activeTab === 'home';
 
+  // On the build page the creature sits top-left at every size, smaller so it
+  // clears the control panel. Under the pixel theme on desktop the in-page
+  // NavBar owns the top edge, so it stays bottom-right there.
+  const onBuild = activeTab === 'build';
+  const buildCorner = currentTheme?.layout === 'pixel'
+    ? 'top-2 left-2 lg:top-auto lg:left-auto lg:bottom-8 lg:right-8'
+    : 'top-2 left-2';
+
   return (
     <>
       {/* Corner creature button with speech bubble */}
       {!hideCreature && (
       <div className={`fixed z-50 ${
-        (activeTab === 'build' || activeTab === 'build-v2')
-          ? 'top-2 left-2 lg:top-auto lg:left-auto lg:bottom-8 lg:right-8'
+        onBuild
+          ? buildCorner
           : 'bottom-20 right-2 landscape:bottom-2 landscape:right-2 lg:bottom-8 lg:right-8'
       }`}>
         {/* Speech bubble - every tab except build, fades out after BUBBLE_DURATION_MS
@@ -122,7 +130,11 @@ export const ThemeSelector = ({ currentTheme, onThemeChange, activeTab, reduceMo
           <motion.img
             src={getModalCreature()}
             alt="Change theme"
-            className="w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 object-contain"
+            className={`object-contain ${
+              onBuild && currentTheme?.layout !== 'pixel'
+                ? 'w-16 h-16 sm:w-20 sm:h-20'
+                : 'w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32'
+            }`}
             animate={reduceMotion ? undefined : {
               y: [0, -8, 0],
               rotate: [0, 5, -5, 0],

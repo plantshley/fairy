@@ -19,7 +19,7 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, onO
   return (
     <>
       {/* Menu button - only shown on the build page. Sits in the top-right
-          corner, mirroring the BackgroundMusic toggle's left-3 inset. The image
+          corner with a right-3 inset. The image
           is decorative: the accessible name stays "Open navigation menu" so the
           house art never reads as a home link to assistive tech. */}
       <button
@@ -84,10 +84,10 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, onO
                   </motion.button>
                 ))}
 
-                {/* Mobile-only extras. The floating music toggle is hidden on
-                    the mobile build page (see App.jsx), so it moves in here. The
-                    menu stays open on toggle so the new state is visible. */}
-                <div className="lg:hidden">
+                {/* The floating music toggle is hidden on the build page (see
+                    App.jsx), so it moves in here. The menu stays open on toggle
+                    so the new state is visible. */}
+                <div>
                   <div
                     className="my-1 h-px"
                     style={{ backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }}
@@ -108,7 +108,7 @@ export const MobileNavigationMenu = ({ activeTab, onTabChange, currentTheme, onO
 
                   {onOpenAccessibility && (
                     <motion.button
-                      className="w-full px-3 py-2 rounded-xl font-bonbon text-sm transition-all text-left flex items-center gap-2"
+                      className="lg:hidden w-full px-3 py-2 rounded-xl font-bonbon text-sm transition-all text-left flex items-center gap-2"
                       style={{ color: 'var(--text-primary)' }}
                       onClick={() => {
                         setIsOpen(false);
