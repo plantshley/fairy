@@ -35,9 +35,9 @@ export const SHOP_CATEGORIES = [
 ];
 
 export const shopProducts = [
+  { slug: 'ginkgo-fairy',     title: 'Ginkgo Fairy Sylph',     price: '$35',   category: 'sylph',    kofiUrl: 'https://ko-fi.com/s/17677c8e4e' },
   { slug: 'amber-glow-butterfly',     title: 'Amber Glow Butterfly',     price: '$35',   category: 'tenshi',    kofiUrl: 'https://ko-fi.com/s/06bdce3346' },
   { slug: 'princess-polly',     title: 'Princess Polly Cream Cake',     price: '$35',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/019d649d5b' },
-
   { slug: 'franken-frootie',     title: 'Franken-Frootie',     price: '$30',   category: 'toodie',    kofiUrl: 'https://ko-fi.com/s/ca78e28068' },
   { slug: 'garnet-starlight-witch',     title: 'Garnet Starlight Witch',     price: '$70',   category: 'lovely',    kofiUrl: 'https://ko-fi.com/s/8c3edc4c85' },
   { slug: 'sunset-candy-spider',        title: 'Sunset Candy Spider',        price: '$40',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/44caf8c860' },
