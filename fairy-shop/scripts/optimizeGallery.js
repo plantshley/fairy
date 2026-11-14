@@ -12,8 +12,8 @@ const __dirname = path.dirname(__filename);
 // elsewhere, so we replace in place. Original mtimes are preserved because the
 // gallery manifest sorts most categories by mtime.
 //
-// After running this, re-run `npm run update-gallery` and commit both the
-// gallery folder and the regenerated manifest.
+// The gallery manifest is regenerated automatically at the end. Commit both
+// the gallery folder and src/galleryManifest.json.
 
 const GALLERY_DIR = path.join(__dirname, '..', 'public', 'gallery');
 const MAX_DIM = 1800;      // longest edge, px (no enlargement)
@@ -91,3 +91,8 @@ console.log('\n─── summary ───');
 console.log(`converted: ${stats.converted}   dropped: ${stats.dropped}   skipped: ${stats.skipped}   errors: ${stats.errors}`);
 console.log(`before:    ${(stats.bytesBefore / 1e6).toFixed(0)} MB`);
 console.log(`after:     ${(stats.bytesAfter / 1e6).toFixed(0)} MB (converted files only; dropped files removed)`);
+
+// File extensions changed, so the manifest must be rebuilt or the gallery 404s.
+// The generator runs on import.
+console.log('\n─── regenerating manifest ───');
+await import('./generateGalleryManifest.js');
