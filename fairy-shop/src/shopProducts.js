@@ -35,8 +35,10 @@ export const SHOP_CATEGORIES = [
 ];
 
 export const shopProducts = [
+  { slug: 'strawb-cream',     title: 'Soft Strawberry Cream Leggie Lovely',     price: '$45',   category: 'lovely',    kofiUrl: 'https://ko-fi.com/s/1e6275e604' },
+  { slug: 'carrot-cake',     title: 'Baby Bun Carrot Cake',     price: '$25',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/aa9368fffe' },
+
   { slug: 'psv-cake',     title: 'Pistachio Strawberry Velvet Cake',     price: '$40',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/80731d53fc' },
-  { slug: 'frutiger-jelly',     title: 'Frutiger Aero Jelly',     price: '$25',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/2f1266cc50' },
   { slug: 'ginkgo-fairy',     title: 'Ginkgo Fairy Sylph',     price: '$35',   category: 'sylph',    kofiUrl: 'https://ko-fi.com/s/17677c8e4e' },
   { slug: 'amber-glow-butterfly',     title: 'Amber Glow Butterfly',     price: '$35',   category: 'tenshi',    kofiUrl: 'https://ko-fi.com/s/06bdce3346' },
   { slug: 'princess-polly',     title: 'Princess Polly Cream Cake',     price: '$35',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/019d649d5b' },
