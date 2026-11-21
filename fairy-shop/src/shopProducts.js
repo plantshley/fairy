@@ -35,7 +35,7 @@ export const SHOP_CATEGORIES = [
 ];
 
 export const shopProducts = [
-  { slug: 'strawb-cream',     title: 'Soft Strawberry Cream Leggie Lovely',     price: '$45',   category: 'lovely',    kofiUrl: 'https://ko-fi.com/s/1e6275e604' },
+  { slug: 'strawb-cream',     title: 'Soft Strawberry Cream Leggie Lovely',     price: '$50',   category: 'lovely',    kofiUrl: 'https://ko-fi.com/s/1e6275e604' },
   { slug: 'carrot-cake',     title: 'Baby Bun Carrot Cake',     price: '$25',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/aa9368fffe' },
 
   { slug: 'psv-cake',     title: 'Pistachio Strawberry Velvet Cake',     price: '$40',   category: 'kirarin',    kofiUrl: 'https://ko-fi.com/s/80731d53fc' },
@@ -52,7 +52,7 @@ export const shopProducts = [
   { slug: 'star-bee',                   title: 'Bee a Star Frootie',         price: '$35',  category: 'toodie',    kofiUrl: 'https://ko-fi.com/s/8e7ba8f0ea' },
   { slug: 'vampire-rock-harpy',         title: 'Vampire Rock Harpy',         price: '$55',   category: 'harpy',    kofiUrl: 'https://ko-fi.com/s/58b54f21fa' },
   { slug: 'blip',                       title: 'Blip',                       price: '$55',   category: 'impy',         kofiUrl: 'https://ko-fi.com/s/8831030034' },
-  { slug: 'midnight-sun-lovely',        title: 'Midnight Sun Lovely',        price: '$50',   category: 'lovely',   kofiUrl: 'https://ko-fi.com/s/4dbbfc064d' },
+  { slug: 'midnight-sun-lovely',        title: 'Midnight Sun Lovely',        price: '$45',   category: 'lovely',   kofiUrl: 'https://ko-fi.com/s/4dbbfc064d' },
   { slug: 'coasters',                   title: 'Coasters',                   price: '$5',    category: '',         kofiUrl: 'https://ko-fi.com/s/01b13d856f' },
   { slug: 'mini-magnets',               title: 'Mini Magnets',               price: '$5',    category: 'yosei',         kofiUrl: 'https://ko-fi.com/s/95112971d4' },
   { slug: 'pan-pride-party',            title: 'Pan Party Kirarin',          price: '$40',   category: 'kirarin',  kofiUrl: 'https://ko-fi.com/s/ef6280c1df' },
